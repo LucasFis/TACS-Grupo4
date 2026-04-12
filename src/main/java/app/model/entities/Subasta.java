@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 @Getter
 @Setter
 public class Subasta {
+    private String id;
     private Usuario usuario;
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaCierre;

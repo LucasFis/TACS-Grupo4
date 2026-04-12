@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 public class Propuesta {
 
+  private String id;
   private Usuario usuarioOrigen;
   private Usuario usuarioDestino;
   private List<Figurita> figuritasOfrecidas;

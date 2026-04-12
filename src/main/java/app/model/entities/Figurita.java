@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 public class Figurita {
 
+  private String id;
+
   private Integer numero;
 
   private String jugador;
