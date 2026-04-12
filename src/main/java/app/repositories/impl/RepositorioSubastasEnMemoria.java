@@ -20,11 +20,6 @@ public class RepositorioSubastasEnMemoria implements RepositorioSubastas {
   }
 
   @Override
-  public List<Subasta> findAll() {
-    return new ArrayList<>(storage.values());
-  }
-
-  @Override
   public List<Subasta> findByUsuarioId(String userId) {
     return storage.values().stream()
         .filter(s -> s.getUsuario().getId().equals(userId))

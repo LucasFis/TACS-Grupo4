@@ -20,11 +20,6 @@ public class RepositorioPropuestasEnMemoria implements RepositorioPropuestas {
   }
 
   @Override
-  public List<Propuesta> findAll() {
-    return new ArrayList<>(storage.values());
-  }
-
-  @Override
   public List<Propuesta> findByOrigenId(String userId) {
     return storage.values().stream()
         .filter(p -> p.getUsuarioOrigen().getId().equals(userId))
