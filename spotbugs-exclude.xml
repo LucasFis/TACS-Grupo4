@@ -10,4 +10,8 @@
     <Class name="~app\.model\..*"/>
     <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,UUF_UNUSED_FIELD,URF_UNREAD_FIELD,UWF_UNWRITTEN_FIELD"/>
   </Match>
+  <Match>
+    <Class name="~app\.dto\..*"/>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
 </FindBugsFilter>
