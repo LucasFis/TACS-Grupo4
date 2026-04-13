@@ -12,22 +12,22 @@ import app.model.entities.Usuario;
 import app.repositories.RepositorioPropuestas;
 import app.repositories.RepositorioSubastas;
 import app.repositories.RepositorioUsuarios;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 @Component
-public class DataInitializer implements CommandLineRunner {
+public class InicializadorDeDatos implements CommandLineRunner {
 
     private final RepositorioUsuarios usuarios;
     private final RepositorioPropuestas propuestas;
     private final RepositorioSubastas subastas;
 
-    public DataInitializer(RepositorioUsuarios usuarios,
-                           RepositorioPropuestas propuestas,
-                           RepositorioSubastas subastas) {
+    public InicializadorDeDatos(RepositorioUsuarios usuarios,
+                                RepositorioPropuestas propuestas,
+                                RepositorioSubastas subastas) {
         this.usuarios = usuarios;
         this.propuestas = propuestas;
         this.subastas = subastas;
@@ -83,16 +83,13 @@ public class DataInitializer implements CommandLineRunner {
         Usuario matias = usuarios.findById("u-3");
 
         // Lucas le ofrece Messi a Sofía a cambio de Mbappé — PENDIENTE
-        propuestas.save(new Propuesta("p-1", lucas, sofia,
-                List.of(messi), mbappe, EstadoProceso.PENDIENTE));
+        propuestas.save(new Propuesta("p-1", lucas, sofia,  List.of(messi),     mbappe,  EstadoProceso.PENDIENTE));
 
         // Sofía le ofrece Griezmann a Matías a cambio de Vinicius — ACEPTADO
-        propuestas.save(new Propuesta("p-2", sofia, matias,
-                List.of(griezmann), vinicius, EstadoProceso.ACEPTADO));
+        propuestas.save(new Propuesta("p-2", sofia, matias, List.of(griezmann), vinicius, EstadoProceso.ACEPTADO));
 
         // Matías le ofrece Vinicius a Lucas a cambio de Di María — RECHAZADO
-        propuestas.save(new Propuesta("p-3", matias, lucas,
-                List.of(vinicius), diMaria, EstadoProceso.RECHAZADO));
+        propuestas.save(new Propuesta("p-3", matias, lucas, List.of(vinicius),  diMaria,  EstadoProceso.RECHAZADO));
     }
 
     private void cargarSubastas(Figurita griezmann, Figurita vinicius) {
@@ -101,14 +98,12 @@ public class DataInitializer implements CommandLineRunner {
 
         // Subasta activa: Sofía subasta Griezmann, cierra en 2 días
         subastas.save(new Subasta("s-1", sofia,
-                LocalDateTime.now().minusHours(1),
-                LocalDateTime.now().plusDays(2),
+                LocalDateTime.now().minusHours(1), LocalDateTime.now().plusDays(2),
                 griezmann, null));
 
         // Subasta vencida: Matías subastó Vinicius, ya cerró
         subastas.save(new Subasta("s-2", matias,
-                LocalDateTime.now().minusDays(3),
-                LocalDateTime.now().minusDays(1),
+                LocalDateTime.now().minusDays(3), LocalDateTime.now().minusDays(1),
                 vinicius, null));
     }
 }

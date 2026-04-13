@@ -4,8 +4,11 @@ import app.model.entities.Propuesta;
 import java.util.List;
 
 public interface RepositorioPropuestas {
-  Propuesta findById(String id);
-  List<Propuesta> findByOrigenId(String userId);
-  List<Propuesta> findByDestinoId(String userId);
-  void save(Propuesta propuesta);
+    // Propuestas enviadas
+    List<Propuesta> findByOrigenId(String userId);
+
+    // Propuestas recibidas
+    List<Propuesta> findByDestinoId(String userId);
+
+    void save(Propuesta propuesta);
 }

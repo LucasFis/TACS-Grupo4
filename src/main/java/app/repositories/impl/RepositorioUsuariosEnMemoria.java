@@ -9,15 +9,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RepositorioUsuariosEnMemoria implements RepositorioUsuarios {
 
-  private final Map<String, Usuario> storage = new HashMap<>();
+    private final Map<String, Usuario> storage = new HashMap<>();
 
-  @Override
-  public Usuario findById(String id) {
-    return storage.get(id);
-  }
+    @Override
+    public Usuario findById(String id) {
+        return storage.get(id);
+    }
 
-  @Override
-  public void save(Usuario usuario) {
-    storage.put(usuario.getId(), usuario);
-  }
+    @Override
+    public void save(Usuario usuario) {
+        storage.put(usuario.getId(), usuario);
+    }
 }
