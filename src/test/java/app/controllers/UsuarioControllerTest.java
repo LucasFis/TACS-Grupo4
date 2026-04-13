@@ -20,7 +20,7 @@ class UsuarioControllerTest {
 
     @Test
     void getOperaciones_usuarioExistente_retorna200ConDatos() throws Exception {
-        mockMvc.perform(get("/usuarios/u-1/operaciones"))
+        mockMvc.perform(get("/usuarios/1000/operaciones"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.figuritas_publicadas").isArray())
                 .andExpect(jsonPath("$.propuestas_enviadas").isArray())

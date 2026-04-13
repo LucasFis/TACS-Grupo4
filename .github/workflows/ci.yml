@@ -22,3 +22,6 @@ jobs:
 
       - name: Correr tests y validaciones
         run: mvn verify
+
+      - name: Verificar build de Docker
+        run: docker build -t tacs-g4 .

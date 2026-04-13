@@ -3,9 +3,10 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copiamos el pom, la configuración de SpotBugs y el código fuente
+# Copiamos el pom, la configuración de SpotBugs, la configuracion de lombok y el código fuente
 COPY pom.xml .
 COPY spotbugs-exclude.xml .
+COPY lombok.config .
 COPY src ./src
 
 # Compilamos, corremos tests y validaciones, y generamos el JAR
