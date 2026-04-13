@@ -72,7 +72,16 @@ public class UsuarioController {
                 }
             });
 
-            sugerencias.add(sugerencia);
+            if(!sugerencia.getFiguritasSugeridas().isEmpty()){
+                sugerencias.add(sugerencia);
+            }
+        });
+
+        sugerencias.forEach(sugerencia -> {
+            System.out.println("Usuario: " + sugerencia.getUsuarioSugerido().getNombre());
+            sugerencia.getFiguritasSugeridas().forEach(figurita -> {
+                System.out.println("Jugador: " + figurita.getJugador());
+            });
         });
 
         return ResponseEntity.ok(new TemporalDto("Sugerencias totales: " + sugerencias.size()));
