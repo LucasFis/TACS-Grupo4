@@ -23,10 +23,8 @@ import java.util.Map;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final RepositorioUsuarios usuarioRepositorio;
 
-    public UsuarioController(UsuarioService usuarioService, RepositorioUsuarios usuarioRepositorio) {
-        this.usuarioRepositorio = usuarioRepositorio;
+    public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
@@ -41,17 +39,9 @@ public class UsuarioController {
 
     @PostMapping("/{user_id}/calificaciones")
     public ResponseEntity<TemporalDto> calificarUsuario(@PathVariable String user_id, @RequestBody Map<String, Object> body) {
-
         try {
-            Usuario usuario = this.usuarioRepositorio.findById(user_id);
-            Integer calificacion = (Integer) body.get("calificacion");
-
-            usuario.getCalificaciones().add(calificacion);
-
-            this.usuarioRepositorio.save(usuario);
-
-
-            return ResponseEntity.ok(new TemporalDto("Nueva calificacion: " + usuario.getCalificacionMedia()));
+            Number calificacionMedia = this.usuarioService.agregarCalificacion((Integer) body.get("calificacion"), user_id);
+            return ResponseEntity.ok(new TemporalDto("Nueva calificacion: " + calificacionMedia));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new TemporalDto("Bad request: " + e.getMessage()));
         }
@@ -59,31 +49,12 @@ public class UsuarioController {
 
     @GetMapping("/{user_id}/sugerencias")
     public ResponseEntity<TemporalDto> getSugerencias(@PathVariable String user_id) {
-        Usuario usuarioObjetivo = this.usuarioRepositorio.findById(user_id);
-        List<Usuario> usuarios = this.usuarioRepositorio.findAll();
-        List<Sugerencia> sugerencias = new ArrayList<>();
+        try {
+            List<Sugerencia> sugerencias = this.usuarioService.getSugerencias(user_id);
 
-        usuarios.forEach(usuario -> {
-            Sugerencia sugerencia = new Sugerencia(usuario, new ArrayList<>());
-
-            usuario.getColeccion().getRepetidas().forEach(repetida -> {
-                if(usuarioObjetivo.getColeccion().getFaltantes().contains(repetida.getFigurita())){
-                    sugerencia.getFiguritasSugeridas().add(repetida.getFigurita());
-                }
-            });
-
-            if(!sugerencia.getFiguritasSugeridas().isEmpty()){
-                sugerencias.add(sugerencia);
-            }
-        });
-
-        sugerencias.forEach(sugerencia -> {
-            System.out.println("Usuario: " + sugerencia.getUsuarioSugerido().getNombre());
-            sugerencia.getFiguritasSugeridas().forEach(figurita -> {
-                System.out.println("Jugador: " + figurita.getJugador());
-            });
-        });
-
-        return ResponseEntity.ok(new TemporalDto("Sugerencias totales: " + sugerencias.size()));
+            return ResponseEntity.ok(new TemporalDto("Sugerencias totales: " + sugerencias.size()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new TemporalDto("Bad request: " + e.getMessage()));
+        }
     }
 }
