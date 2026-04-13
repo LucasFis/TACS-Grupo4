@@ -40,15 +40,21 @@ public class UsuarioController {
     }
 
     @PostMapping("/{user_id}/calificaciones")
-    public ResponseEntity<TemporalDto> calificarUsuario(@PathVariable String user_id, @RequestBody String calificacion) {
+    public ResponseEntity<TemporalDto> calificarUsuario(@PathVariable String user_id, @RequestBody Map<String, Object> body) {
 
-        Usuario usuario = this.usuarioRepositorio.findById(user_id);
+        try {
+            Usuario usuario = this.usuarioRepositorio.findById(user_id);
+            Integer calificacion = (Integer) body.get("calificacion");
 
-        usuario.getCalificaciones().add(Integer.parseInt(calificacion));
+            usuario.getCalificaciones().add(calificacion);
 
-        this.usuarioRepositorio.save(usuario);
+            this.usuarioRepositorio.save(usuario);
 
-        return ResponseEntity.ok(new TemporalDto("Nueva calificacion: " + usuario.getCalificacionMedia()));
+
+            return ResponseEntity.ok(new TemporalDto("Nueva calificacion: " + usuario.getCalificacionMedia()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new TemporalDto("Bad request: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/{user_id}/sugerencias")

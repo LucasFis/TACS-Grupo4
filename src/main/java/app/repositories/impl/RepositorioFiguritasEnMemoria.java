@@ -13,7 +13,12 @@ public class RepositorioFiguritasEnMemoria implements RepositorioFiguritas {
 
   @Override
   public Figurita findById(String id) {
-    return storage.get(id);
+    Figurita figurita = storage.get(id);
+
+    if(figurita == null) {
+      throw new RuntimeException("Figurita no encontrada");
+    }
+    return figurita;
   }
 
   @Override

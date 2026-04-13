@@ -55,34 +55,39 @@ public class SubastaController {
 
     @PostMapping("/{sub_id}/propuestas")
     public ResponseEntity<TemporalDto> ofertarEnSubasta(@PathVariable String sub_id, @RequestHeader("id") String id, @RequestBody Map<String,Object> body) {
-        Usuario usuarioOrigen = this.repoUser.findById(id);
-        Usuario usuarioDestino = this.repoUser.findById((String) body.get("usuarioId"));
-        Figurita figuritaBuscada = this.repoFigurita.findById((String) body.get("figuritaBuscadaId"));
-        List<Figurita> figuritasOfrecidas = new ArrayList<>();
+        try{
+            Usuario usuarioOrigen = this.repoUser.findById(id);
+            Usuario usuarioDestino = this.repoUser.findById((String) body.get("usuarioId"));
+            List<Figurita> figuritasOfrecidas = new ArrayList<>();
 
-        Subasta subasta = this.repoSubasta.findById(sub_id);
+            Subasta subasta = this.repoSubasta.findById(sub_id);
 
-        List<Object> rawFiguritasId = (ArrayList<Object>) body.get("figuritasOfrecidas");
+            Figurita figuritaBuscada = subasta.getFiguritaSubastada();
 
-        Boolean hayDuplicados = rawFiguritasId.size() != rawFiguritasId.stream().distinct().count();
-        Boolean esLaFiguritaSubastada = Objects.equals(figuritaBuscada.getId(), subasta.getFiguritaSubastada().getId());
+            List<Object> rawFiguritasId = (ArrayList<Object>) body.get("figuritasOfrecidas");
 
-        if (hayDuplicados || !esLaFiguritaSubastada) {
-            //El listado debe tener figuritas distintas
-            return ResponseEntity.badRequest().body(new TemporalDto("Bad request: hayDuplicado " + hayDuplicados + ", esLaFiguritaSubastada " + esLaFiguritaSubastada));
+            boolean hayDuplicados = rawFiguritasId.size() != rawFiguritasId.stream().distinct().count();
+            boolean esLaFiguritaSubastada = Objects.equals(figuritaBuscada.getId(), subasta.getFiguritaSubastada().getId());
+
+            if (hayDuplicados || !esLaFiguritaSubastada) {
+                //El listado debe tener figuritas distintas
+                return ResponseEntity.badRequest().body(new TemporalDto("Bad request: " + (hayDuplicados ? "Figuritas ofrecidas repetidas" :"No es la figurita subastada")));
+            }
+
+            rawFiguritasId.forEach(figuritaId -> {
+                Figurita figurita = this.repoFigurita.findById((String) figuritaId);
+                figuritasOfrecidas.add(figurita);
+            });
+
+            Propuesta nuevaPropuesta = new Propuesta(usuarioOrigen, usuarioDestino, figuritasOfrecidas, figuritaBuscada, EstadoProceso.PENDIENTE);
+
+            subasta.setPropuestaGanadora(nuevaPropuesta);
+
+            this.repoSubasta.save(subasta);
+
+            return ResponseEntity.ok(new TemporalDto("POST /subastas/" + sub_id + "/propuestas"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new TemporalDto("Bad request: "+ e.getMessage()));
         }
-
-        rawFiguritasId.forEach(figuritaId -> {
-            Figurita figurita = this.repoFigurita.findById((String) figuritaId);
-            figuritasOfrecidas.add(figurita);
-        });
-
-        Propuesta nuevaPropuesta = new Propuesta(usuarioOrigen, usuarioDestino, figuritasOfrecidas, figuritaBuscada, EstadoProceso.PENDIENTE);
-
-        subasta.setPropuestaGanadora(nuevaPropuesta);
-
-        this.repoSubasta.save(subasta);
-
-        return ResponseEntity.ok(new TemporalDto("POST /subastas/" + sub_id + "/propuestas"));
     }
 }

@@ -22,7 +22,11 @@ public class RepositorioSubastasEnMemoria implements RepositorioSubastas {
 
     @Override
     public Subasta findById(String id) {
-        return storage.get(id);
+        Subasta subasta = storage.get(id);
+        if (subasta == null) {
+            throw new RuntimeException("Subasta no encontrada");
+        }
+        return subasta;
     }
 
     @Override
