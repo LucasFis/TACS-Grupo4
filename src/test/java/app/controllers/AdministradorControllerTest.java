@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -17,8 +18,13 @@ class AdministradorControllerTest {
     MockMvc mockMvc;
 
     @Test
-    void getEstadisticasNoFalla() throws Exception {
-        mockMvc.perform(get("/administrador/estadisticas")).andExpect(status().isOk());
+    void getEstadisticas_retorna200ConDatos() throws Exception {
+        mockMvc.perform(get("/administrador/estadisticas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total_usuarios").isNumber())
+                .andExpect(jsonPath("$.total_figuritas_publicadas").isNumber())
+                .andExpect(jsonPath("$.total_propuestas").isNumber())
+                .andExpect(jsonPath("$.total_subastas_activas").isNumber());
     }
 
 }

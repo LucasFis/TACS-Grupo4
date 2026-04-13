@@ -6,5 +6,7 @@ import java.util.List;
 public interface RepositorioSubastas {
     List<Subasta> findByUsuarioId(String userId);
 
+    List<Subasta> findAll();
+
     void save(Subasta subasta);
 }

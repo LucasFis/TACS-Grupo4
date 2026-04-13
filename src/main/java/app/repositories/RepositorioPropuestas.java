@@ -10,5 +10,7 @@ public interface RepositorioPropuestas {
     // Propuestas recibidas
     List<Propuesta> findByDestinoId(String userId);
 
+    List<Propuesta> findAll();
+
     void save(Propuesta propuesta);
 }

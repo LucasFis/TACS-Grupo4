@@ -2,6 +2,7 @@ package app.repositories.impl;
 
 import app.model.entities.Propuesta;
 import app.repositories.RepositorioPropuestas;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,11 @@ public class RepositorioPropuestasEnMemoria implements RepositorioPropuestas {
         return storage.values().stream()
                 .filter(p -> p.getUsuarioDestino().getId().equals(userId))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Propuesta> findAll() {
+        return new ArrayList<>(storage.values());
     }
 
     @Override
