@@ -39,7 +39,7 @@ class SubastaControllerTest {
 
         String json = """
         {
-            "figuritaId": "figu123",
+            "figurita_id": "figu123",
             "duracion": 10
         }
         """;
@@ -75,9 +75,8 @@ class SubastaControllerTest {
 
         String json = """
     {
-        "usuarioId": "user1",
-        "figuritaBuscadaId": "figu123",
-        "figuritasOfrecidas": ["figu321","figu132"]
+        "usuario_id": "user1",
+        "figuritas_ofrecidas": ["figu321","figu132"]
     }
     """;
 

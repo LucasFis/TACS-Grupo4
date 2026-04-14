@@ -29,11 +29,16 @@ public class SubastaDto {
     this.duracion = duracion.toMinutes();
     this.figurita = subasta.getFiguritaSubastada();
     Propuesta propGanadora = subasta.getPropuestaGanadora();
-    List<Figurita> figuritasOfrecidasDom = new ArrayList<>(propGanadora.getFiguritasOfrecidas());
 
-    this.propuestaGanadora = new PropuestaDto(propGanadora.getId(),
-        propGanadora.getUsuarioOrigen().getId(), propGanadora.getUsuarioDestino().getId(),
-        propGanadora.getFiguritaBuscada().getId(),
-        figuritasOfrecidasDom.stream().map(Figurita::getId).toList(), propGanadora.getEstado());
+    if(propGanadora == null) {
+      this.propuestaGanadora = null;
+    }
+    else {
+      List<Figurita> figuritasOfrecidasDom = new ArrayList<>(propGanadora.getFiguritasOfrecidas());
+      this.propuestaGanadora = new PropuestaDto(propGanadora.getId(),
+          propGanadora.getUsuarioOrigen().getId(), propGanadora.getUsuarioDestino().getId(),
+          propGanadora.getFiguritaBuscada().getId(),
+          figuritasOfrecidasDom.stream().map(Figurita::getId).toList(), propGanadora.getEstado());
+    }
   }
 }

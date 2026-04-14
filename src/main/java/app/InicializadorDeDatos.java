@@ -11,6 +11,7 @@ import app.model.entities.Subasta;
 import app.model.entities.Usuario;
 import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioFiguritas;
+import app.repositories.RepositorioFiguritasIntercambiables;
 import app.repositories.RepositorioPropuestas;
 import app.repositories.RepositorioSubastas;
 import app.repositories.RepositorioUsuarios;
@@ -28,17 +29,20 @@ public class InicializadorDeDatos implements CommandLineRunner {
     private final RepositorioSubastas subastas;
     private final RepositorioFiguritas figuritas;
     private final RepositorioColecciones colecciones;
+    private final RepositorioFiguritasIntercambiables intercambiables;
 
     public InicializadorDeDatos(RepositorioUsuarios usuarios,
                                 RepositorioPropuestas propuestas,
                                 RepositorioSubastas subastas,
                                 RepositorioColecciones colecciones,
-                                RepositorioFiguritas figuritas) {
+                                RepositorioFiguritas figuritas,
+                                RepositorioFiguritasIntercambiables intercambiables) {
         this.usuarios = usuarios;
         this.propuestas = propuestas;
         this.subastas = subastas;
         this.colecciones = colecciones;
         this.figuritas = figuritas;
+        this.intercambiables = intercambiables;
     }
 
     @Override
@@ -67,32 +71,52 @@ public class InicializadorDeDatos implements CommandLineRunner {
                                 Figurita pedri, Figurita kroos) {
         // Lucas: tiene Messi y Di María repetidas, le falta Mbappé y Vinicius
         Coleccion coleccionLucas = new Coleccion();
-        coleccionLucas.getRepetidas().add(new FiguritaIntercambiable(messi,    3, List.of(MetodoIntercambio.INTERCAMBIO), "1000"));
-        coleccionLucas.getRepetidas().add(new FiguritaIntercambiable(diMaria,  2, List.of(MetodoIntercambio.INTERCAMBIO), "1000"));
+        coleccionLucas.setId("1");
+        FiguritaIntercambiable interMessi = new FiguritaIntercambiable(messi,    3, List.of(MetodoIntercambio.INTERCAMBIO), "1000");
+        coleccionLucas.getRepetidas().add(interMessi);
+        FiguritaIntercambiable interDiMaria = new FiguritaIntercambiable(diMaria, 2, List.of(MetodoIntercambio.SUBASTA),     "1000");
+        coleccionLucas.getRepetidas().add(interDiMaria);
         coleccionLucas.getFaltantes().add(mbappe);
         coleccionLucas.getFaltantes().add(vinicius);
+
+
+        intercambiables.save(interMessi);
+        intercambiables.save(interDiMaria);
+        colecciones.save(coleccionLucas);
         usuarios.save(new Usuario("1000", "Lucas",  coleccionLucas, "+5491100000001", new ArrayList<>()));
 
         // Sofía: tiene Mbappé y Griezmann repetidas, le falta Messi y Lautaro
         Coleccion coleccionSofia = new Coleccion();
-        coleccionSofia.getRepetidas().add(new FiguritaIntercambiable(mbappe,    2, List.of(MetodoIntercambio.INTERCAMBIO), "1001"));
-        coleccionSofia.getRepetidas().add(new FiguritaIntercambiable(griezmann, 1, List.of(MetodoIntercambio.SUBASTA),     "1001"));
+        coleccionSofia.setId("2");
+        FiguritaIntercambiable interMbappe = new FiguritaIntercambiable(mbappe, 2, List.of(MetodoIntercambio.INTERCAMBIO), "1001");
+        coleccionSofia.getRepetidas().add(interMbappe);
+        FiguritaIntercambiable interGriezmann = new FiguritaIntercambiable(griezmann, 1, List.of(MetodoIntercambio.SUBASTA),     "1001");
+        coleccionSofia.getRepetidas().add(interGriezmann);
         coleccionSofia.getFaltantes().add(messi);
         coleccionSofia.getFaltantes().add(lautaro);
+        intercambiables.save(interMbappe);
+        intercambiables.save(interGriezmann);
+        colecciones.save(coleccionSofia);
         usuarios.save(new Usuario("1001", "Sofía",  coleccionSofia, "+5491100000002", new ArrayList<>()));
 
         // Matías: tiene Vinicius repetido, le falta Pedri y Kroos
         Coleccion coleccionMatias = new Coleccion();
-        coleccionMatias.getRepetidas().add(new FiguritaIntercambiable(vinicius, 4, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA), "1002"));
+        coleccionMatias.setId("3");
+        FiguritaIntercambiable interVinicius = new FiguritaIntercambiable(vinicius, 1, List.of(MetodoIntercambio.INTERCAMBIO), "1002");
+        coleccionMatias.getRepetidas().add(interVinicius);
         coleccionMatias.getFaltantes().add(pedri);
         coleccionMatias.getFaltantes().add(kroos);
+        intercambiables.save(interVinicius);
+        colecciones.save(coleccionMatias);
         usuarios.save(new Usuario("1002", "Matías", coleccionMatias, "+5491100000003", new ArrayList<>()));
 
-        Coleccion coleccionJuan = new Coleccion("1");
-        coleccionJuan.getRepetidas().add(new FiguritaIntercambiable(vinicius, 4, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA), "1003"));
+        Coleccion coleccionJuan = new Coleccion();
+        coleccionJuan.setId("4");
+        FiguritaIntercambiable interPedri = new FiguritaIntercambiable(pedri, 1, List.of(MetodoIntercambio.INTERCAMBIO), "1003");
+        coleccionJuan.getRepetidas().add(interPedri);
         coleccionJuan.getFaltantes().add(pedri);
         coleccionJuan.getFaltantes().add(kroos);
-
+        intercambiables.save(interPedri);
         colecciones.save(coleccionJuan);
         usuarios.save(new Usuario("1003", "Juan", coleccionJuan, "+5491100000003", new ArrayList<>()));
     }

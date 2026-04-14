@@ -1,6 +1,7 @@
 package app.controllers;
 
 import app.dto.FiguritaIntercambiableDto;
+import app.dto.NotificacionesDto;
 import app.dto.OperacionesDto;
 import app.dto.SugerenciaDto;
 import app.dto.TemporalDto;
@@ -59,7 +60,7 @@ public class UsuarioController {
         return ResponseEntity.accepted().body(sugerenciasDto);
     }
     @GetMapping("/{user_id}/notificaciones")
-    public ResponseEntity<List<Notificacion>> getNotificaciones(@PathVariable String user_id) {
+    public ResponseEntity<List<NotificacionesDto>> getNotificaciones(@PathVariable String user_id) {
         return ResponseEntity.ok(this.usuarioService.getNotificaciones(user_id));
     }
 }

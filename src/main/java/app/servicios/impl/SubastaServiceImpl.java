@@ -2,6 +2,7 @@ package app.servicios.impl;
 
 import app.dto.SubastaDto;
 import app.dto.TemporalDto;
+import app.exceptions.BadRequestException;
 import app.model.entities.EstadoProceso;
 import app.model.entities.Figurita;
 import app.model.entities.Propuesta;
@@ -67,7 +68,7 @@ public class SubastaServiceImpl implements SubastaService {
 
     if (rawFiguritasId.size() != rawFiguritasId.stream().distinct().count()) {
       //El listado debe tener figuritas distintas
-      throw new RuntimeException("Figuritas ofrecidas repetidas");
+      throw new BadRequestException("Figuritas ofrecidas repetidas");
     }
 
     rawFiguritasId.forEach(figuritaId -> {

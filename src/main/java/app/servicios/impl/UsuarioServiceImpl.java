@@ -1,6 +1,7 @@
 package app.servicios.impl;
 
 import app.dto.FiguritaIntercambiableDto;
+import app.dto.NotificacionesDto;
 import app.dto.OperacionesDto;
 import app.dto.SugerenciaDto;
 import app.exceptions.BadRequestException;
@@ -125,9 +126,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         return sugerencias.stream().map(SugerenciaDto::new).toList();
     }
 
-    public List<Notificacion> getNotificaciones(String userId) {
+    public List<NotificacionesDto> getNotificaciones(String userId) {
         Usuario usuario = repositorioUsuarios.findById(userId);
 
-        return this.repositorioNotificaciones.buscarPorUsuario(usuario);
+        return this.repositorioNotificaciones.buscarPorUsuario(usuario).stream().map(NotificacionesDto::new).toList();
     }
 }

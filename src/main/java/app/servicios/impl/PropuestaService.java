@@ -1,4 +1,4 @@
-package app.servicios;
+package app.servicios.impl;
 
 import app.dto.PropuestaDto;
 import app.dto.request.CrearPropuestaRequest;
@@ -67,25 +67,25 @@ public class PropuestaService {
     return toDto(propuesta);
   }
   
-  public Propuesta obtenerPorId(String id) {
-        Propuesta propuesta = propuestas.get(id);
+//  public Propuesta obtenerPorId(String id) {
+//      Propuesta propuesta = this.repositorioPropuestas.findById(id);
+//
+//      if (propuesta == null) {
+//          throw new RuntimeException("Propuesta no encontrada");
+//      }
+//
+//      return propuesta;
+//  }
 
-        if (propuesta == null) {
-            throw new RuntimeException("Propuesta no encontrada");
-        }
-
-        return propuesta;
-    }
-
-    public void aceptar(String id) {
-        Propuesta propuesta = obtenerPorId(id);
-        propuesta.aceptar(propuesta.getUsuarioDestino());
-    }
-
-    public void rechazar(String id) {
-        Propuesta propuesta = obtenerPorId(id);
-        propuesta.rechazar(propuesta.getUsuarioDestino());
-    }
+//  public void aceptar(String id) {
+//      Propuesta propuesta = obtenerPorId(id);
+//      propuesta.aceptar(propuesta.getUsuarioDestino());
+//  }
+//
+//  public void rechazar(String id) {
+//      Propuesta propuesta = obtenerPorId(id);
+//      propuesta.rechazar(propuesta.getUsuarioDestino());
+//  }
 
   private PropuestaDto toDto(Propuesta p) {
     return new PropuestaDto(

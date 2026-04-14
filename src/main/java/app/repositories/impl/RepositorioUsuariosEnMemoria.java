@@ -1,5 +1,6 @@
 package app.repositories.impl;
 
+import app.exceptions.NotFoundException;
 import app.model.entities.Figurita;
 import app.model.entities.Usuario;
 import app.repositories.RepositorioUsuarios;
@@ -16,6 +17,9 @@ public class RepositorioUsuariosEnMemoria implements RepositorioUsuarios {
 
     @Override
     public Usuario findById(String id) {
+        if(!storage.containsKey(id)) {
+            throw new NotFoundException("Usuario no encontrado");
+        }
         return storage.get(id);
     }
 
