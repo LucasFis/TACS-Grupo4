@@ -8,6 +8,8 @@ public interface RepositorioSubastas {
 
     List<Subasta> findAll();
 
+    Subasta findById(String id);
+
     int count();
 
     void save(Subasta subasta);
