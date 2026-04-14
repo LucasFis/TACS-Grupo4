@@ -4,6 +4,8 @@ import app.model.entities.Figurita;
 import app.model.entities.Usuario;
 import java.util.List;
 
+import java.util.List;
+
 public interface RepositorioUsuarios {
 
     Usuario findById(String id);

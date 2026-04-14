@@ -9,11 +9,11 @@ import java.util.Map;
 
 @Repository
 public class RepositorioFiguritasEnMemoria implements RepositorioFiguritas {
-
   private final Map<String, Figurita> storage = new HashMap<>();
 
+  @Override
   public Figurita findById(String id) {
-    Figurita figurita = storage.values()
+      Figurita figurita = storage.values()
         .stream()
         .filter(c -> c.getId().equals(id))
         .findFirst().orElse(null);
@@ -27,5 +27,6 @@ public class RepositorioFiguritasEnMemoria implements RepositorioFiguritas {
 
   public void save(Figurita figurita) {
     this.storage.put(figurita.getId(), figurita);
+
   }
 }

@@ -44,7 +44,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         List<FiguritaIntercambiable> figuritasPublicadas = usuario.getColeccion().getRepetidas();
 
-        List<Propuesta> enviadas  = repositorioPropuestas.findByOrigenId(userId);
+        List<Propuesta> enviadas = repositorioPropuestas.findByOrigenId(userId);
         List<Propuesta> recibidas = repositorioPropuestas.findByDestinoId(userId);
 
         List<Subasta> subastasActivas = repositorioSubastas.findByUsuarioId(userId)
