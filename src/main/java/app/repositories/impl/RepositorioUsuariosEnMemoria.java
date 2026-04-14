@@ -24,6 +24,11 @@ public class RepositorioUsuariosEnMemoria implements RepositorioUsuarios {
     }
 
     @Override
+    public int count() {
+        return storage.size();
+    }
+
+    @Override
     public void save(Usuario usuario) {
         storage.put(usuario.getId(), usuario);
     }

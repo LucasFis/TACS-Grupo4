@@ -12,5 +12,7 @@ public interface RepositorioPropuestas {
 
     List<Propuesta> findAll();
 
+    int count();
+
     void save(Propuesta propuesta);
 }

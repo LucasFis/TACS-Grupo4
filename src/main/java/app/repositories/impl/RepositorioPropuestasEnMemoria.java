@@ -34,6 +34,11 @@ public class RepositorioPropuestasEnMemoria implements RepositorioPropuestas {
     }
 
     @Override
+    public int count() {
+        return storage.size();
+    }
+
+    @Override
     public void save(Propuesta propuesta) {
         storage.put(propuesta.getId(), propuesta);
     }

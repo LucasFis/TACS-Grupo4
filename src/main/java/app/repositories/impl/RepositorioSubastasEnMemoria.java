@@ -27,6 +27,11 @@ public class RepositorioSubastasEnMemoria implements RepositorioSubastas {
     }
 
     @Override
+    public int count() {
+        return storage.size();
+    }
+
+    @Override
     public void save(Subasta subasta) {
         storage.put(subasta.getId(), subasta);
     }

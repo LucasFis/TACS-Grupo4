@@ -8,5 +8,7 @@ public interface RepositorioSubastas {
 
     List<Subasta> findAll();
 
+    int count();
+
     void save(Subasta subasta);
 }

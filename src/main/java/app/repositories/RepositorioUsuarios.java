@@ -9,5 +9,7 @@ public interface RepositorioUsuarios {
 
     List<Usuario> findAll();
 
+    int count();
+
     void save(Usuario usuario);
 }
