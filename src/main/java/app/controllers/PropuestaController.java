@@ -12,13 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-@RequiredArgsConstructor
 
 @RestController
 @RequestMapping("/propuestas")
 public class PropuestaController {
-    private final PropuestaService propuestaService;
-
     private final PropuestaService propuestaService;
 
     public PropuestaController(PropuestaService propuestaService) {
@@ -31,14 +28,14 @@ public class PropuestaController {
     }
 
     @PatchMapping("/{prop_id}/aceptar")
-    public ResponseEntity<TemporalDto> aceptar(@PathVariable String prop_id) {
+    public ResponseEntity<?> aceptar(@PathVariable String prop_id) {
         propuestaService.aceptar(prop_id);
-        return ResponseEntity.ok(new TemporalDto("Propuesta " + prop_id + " aceptada"));
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{prop_id}/rechazar")
-    public ResponseEntity<TemporalDto> rechazar(@PathVariable String prop_id) {
+    public ResponseEntity<?> rechazar(@PathVariable String prop_id) {
         propuestaService.rechazar(prop_id);
-        return ResponseEntity.ok(new TemporalDto("Propuesta " + prop_id + " rechazada"));
+        return ResponseEntity.noContent().build();
     }
 }

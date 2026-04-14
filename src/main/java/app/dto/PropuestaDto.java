@@ -14,4 +14,6 @@ public class PropuestaDto {
   private String figuritaBuscadaId;
   private List<String> figuritasOfrocidasIds;
   private EstadoProceso estado;
+
+
 }

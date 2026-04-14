@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.dto.SubastaDto;
 import app.dto.TemporalDto;
 import app.model.entities.EstadoProceso;
 import app.model.entities.Figurita;
@@ -34,32 +35,24 @@ public class SubastaController {
     }
 
     @PostMapping
-    public ResponseEntity<TemporalDto> crearSubasta(@RequestHeader("id") String id, @RequestBody Map<String,Object> body) {
-        try {
-            String figuritaId = (String) body.get("figuritaId");
-            LocalDateTime fechaInicio =  LocalDateTime.now();
-            Number duracion = (Number) body.get("duracion");
-            LocalDateTime fechaFin = fechaInicio.plusMinutes(duracion.longValue());
+    public ResponseEntity<SubastaDto> crearSubasta(@RequestHeader("id") String id, @RequestBody Map<String,Object> body) {
+        String figuritaId = (String) body.get("figuritaId");
+        LocalDateTime fechaInicio =  LocalDateTime.now();
+        Number duracion = (Number) body.get("duracion");
+        LocalDateTime fechaFin = fechaInicio.plusMinutes(duracion.longValue());
 
-            Subasta nuevaSubasta = this.subastaService.crearSubasta(id, fechaInicio, fechaFin, figuritaId, null);
+        SubastaDto subastaDto = this.subastaService.crearSubasta(id, fechaInicio, fechaFin, figuritaId, null);
 
-            return ResponseEntity.ok(new TemporalDto("POST /subastas, Id: " + nuevaSubasta.getId() + " (Sin DB no hay ID)"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new TemporalDto("Bad request: " + e.getMessage()));
-        }
+        return ResponseEntity.ok(subastaDto);
     }
 
     @PostMapping("/{sub_id}/propuestas")
-    public ResponseEntity<TemporalDto> ofertarEnSubasta(@PathVariable String sub_id, @RequestHeader("id") String id, @RequestBody Map<String,Object> body) {
-        try{
-            String usuarioDestino = (String) body.get("usuarioId");
-            List<Object> rawFiguritasId = (ArrayList<Object>) body.get("figuritasOfrecidas");
+    public ResponseEntity<SubastaDto> ofertarEnSubasta(@PathVariable String sub_id, @RequestHeader("id") String id, @RequestBody Map<String,Object> body) {
+        String usuarioDestino = (String) body.get("usuarioId");
+        List<Object> rawFiguritasId = (ArrayList<Object>) body.get("figuritasOfrecidas");
 
-            boolean esGanadora = this.subastaService.ofertarEnSubasta(id, usuarioDestino, sub_id, rawFiguritasId);
+        SubastaDto subastaDto = this.subastaService.ofertarEnSubasta(id, usuarioDestino, sub_id, rawFiguritasId);
 
-            return ResponseEntity.ok(new TemporalDto("POST /subastas/" + sub_id + "/propuestas, tu propuesta es: " + (esGanadora ? "ganadora" : "perdedora")));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new TemporalDto("Bad request: "+ e.getMessage()));
-        }
+        return ResponseEntity.accepted().body(subastaDto);
     }
 }

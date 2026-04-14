@@ -1,5 +1,6 @@
 package app.servicios.impl;
 
+import app.dto.SubastaDto;
 import app.dto.TemporalDto;
 import app.model.entities.EstadoProceso;
 import app.model.entities.Figurita;
@@ -37,8 +38,8 @@ public class SubastaServiceImpl implements SubastaService {
   }
 
   @Override
-  public Subasta crearSubasta(String userId, LocalDateTime fechaInicio, LocalDateTime fechaFin,
-                              String figuritaId, Propuesta propuestaGanadora) {
+  public SubastaDto crearSubasta(String userId, LocalDateTime fechaInicio, LocalDateTime fechaFin,
+                                 String figuritaId, Propuesta propuestaGanadora) {
     Usuario usuario = this.repoUsuario.findById(userId);
     Figurita figuritaSubastada = this.repoFigurita.findById(figuritaId);
     Subasta nuevaSubasta = new Subasta(
@@ -51,11 +52,11 @@ public class SubastaServiceImpl implements SubastaService {
 
     this.notificacionService.notificarInteresados(interesados,"Encontramos una subasta de una figurita que te falta!");
 
-    return nuevaSubasta;
+    return new SubastaDto(nuevaSubasta);
   }
 
   @Override
-  public boolean ofertarEnSubasta(String userId, String usuarioDestinoId,
+  public SubastaDto ofertarEnSubasta(String userId, String usuarioDestinoId,
                                String subastaId, List<Object> rawFiguritasId) {
     Usuario usuarioOrigen = this.repoUsuario.findById(userId);
     Usuario usuarioDestino = this.repoUsuario.findById(usuarioDestinoId);
@@ -82,7 +83,6 @@ public class SubastaServiceImpl implements SubastaService {
 
     this.repoSubasta.save(subasta);
 
-    //TODO: Aca verificar con id en persistencia real.
-    return Objects.equals(nuevaPropuesta, subasta.getPropuestaGanadora());
+    return new SubastaDto(subasta);
   }
 }

@@ -2,6 +2,8 @@ package app.servicios.impl;
 
 import app.dto.FiguritaIntercambiableDto;
 import app.dto.OperacionesDto;
+import app.dto.SugerenciaDto;
+import app.exceptions.BadRequestException;
 import app.exceptions.NotFoundException;
 import app.model.entities.FiguritaIntercambiable;
 import app.model.entities.Propuesta;
@@ -88,10 +90,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = this.repositorioUsuarios.findById(userId);
 
         if(calificacion == null) {
-            throw new RuntimeException("La calificacion no puede ser nula");
+            throw new BadRequestException("La calificacion no puede ser nula");
         }
         if(calificacion < 0 || calificacion > 10) {
-            throw new RuntimeException("La calificacion debe estar entre 0 y 10");
+            throw new BadRequestException("La calificacion debe estar entre 0 y 10");
         }
 
         usuario.getCalificaciones().add(calificacion);
@@ -101,7 +103,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public List<Sugerencia> getSugerencias(String userId) {
+    public List<SugerenciaDto> getSugerencias(String userId) {
         Usuario usuarioObjetivo = this.repositorioUsuarios.findById(userId);
         List<Usuario> usuarios = this.repositorioUsuarios.findAll();
         List<Sugerencia> sugerencias = new ArrayList<>();
@@ -120,7 +122,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             }
         });
 
-        return sugerencias;
+        return sugerencias.stream().map(SugerenciaDto::new).toList();
     }
 
     public List<Notificacion> getNotificaciones(String userId) {
