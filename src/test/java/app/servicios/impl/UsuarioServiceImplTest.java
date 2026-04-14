@@ -10,6 +10,7 @@ import app.model.entities.FiguritaIntercambiable;
 import app.model.entities.Propuesta;
 import app.model.entities.Seleccion;
 import app.model.entities.Subasta;
+import app.model.entities.Sugerencia;
 import app.model.entities.Usuario;
 import app.repositories.RepositorioFiguritasIntercambiables;
 import app.repositories.RepositorioNotificaciones;
@@ -150,5 +151,30 @@ class UsuarioServiceImplTest {
         verify(repositorioUsuarios).save(usuario);
     }
 
+    @Test
+    void getSugerencias_conCoincidencias_retornaSugerencias() {
+        // figurita
+        Figurita messi = new Figurita("ARG-10", 10, "Messi", Seleccion.ARGENTINA);
+
+        // usuario objetivo (le falta messi)
+        Coleccion coleccionObjetivo = new Coleccion();
+        coleccionObjetivo.getFaltantes().add(messi);
+        Usuario objetivo = new Usuario("u-1", "Lucas", coleccionObjetivo, "+54911", new ArrayList<>());
+
+        // usuario que tiene repetida a messi
+        Coleccion coleccionOtro = new Coleccion();
+        coleccionOtro.getRepetidas().add(
+            new FiguritaIntercambiable(messi, 1, new ArrayList<>(), "u-2")
+        );
+        Usuario otro = new Usuario("u-2", "Sofía", coleccionOtro, "+54911", new ArrayList<>());
+
+        when(repositorioUsuarios.findById("u-1")).thenReturn(objetivo);
+        when(repositorioUsuarios.findAll()).thenReturn(List.of(objetivo, otro));
+
+        List<Sugerencia> resultado = service.getSugerencias("u-1");
+
+        assertEquals(1, resultado.size());
+        assertEquals(1, resultado.get(0).getFiguritasSugeridas().size());
+    }
 
 }

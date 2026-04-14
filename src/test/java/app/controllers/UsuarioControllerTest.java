@@ -61,4 +61,11 @@ class UsuarioControllerTest {
         mockMvc.perform(get("/usuarios/u-99/intercambiables"))
             .andExpect(status().isNotFound());
     }
+
+    @Test
+    void getSugerencias_usuarioExistente_retorna200() throws Exception {
+        mockMvc.perform(get("/usuarios/1000/sugerencias"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray());
+    }
 }
