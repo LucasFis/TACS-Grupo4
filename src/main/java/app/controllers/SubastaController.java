@@ -9,6 +9,7 @@ import app.model.entities.Usuario;
 import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioSubastas;
 import app.repositories.RepositorioUsuarios;
+import app.servicios.SubastaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,66 +27,37 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/subastas")
 public class SubastaController {
-    private RepositorioUsuarios repoUser;
-    private RepositorioSubastas repoSubasta;
-    private RepositorioFiguritas repoFigurita;
+    private SubastaService subastaService;
 
-    SubastaController(RepositorioUsuarios repoUser, RepositorioSubastas repoSubasta, RepositorioFiguritas repoFigurita) {
-        this.repoUser = repoUser;
-        this.repoSubasta = repoSubasta;
-        this.repoFigurita = repoFigurita;
+    SubastaController(SubastaService subastaService) {
+        this.subastaService = subastaService;
     }
 
     @PostMapping
     public ResponseEntity<TemporalDto> crearSubasta(@RequestHeader("id") String id, @RequestBody Map<String,Object> body) {
-        Usuario usuario = this.repoUser.findById(id);
-        Figurita figuritaSubastada = this.repoFigurita.findById((String) body.get("figuritaId"));
+        try {
+            String figuritaId = (String) body.get("figuritaId");
+            LocalDateTime fechaInicio =  LocalDateTime.now();
+            Number duracion = (Number) body.get("duracion");
+            LocalDateTime fechaFin = fechaInicio.plusMinutes(duracion.longValue());
 
-        LocalDateTime fechaInicio =  LocalDateTime.now();
+            Subasta nuevaSubasta = this.subastaService.crearSubasta(id, fechaInicio, fechaFin, figuritaId, null);
 
-        Number duracion = (Number) body.get("duracion");
-        LocalDateTime fechaFin = fechaInicio.plusMinutes(duracion.longValue());
-
-        Subasta nuevaSubasta = new Subasta(usuario, fechaInicio, fechaFin, figuritaSubastada, null);
-
-        this.repoSubasta.save(nuevaSubasta);
-
-        return ResponseEntity.ok(new TemporalDto("POST /subastas"));
+            return ResponseEntity.ok(new TemporalDto("POST /subastas, Id: " + nuevaSubasta.getId() + " (Sin DB no hay ID)"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new TemporalDto("Bad request: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/{sub_id}/propuestas")
     public ResponseEntity<TemporalDto> ofertarEnSubasta(@PathVariable String sub_id, @RequestHeader("id") String id, @RequestBody Map<String,Object> body) {
         try{
-            Usuario usuarioOrigen = this.repoUser.findById(id);
-            Usuario usuarioDestino = this.repoUser.findById((String) body.get("usuarioId"));
-            List<Figurita> figuritasOfrecidas = new ArrayList<>();
-
-            Subasta subasta = this.repoSubasta.findById(sub_id);
-
-            Figurita figuritaBuscada = subasta.getFiguritaSubastada();
-
+            String usuarioDestino = (String) body.get("usuarioId");
             List<Object> rawFiguritasId = (ArrayList<Object>) body.get("figuritasOfrecidas");
 
-            boolean hayDuplicados = rawFiguritasId.size() != rawFiguritasId.stream().distinct().count();
-            boolean esLaFiguritaSubastada = Objects.equals(figuritaBuscada.getId(), subasta.getFiguritaSubastada().getId());
+            boolean esGanadora = this.subastaService.ofertarEnSubasta(id, usuarioDestino, sub_id, rawFiguritasId);
 
-            if (hayDuplicados || !esLaFiguritaSubastada) {
-                //El listado debe tener figuritas distintas
-                return ResponseEntity.badRequest().body(new TemporalDto("Bad request: " + (hayDuplicados ? "Figuritas ofrecidas repetidas" :"No es la figurita subastada")));
-            }
-
-            rawFiguritasId.forEach(figuritaId -> {
-                Figurita figurita = this.repoFigurita.findById((String) figuritaId);
-                figuritasOfrecidas.add(figurita);
-            });
-
-            Propuesta nuevaPropuesta = new Propuesta(usuarioOrigen, usuarioDestino, figuritasOfrecidas, figuritaBuscada, EstadoProceso.PENDIENTE);
-
-            subasta.setPropuestaGanadora(nuevaPropuesta);
-
-            this.repoSubasta.save(subasta);
-
-            return ResponseEntity.ok(new TemporalDto("POST /subastas/" + sub_id + "/propuestas"));
+            return ResponseEntity.ok(new TemporalDto("POST /subastas/" + sub_id + "/propuestas, tu propuesta es: " + (esGanadora ? "ganadora" : "perdedora")));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new TemporalDto("Bad request: "+ e.getMessage()));
         }

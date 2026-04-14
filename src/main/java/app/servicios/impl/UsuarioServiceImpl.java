@@ -54,6 +54,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Number agregarCalificacion(Integer calificacion, String userId) {
         Usuario usuario = this.repositorioUsuarios.findById(userId);
 
+        if(calificacion == null) {
+            throw new RuntimeException("La calificacion no puede ser nula");
+        }
+        if(calificacion < 0 || calificacion > 10) {
+            throw new RuntimeException("La calificacion debe estar entre 0 y 10");
+        }
+
         usuario.getCalificaciones().add(calificacion);
 
         this.repositorioUsuarios.save(usuario);
@@ -78,13 +85,6 @@ public class UsuarioServiceImpl implements UsuarioService {
             if(!sugerencia.getFiguritasSugeridas().isEmpty()){
                 sugerencias.add(sugerencia);
             }
-        });
-
-        sugerencias.forEach(sugerencia -> {
-            System.out.println("Usuario: " + sugerencia.getUsuarioSugerido().getNombre());
-            sugerencia.getFiguritasSugeridas().forEach(figurita -> {
-                System.out.println("Jugador: " + figurita.getJugador());
-            });
         });
 
         return sugerencias;

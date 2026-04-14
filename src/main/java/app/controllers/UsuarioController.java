@@ -48,11 +48,11 @@ public class UsuarioController {
     }
 
     @GetMapping("/{user_id}/sugerencias")
-    public ResponseEntity<TemporalDto> getSugerencias(@PathVariable String user_id) {
+    public ResponseEntity<?> getSugerencias(@PathVariable String user_id) {
         try {
             List<Sugerencia> sugerencias = this.usuarioService.getSugerencias(user_id);
 
-            return ResponseEntity.ok(new TemporalDto("Sugerencias totales: " + sugerencias.size()));
+            return ResponseEntity.ok(sugerencias); //TODO: Falta DTO, envio mucha informacion del usuario sugerido
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new TemporalDto("Bad request: " + e.getMessage()));
         }
