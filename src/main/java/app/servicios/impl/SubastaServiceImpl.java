@@ -10,6 +10,7 @@ import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioPropuestas;
 import app.repositories.RepositorioSubastas;
 import app.repositories.RepositorioUsuarios;
+import app.servicios.NotificacionService;
 import app.servicios.SubastaService;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -19,16 +20,20 @@ import java.util.Objects;
 
 @Service
 public class SubastaServiceImpl implements SubastaService {
-  private RepositorioSubastas repoSubasta;
-  private RepositorioUsuarios repoUsuario;
-  private RepositorioFiguritas repoFigurita;
-  private RepositorioPropuestas repoPropuesta;
+  private final RepositorioSubastas repoSubasta;
+  private final RepositorioUsuarios repoUsuario;
+  private final RepositorioFiguritas repoFigurita;
+  private final RepositorioPropuestas repoPropuesta;
+  private final NotificacionService notificacionService;
 
-  public SubastaServiceImpl(RepositorioSubastas repoSubasta, RepositorioUsuarios repoUsuario, RepositorioFiguritas repoFigurita, RepositorioPropuestas repoPropuesta) {
+  public SubastaServiceImpl(RepositorioSubastas repoSubasta, RepositorioUsuarios repoUsuario,
+                            RepositorioFiguritas repoFigurita, RepositorioPropuestas repoPropuesta,
+                            NotificacionService notificacionService) {
     this.repoSubasta = repoSubasta;
     this.repoUsuario = repoUsuario;
     this.repoFigurita = repoFigurita;
     this.repoPropuesta = repoPropuesta;
+    this.notificacionService = notificacionService;
   }
 
   @Override
@@ -41,6 +46,11 @@ public class SubastaServiceImpl implements SubastaService {
         figuritaSubastada, propuestaGanadora);
 
     this.repoSubasta.save(nuevaSubasta);
+
+    List<Usuario> interesados = this.repoUsuario.buscarPorFiguritaFaltante(nuevaSubasta.getFiguritaSubastada());
+
+    this.notificacionService.notificarInteresados(interesados,"Encontramos una subasta de una figurita que te falta!");
+
     return nuevaSubasta;
   }
 
@@ -71,8 +81,6 @@ public class SubastaServiceImpl implements SubastaService {
     subasta.algoritmoSeleccionador(nuevaPropuesta);
 
     this.repoSubasta.save(subasta);
-
-    System.out.println("La subasta tiene " + subasta.getPropuestaGanadora() + " propuesta ganadora");
 
     //TODO: Aca verificar con id en persistencia real.
     return Objects.equals(nuevaPropuesta, subasta.getPropuestaGanadora());

@@ -21,5 +21,4 @@ public class PropuestaController {
     public ResponseEntity<TemporalDto> responderPropuesta(@PathVariable String prop_id) {
         return ResponseEntity.ok(new TemporalDto("PATCH /propuestas/" + prop_id));
     }
-
 }

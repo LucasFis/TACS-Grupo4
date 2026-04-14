@@ -15,7 +15,7 @@ public class NotificacionService {
 
   private final RepositorioNotificaciones repositorioNotificaciones;
 
-  NotificacionService(RepositorioNotificaciones repositorioNotificaciones) {
+  public NotificacionService(RepositorioNotificaciones repositorioNotificaciones) {
     this.repositorioNotificaciones = repositorioNotificaciones;
   }
 
