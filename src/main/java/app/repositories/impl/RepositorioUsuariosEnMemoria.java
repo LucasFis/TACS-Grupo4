@@ -30,6 +30,8 @@ public class RepositorioUsuariosEnMemoria implements RepositorioUsuarios {
 
     @Override
     public void save(Usuario usuario) {
-        storage.put(usuario.getId(), usuario);
+        if(!storage.containsKey(usuario.getId())) {
+            storage.put(usuario.getId(), usuario);
+        }
     }
 }

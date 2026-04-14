@@ -14,4 +14,11 @@ public class Usuario {
     private Coleccion coleccion;
     private String telefono;
     private List<Integer> calificaciones;
+
+    public Float getCalificacionMedia() {
+        return (float) calificaciones.stream()
+            .mapToInt(Integer::intValue)
+            .average()
+            .orElse(0.0);
+    }
 }
