@@ -33,10 +33,10 @@ class RepositorioSubastasEnMemoriaTest {
         Subasta s2 = new Subasta("s-2", u2,
                 LocalDateTime.now().minusHours(1), LocalDateTime.now().plusDays(2),
                 null, null);
-        repositorio.save(s1);
-        repositorio.save(s2);
+        repositorio.guardar(s1);
+        repositorio.guardar(s2);
 
-        List<Subasta> resultado = repositorio.findByUsuarioId("u-1");
+        List<Subasta> resultado = repositorio.buscarPorUsuarioId("u-1");
 
         assertEquals(1, resultado.size());
         assertEquals("s-1", resultado.get(0).getId());
@@ -44,6 +44,6 @@ class RepositorioSubastasEnMemoriaTest {
 
     @Test
     void findByUsuarioId_sinResultados_retornaListaVacia() {
-        assertTrue(repositorio.findByUsuarioId("u-99").isEmpty());
+        assertTrue(repositorio.buscarPorUsuarioId("u-99").isEmpty());
     }
 }

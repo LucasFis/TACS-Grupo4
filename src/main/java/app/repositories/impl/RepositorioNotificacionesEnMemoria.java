@@ -15,7 +15,7 @@ public class RepositorioNotificacionesEnMemoria implements RepositorioNotificaci
   private final Map<String, Notificacion> storage = new HashMap<>();
 
   @Override
-  public void save(Notificacion notificacion) {
+  public void guardar(Notificacion notificacion) {
     if (storage.containsKey(notificacion.getId())) {
       storage.put(notificacion.getId(), notificacion);
       return;

@@ -34,11 +34,11 @@ public class FiguritaService implements IFiguritaService {
     return repositorioIntercambiables
         .buscarPorFiguritaIds(idsFiltrados)
         .stream()
-        .map(this::toDto)
+        .map(this::aDto)
         .toList();
   }
 
-  private FiguritaIntercambiableDto toDto(FiguritaIntercambiable fi) {
+  private FiguritaIntercambiableDto aDto(FiguritaIntercambiable fi) {
     return new FiguritaIntercambiableDto(
         fi.getFigurita().getId(),
         fi.getFigurita().getNumero(),

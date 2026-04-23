@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface RepositorioUsuarios {
 
-    Usuario findById(String id);
+    Usuario buscarPorId(String id);
 
-    List<Usuario> findAll();
+    List<Usuario> buscarTodos();
 
-    int count();
+    int contar();
 
     List<Usuario> buscarPorFiguritaFaltante(Figurita figurita);
 
-    void save(Usuario usuario);
+    void guardar(Usuario usuario);
 }

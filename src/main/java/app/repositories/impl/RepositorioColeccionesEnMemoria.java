@@ -25,7 +25,7 @@ public class RepositorioColeccionesEnMemoria implements RepositorioColecciones {
     return col;
   }
 
-  public void save(Coleccion coleccion) {
+  public void guardar(Coleccion coleccion) {
     this.storage.put(coleccion.getId(), coleccion);
   }
 }

@@ -65,8 +65,8 @@ public class SubastaServiceTest {
 
     LocalDateTime fechaInicio = LocalDateTime.now();
 
-    when(repositorioUsuarios.findById("u-2")).thenReturn(sofia);
-    when(repositorioFiguritas.findById("ARG-10")).thenReturn(messi);
+    when(repositorioUsuarios.buscarPorId("u-2")).thenReturn(sofia);
+    when(repositorioFiguritas.buscarPorId("ARG-10")).thenReturn(messi);
 
     when(repositorioUsuarios.buscarPorFiguritaFaltante(messi)).thenReturn(List.of(usuarioSinMessi));
 
@@ -91,8 +91,8 @@ public class SubastaServiceTest {
 
     LocalDateTime fechaInicio = LocalDateTime.now();
 
-    when(repositorioUsuarios.findById("u-2")).thenReturn(sofia);
-    when(repositorioFiguritas.findById("ARG-11")).thenReturn(diMaria);
+    when(repositorioUsuarios.buscarPorId("u-2")).thenReturn(sofia);
+    when(repositorioFiguritas.buscarPorId("ARG-11")).thenReturn(diMaria);
 
     when(repositorioUsuarios.buscarPorFiguritaFaltante(diMaria)).thenReturn(List.of());
 

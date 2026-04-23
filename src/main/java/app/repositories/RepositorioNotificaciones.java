@@ -6,6 +6,6 @@ import app.model.notificador.Notificacion;
 import java.util.List;
 
 public interface RepositorioNotificaciones {
-  void save(Notificacion notificacion);
+  void guardar(Notificacion notificacion);
   List<Notificacion> buscarPorUsuario(Usuario usuario);
 }

@@ -17,32 +17,32 @@ public class RepositorioPropuestasEnMemoria implements RepositorioPropuestas {
     private final Map<String, Propuesta> storage = new HashMap<>();
 
     @Override
-    public List<Propuesta> findByOrigenId(String userId) {
+    public List<Propuesta> buscarPorOrigenId(String userId) {
         return storage.values().stream()
                 .filter(p -> p.getUsuarioOrigen().getId().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Propuesta> findByDestinoId(String userId) {
+    public List<Propuesta> buscarPorDestinoId(String userId) {
         return storage.values().stream()
                 .filter(p -> p.getUsuarioDestino().getId().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Propuesta> findAll() {
+    public List<Propuesta> buscarTodos() {
         return new ArrayList<>(storage.values());
     }
 
     @Override
-    public void save(Propuesta propuesta) {
+    public void guardar(Propuesta propuesta) {
 
       this.storage.putIfAbsent(propuesta.getId(), propuesta);
     }
 
     @Override
-    public Propuesta findById(String id){
+    public Propuesta buscarPorId(String id){
         Propuesta propuesta = storage.get(id);
 
         if (propuesta == null) {
@@ -52,7 +52,7 @@ public class RepositorioPropuestasEnMemoria implements RepositorioPropuestas {
     }
 
     @Override
-    public int count() {
+    public int contar() {
         return storage.size();
     }
 

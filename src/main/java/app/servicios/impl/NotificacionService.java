@@ -20,7 +20,7 @@ public class NotificacionService implements INotificacionService {
   public void notificarInteresados(List<Usuario> interesados, String cuerpo) {
     interesados.forEach(u -> {
       Mensaje mensaje = new Mensaje(cuerpo, LocalDateTime.now());
-      this.repositorioNotificaciones.save(new Notificacion(mensaje, u));
+      this.repositorioNotificaciones.guardar(new Notificacion(mensaje, u));
     });
   }
 }

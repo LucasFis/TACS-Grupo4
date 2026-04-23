@@ -43,18 +43,18 @@ public class PropuestaService implements IPropuestaService {
    * destino y figuritas existan. El estado inicial es PENDIENTE.
    */
   public PropuestaDto crearPropuesta(CrearPropuestaRequest request) {
-    Usuario origen  = repositorioUsuarios.findById(request.getUsuarioOrigenId());
-    Usuario destino = repositorioUsuarios.findById(request.getUsuarioDestinoId());
+    Usuario origen  = repositorioUsuarios.buscarPorId(request.getUsuarioOrigenId());
+    Usuario destino = repositorioUsuarios.buscarPorId(request.getUsuarioDestinoId());
 
     if (origen  == null) throw new NotFoundException("Usuario origen no encontrado");
     if (destino == null) throw new NotFoundException("Usuario destino no encontrado");
 
     Figurita figuritaBuscada = repositorioFiguritas
-        .findById(request.getFiguritaBuscadaId());
+        .buscarPorId(request.getFiguritaBuscadaId());
 
     List<Figurita> figuritasOfrecidas = request.getFiguritasOfrecidasIds()
         .stream()
-        .map(repositorioFiguritas::findById)
+        .map(repositorioFiguritas::buscarPorId)
         .toList();
 
     Propuesta propuesta = new Propuesta(
@@ -66,28 +66,28 @@ public class PropuestaService implements IPropuestaService {
         EstadoProceso.PENDIENTE
     );
 
-    repositorioPropuestas.save(propuesta);
+    repositorioPropuestas.guardar(propuesta);
 
     String cuerpo = "Tenes una nueva propuesta de: " + propuesta.getUsuarioOrigen().getNombre()
         + "por la figurita numero: " + figuritaBuscada.getNumero();
 
     notificacionService.notificarInteresados(List.of(propuesta.getUsuarioDestino()), cuerpo);
 
-    return toDto(propuesta);
+    return aDto(propuesta);
   }
   public void aceptar(String id) {
-      Propuesta propuesta = repositorioPropuestas.findById(id);
+      Propuesta propuesta = repositorioPropuestas.buscarPorId(id);
       propuesta.aceptar(propuesta.getUsuarioDestino());
-      repositorioPropuestas.save(propuesta);
+      repositorioPropuestas.guardar(propuesta);
   }
 
   public void rechazar(String id) {
-      Propuesta propuesta = this.repositorioPropuestas.findById(id);
+      Propuesta propuesta = this.repositorioPropuestas.buscarPorId(id);
       propuesta.rechazar(propuesta.getUsuarioDestino());
-      repositorioPropuestas.save(propuesta);
+      repositorioPropuestas.guardar(propuesta);
   }
 
-  private PropuestaDto toDto(Propuesta p) {
+  private PropuestaDto aDto(Propuesta p) {
     return new PropuestaDto(
         p.getId(),
         p.getUsuarioOrigen().getId(),

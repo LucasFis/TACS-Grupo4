@@ -16,7 +16,7 @@ public class RepositorioUsuariosEnMemoria implements RepositorioUsuarios {
     private final Map<String, Usuario> storage = new HashMap<>();
 
     @Override
-    public Usuario findById(String id) {
+    public Usuario buscarPorId(String id) {
         if(!storage.containsKey(id)) {
             throw new NotFoundException("Usuario no encontrado");
         }
@@ -32,17 +32,17 @@ public class RepositorioUsuariosEnMemoria implements RepositorioUsuarios {
     }
 
     @Override
-    public List<Usuario> findAll() {
+    public List<Usuario> buscarTodos() {
         return new ArrayList<>(storage.values());
     }
 
     @Override
-    public int count() {
+    public int contar() {
         return storage.size();
     }
 
     @Override
-    public void save(Usuario usuario) {
+    public void guardar(Usuario usuario) {
         if(!storage.containsKey(usuario.getId())) {
             storage.put(usuario.getId(), usuario);
         }

@@ -26,7 +26,7 @@ public class RepositorioFiguritasIntercambiablesEnMemoria
         .toList();
   }
   @Override
-  public void save(FiguritaIntercambiable figuritaIntercambiable) {
+  public void guardar(FiguritaIntercambiable figuritaIntercambiable) {
     storage.put(figuritaIntercambiable.getFigurita().getId(), figuritaIntercambiable);
   }
 }

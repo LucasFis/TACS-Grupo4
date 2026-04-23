@@ -31,10 +31,10 @@ class RepositorioPropuestasEnMemoriaTest {
     void findByOrigenId_retornaSoloPropuestasDelOrigen() {
         Propuesta p1 = new Propuesta("p-1", u1, u2, new ArrayList<>(), null, EstadoProceso.PENDIENTE);
         Propuesta p2 = new Propuesta("p-2", u2, u3, new ArrayList<>(), null, EstadoProceso.PENDIENTE);
-        repositorio.save(p1);
-        repositorio.save(p2);
+        repositorio.guardar(p1);
+        repositorio.guardar(p2);
 
-        List<Propuesta> resultado = repositorio.findByOrigenId("u-1");
+        List<Propuesta> resultado = repositorio.buscarPorOrigenId("u-1");
 
         assertEquals(1, resultado.size());
         assertEquals("p-1", resultado.get(0).getId());
@@ -44,10 +44,10 @@ class RepositorioPropuestasEnMemoriaTest {
     void findByDestinoId_retornaSoloPropuestasDelDestino() {
         Propuesta p1 = new Propuesta("p-1", u1, u2, new ArrayList<>(), null, EstadoProceso.PENDIENTE);
         Propuesta p2 = new Propuesta("p-2", u2, u3, new ArrayList<>(), null, EstadoProceso.PENDIENTE);
-        repositorio.save(p1);
-        repositorio.save(p2);
+        repositorio.guardar(p1);
+        repositorio.guardar(p2);
 
-        List<Propuesta> resultado = repositorio.findByDestinoId("u-2");
+        List<Propuesta> resultado = repositorio.buscarPorDestinoId("u-2");
 
         assertEquals(1, resultado.size());
         assertEquals("p-1", resultado.get(0).getId());
@@ -55,6 +55,6 @@ class RepositorioPropuestasEnMemoriaTest {
 
     @Test
     void findByOrigenId_sinResultados_retornaListaVacia() {
-        assertTrue(repositorio.findByOrigenId("u-99").isEmpty());
+        assertTrue(repositorio.buscarPorOrigenId("u-99").isEmpty());
     }
 }

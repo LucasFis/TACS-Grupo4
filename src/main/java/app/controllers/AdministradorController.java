@@ -16,8 +16,8 @@ public class AdministradorController {
     private final IEstadisticasService estadisticasService;
 
     @GetMapping("/estadisticas")
-    public ResponseEntity<EstadisticasDto> getEstadisticas() {
-        return ResponseEntity.ok(estadisticasService.getEstadisticas());
+    public ResponseEntity<EstadisticasDto> obtenerEstadisticas() {
+        return ResponseEntity.ok(estadisticasService.obtenerEstadisticas());
     }
 
 }

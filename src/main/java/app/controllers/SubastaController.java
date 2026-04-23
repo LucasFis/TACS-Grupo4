@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/subastas")
 public class SubastaController {
-    private ISubastaService subastaService;
+    private final ISubastaService subastaService;
 
     SubastaController(ISubastaService subastaService) {
         this.subastaService = subastaService;

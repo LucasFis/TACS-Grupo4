@@ -22,17 +22,17 @@ public class RepositorioFiguritasEnMemoriaTest {
   void findByIdNoEncuentraYtiraExcepcion() {
     Figurita messi = new Figurita("ARG-10", 10, "Messi", Seleccion.ARGENTINA);
 
-    repositorio.save(messi);
+    repositorio.guardar(messi);
 
-    assertThrows(RuntimeException.class, () -> {repositorio.findById("11");});
+    assertThrows(RuntimeException.class, () -> {repositorio.buscarPorId("11");});
   }
 
   @Test
   void findByIdValido() {
     Figurita messi = new Figurita("ARG-10", 10, "Messi", Seleccion.ARGENTINA);
 
-    repositorio.save(messi);
+    repositorio.guardar(messi);
 
-    assertEquals(messi.getId(), repositorio.findById("ARG-10").getId());
+    assertEquals(messi.getId(), repositorio.buscarPorId("ARG-10").getId());
   }
 }

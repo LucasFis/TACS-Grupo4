@@ -29,8 +29,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/{user_id}/operaciones")
-    public ResponseEntity<OperacionesDto> getOperaciones(@PathVariable String user_id) {
-        OperacionesDto operaciones = usuarioService.getOperacionesUsuario(user_id);
+    public ResponseEntity<OperacionesDto> obtenerOperaciones(@PathVariable String user_id) {
+        OperacionesDto operaciones = usuarioService.obtenerOperacionesUsuario(user_id);
         if (operaciones == null) {
             return ResponseEntity.notFound().build();
         }
@@ -45,21 +45,21 @@ public class UsuarioController {
     }
 
     @GetMapping("/{user_id}/intercambiables")
-    public ResponseEntity<List<FiguritaIntercambiableDto>> getIntercambiables(
+    public ResponseEntity<List<FiguritaIntercambiableDto>> obtenerIntercambiables(
         @PathVariable String user_id) {
 
         return ResponseEntity.ok(
-            usuarioService.getIntercambiablesUsuario(user_id)
+            usuarioService.obtenerIntercambiablesUsuario(user_id)
         );
     }
     @GetMapping("/{user_id}/sugerencias")
-    public ResponseEntity<List<SugerenciaDto>> getSugerencias(@PathVariable String user_id) {
-        List<SugerenciaDto> sugerenciasDto = this.usuarioService.getSugerencias(user_id);
+    public ResponseEntity<List<SugerenciaDto>> obtenerSugerencias(@PathVariable String user_id) {
+        List<SugerenciaDto> sugerenciasDto = this.usuarioService.obtenerSugerencias(user_id);
 
         return ResponseEntity.accepted().body(sugerenciasDto);
     }
     @GetMapping("/{user_id}/notificaciones")
-    public ResponseEntity<List<NotificacionesDto>> getNotificaciones(@PathVariable String user_id) {
-        return ResponseEntity.ok(this.usuarioService.getNotificaciones(user_id));
+    public ResponseEntity<List<NotificacionesDto>> obtenerNotificaciones(@PathVariable String user_id) {
+        return ResponseEntity.ok(this.usuarioService.obtenerNotificaciones(user_id));
     }
 }

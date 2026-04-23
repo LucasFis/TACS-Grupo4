@@ -46,18 +46,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     @Override
-    public OperacionesDto getOperacionesUsuario(String userId) {
-        Usuario usuario = repositorioUsuarios.findById(userId);
+    public OperacionesDto obtenerOperacionesUsuario(String userId) {
+        Usuario usuario = repositorioUsuarios.buscarPorId(userId);
         if (usuario == null) {
             return null;
         }
 
         List<FiguritaIntercambiable> figuritasPublicadas = usuario.getColeccion().getRepetidas();
 
-        List<Propuesta> enviadas = repositorioPropuestas.findByOrigenId(userId);
-        List<Propuesta> recibidas = repositorioPropuestas.findByDestinoId(userId);
+        List<Propuesta> enviadas = repositorioPropuestas.buscarPorOrigenId(userId);
+        List<Propuesta> recibidas = repositorioPropuestas.buscarPorDestinoId(userId);
 
-        List<Subasta> subastasActivas = repositorioSubastas.findByUsuarioId(userId)
+        List<Subasta> subastasActivas = repositorioSubastas.buscarPorUsuarioId(userId)
                 .stream()
                 .filter(Subasta::estaActivo)
                 .toList();
@@ -66,17 +66,17 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 //para cuando quiere realizar una propuesta
     @Override
-    public List<FiguritaIntercambiableDto> getIntercambiablesUsuario(String userId) {
-        Usuario usuario = repositorioUsuarios.findById(userId);
+    public List<FiguritaIntercambiableDto> obtenerIntercambiablesUsuario(String userId) {
+        Usuario usuario = repositorioUsuarios.buscarPorId(userId);
         if (usuario == null) throw new NotFoundException("Usuario no encontrado");
 
         return repositorioFiguritasIntercambiables.buscarPorUsuarioId(userId)
             .stream()
-            .map(this::toDto)
+            .map(this::aDto)
             .toList();
     }
 //implementar mappers en lugar de tener la logica aca
-    private FiguritaIntercambiableDto toDto(FiguritaIntercambiable fi) {
+    private FiguritaIntercambiableDto aDto(FiguritaIntercambiable fi) {
         return new FiguritaIntercambiableDto(
             fi.getFigurita().getId(),
             fi.getFigurita().getNumero(),
@@ -88,7 +88,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
         );
     }
     public Number agregarCalificacion(Integer calificacion, String userId) {
-        Usuario usuario = this.repositorioUsuarios.findById(userId);
+        Usuario usuario = this.repositorioUsuarios.buscarPorId(userId);
 
         if(calificacion == null) {
             throw new BadRequestException("La calificacion no puede ser nula");
@@ -99,14 +99,14 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
         usuario.getCalificaciones().add(calificacion);
 
-        this.repositorioUsuarios.save(usuario);
-        return usuario.getCalificacionMedia();
+        this.repositorioUsuarios.guardar(usuario);
+        return usuario.obtenerCalificacionMedia();
     }
 
     @Override
-    public List<SugerenciaDto> getSugerencias(String userId) {
-        Usuario usuarioObjetivo = this.repositorioUsuarios.findById(userId);
-        List<Usuario> usuarios = this.repositorioUsuarios.findAll();
+    public List<SugerenciaDto> obtenerSugerencias(String userId) {
+        Usuario usuarioObjetivo = this.repositorioUsuarios.buscarPorId(userId);
+        List<Usuario> usuarios = this.repositorioUsuarios.buscarTodos();
         List<Sugerencia> sugerencias = new ArrayList<>();
 
         usuarios.forEach(usuario -> {
@@ -126,8 +126,8 @@ public class UsuarioServiceImpl implements IUsuarioService {
         return sugerencias.stream().map(SugerenciaDto::new).toList();
     }
 
-    public List<NotificacionesDto> getNotificaciones(String userId) {
-        Usuario usuario = repositorioUsuarios.findById(userId);
+    public List<NotificacionesDto> obtenerNotificaciones(String userId) {
+        Usuario usuario = repositorioUsuarios.buscarPorId(userId);
 
         return this.repositorioNotificaciones.buscarPorUsuario(usuario).stream().map(NotificacionesDto::new).toList();
     }

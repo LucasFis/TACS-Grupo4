@@ -40,12 +40,12 @@ class EstadisticasServiceImplTest {
 
     @Test
     void getEstadisticas_sinDatos_retornaTodosCeros() {
-        when(repositorioUsuarios.count()).thenReturn(0);
-        when(repositorioUsuarios.findAll()).thenReturn(List.of());
-        when(repositorioPropuestas.count()).thenReturn(0);
-        when(repositorioSubastas.findAll()).thenReturn(List.of());
+        when(repositorioUsuarios.contar()).thenReturn(0);
+        when(repositorioUsuarios.buscarTodos()).thenReturn(List.of());
+        when(repositorioPropuestas.contar()).thenReturn(0);
+        when(repositorioSubastas.buscarTodos()).thenReturn(List.of());
 
-        EstadisticasDto resultado = service.getEstadisticas();
+        EstadisticasDto resultado = service.obtenerEstadisticas();
 
         assertEquals(0, resultado.getTotalUsuarios());
         assertEquals(0, resultado.getTotalFiguritasPublicadas());
@@ -68,12 +68,12 @@ class EstadisticasServiceImplTest {
         Subasta subastaActiva = new Subasta("s-1", u1,
                 LocalDateTime.now().minusHours(1), LocalDateTime.now().plusDays(2), null, null);
 
-        when(repositorioUsuarios.count()).thenReturn(2);
-        when(repositorioUsuarios.findAll()).thenReturn(List.of(u1, u2));
-        when(repositorioPropuestas.count()).thenReturn(4);
-        when(repositorioSubastas.findAll()).thenReturn(List.of(subastaActiva));
+        when(repositorioUsuarios.contar()).thenReturn(2);
+        when(repositorioUsuarios.buscarTodos()).thenReturn(List.of(u1, u2));
+        when(repositorioPropuestas.contar()).thenReturn(4);
+        when(repositorioSubastas.buscarTodos()).thenReturn(List.of(subastaActiva));
 
-        EstadisticasDto resultado = service.getEstadisticas();
+        EstadisticasDto resultado = service.obtenerEstadisticas();
 
         assertEquals(2, resultado.getTotalUsuarios());
         assertEquals(3, resultado.getTotalFiguritasPublicadas());
@@ -90,12 +90,12 @@ class EstadisticasServiceImplTest {
         Subasta vencida  = new Subasta("s-2", u1,
                 LocalDateTime.now().minusDays(3), LocalDateTime.now().minusDays(1), null, null);
 
-        when(repositorioUsuarios.count()).thenReturn(1);
-        when(repositorioUsuarios.findAll()).thenReturn(List.of(u1));
-        when(repositorioPropuestas.count()).thenReturn(0);
-        when(repositorioSubastas.findAll()).thenReturn(List.of(activa, vencida));
+        when(repositorioUsuarios.contar()).thenReturn(1);
+        when(repositorioUsuarios.buscarTodos()).thenReturn(List.of(u1));
+        when(repositorioPropuestas.contar()).thenReturn(0);
+        when(repositorioSubastas.buscarTodos()).thenReturn(List.of(activa, vencida));
 
-        EstadisticasDto resultado = service.getEstadisticas();
+        EstadisticasDto resultado = service.obtenerEstadisticas();
 
         assertEquals(1, resultado.getTotalSubastasActivas());
     }

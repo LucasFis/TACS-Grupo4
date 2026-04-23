@@ -18,16 +18,16 @@ public class EstadisticasServiceImpl implements IEstadisticasService {
     private final RepositorioSubastas repositorioSubastas;
 
     @Override
-    public EstadisticasDto getEstadisticas() {
-        int totalUsuarios = repositorioUsuarios.count();
+    public EstadisticasDto obtenerEstadisticas() {
+        int totalUsuarios = repositorioUsuarios.contar();
 
-        int totalFiguritasPublicadas = repositorioUsuarios.findAll().stream()
+        int totalFiguritasPublicadas = repositorioUsuarios.buscarTodos().stream()
                 .mapToInt(u -> u.getColeccion().getRepetidas().size())
                 .sum();
 
-        int totalPropuestas = repositorioPropuestas.count();
+        int totalPropuestas = repositorioPropuestas.contar();
 
-        int totalSubastasActivas = (int) repositorioSubastas.findAll().stream()
+        int totalSubastasActivas = (int) repositorioSubastas.buscarTodos().stream()
                 .filter(Subasta::estaActivo)
                 .count();
 

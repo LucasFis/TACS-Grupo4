@@ -14,7 +14,7 @@ public class RepositorioFiguritasEnMemoria implements RepositorioFiguritas {
   private final Map<String, Figurita> storage = new HashMap<>();
 
   @Override
-  public Figurita findById(String id) {
+  public Figurita buscarPorId(String id) {
       Figurita figurita = storage.values()
         .stream()
         .filter(c -> c.getId().equals(id))
@@ -42,7 +42,7 @@ public class RepositorioFiguritasEnMemoria implements RepositorioFiguritas {
     return resultado;
   }
 
-  public void save(Figurita figurita) {
+  public void guardar(Figurita figurita) {
     this.storage.put(figurita.getId(), figurita);
 
   }

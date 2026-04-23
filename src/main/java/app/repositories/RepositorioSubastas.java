@@ -4,13 +4,13 @@ import app.model.entities.Subasta;
 import java.util.List;
 
 public interface RepositorioSubastas {
-    List<Subasta> findByUsuarioId(String userId);
+    List<Subasta> buscarPorUsuarioId(String userId);
 
-    List<Subasta> findAll();
+    List<Subasta> buscarTodos();
 
-    Subasta findById(String id);
+    Subasta buscarPorId(String id);
 
-    int count();
+    int contar();
 
-    void save(Subasta subasta);
+    void guardar(Subasta subasta);
 }

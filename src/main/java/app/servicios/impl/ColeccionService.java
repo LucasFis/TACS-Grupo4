@@ -32,11 +32,11 @@ public class ColeccionService implements IColeccionService {
   public Figurita agregarFaltante(String colId, String figId) {
     Coleccion coleccion = this.repositorioColecciones.buscarPorId(colId);
 
-    Figurita faltante = this.repositorioFiguritas.findById(figId);
+    Figurita faltante = this.repositorioFiguritas.buscarPorId(figId);
 
     coleccion.agregarFaltante(faltante);
 
-    repositorioColecciones.save(coleccion);
+    repositorioColecciones.guardar(coleccion);
 
     return faltante;
   }
@@ -45,14 +45,14 @@ public class ColeccionService implements IColeccionService {
       cantidadDisponible, List<String> modosIntercambio) {
     Coleccion coleccion = this.repositorioColecciones.buscarPorId(colId);
 
-    Figurita figurita = this.repositorioFiguritas.findById(figId);
+    Figurita figurita = this.repositorioFiguritas.buscarPorId(figId);
 
     FiguritaIntercambiable repetida = new FiguritaIntercambiable(
         figurita, cantidadDisponible, modosIntercambio.stream().map(MetodoIntercambio::fromString)
         .toList(), userId);
 
     coleccion.agregarRepetida(repetida);
-    repositorioColecciones.save(coleccion);
+    repositorioColecciones.guardar(coleccion);
 
     List<Usuario> interesados = this.repositorioUsuarios.buscarPorFiguritaFaltante(repetida
         .getFigurita());

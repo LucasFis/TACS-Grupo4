@@ -48,8 +48,8 @@ class SubastaControllerTest {
         }
         """;
 
-        when(repoUser.findById("user123")).thenReturn(origen);
-        when(repoFigurita.findById("figu123")).thenReturn(figuSubastada);
+        when(repoUser.buscarPorId("user123")).thenReturn(origen);
+        when(repoFigurita.buscarPorId("figu123")).thenReturn(figuSubastada);
 
         mockMvc.perform(post("/subastas")
                 .header("user_id", "user123")
@@ -73,14 +73,14 @@ class SubastaControllerTest {
 
         subasta.setFiguritaSubastada(buscada);
 
-        when(repoUser.findById("userSubastador")).thenReturn(subastador);
-        when(repoUser.findById("userPropuesta")).thenReturn(userPropuesta);
+        when(repoUser.buscarPorId("userSubastador")).thenReturn(subastador);
+        when(repoUser.buscarPorId("userPropuesta")).thenReturn(userPropuesta);
 
-        when(repoFigurita.findById("figu123")).thenReturn(buscada);
-        when(repoFigurita.findById("figu321")).thenReturn(ofrecida1);
-        when(repoFigurita.findById("figu132")).thenReturn(ofrecida2);
+        when(repoFigurita.buscarPorId("figu123")).thenReturn(buscada);
+        when(repoFigurita.buscarPorId("figu321")).thenReturn(ofrecida1);
+        when(repoFigurita.buscarPorId("figu132")).thenReturn(ofrecida2);
 
-        when(repoSubasta.findById("1")).thenReturn(subasta);
+        when(repoSubasta.buscarPorId("1")).thenReturn(subasta);
 
         String json = """
     {

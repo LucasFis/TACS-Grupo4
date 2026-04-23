@@ -41,13 +41,13 @@ public class SubastaServiceImpl implements ISubastaService {
   @Override
   public SubastaDto crearSubasta(String userId, LocalDateTime fechaInicio, LocalDateTime fechaFin,
                                  String figuritaId, Propuesta propuestaGanadora) {
-    Usuario usuario = this.repoUsuario.findById(userId);
-    Figurita figuritaSubastada = this.repoFigurita.findById(figuritaId);
+    Usuario usuario = this.repoUsuario.buscarPorId(userId);
+    Figurita figuritaSubastada = this.repoFigurita.buscarPorId(figuritaId);
     Subasta nuevaSubasta = new Subasta(
         usuario, fechaInicio, fechaFin,
         figuritaSubastada, propuestaGanadora);
 
-    this.repoSubasta.save(nuevaSubasta);
+    this.repoSubasta.guardar(nuevaSubasta);
 
     List<Usuario> interesados = this.repoUsuario.buscarPorFiguritaFaltante(nuevaSubasta.getFiguritaSubastada());
 
@@ -59,9 +59,9 @@ public class SubastaServiceImpl implements ISubastaService {
   @Override
   public SubastaDto ofertarEnSubasta(String userId, String usuarioDestinoId,
                                String subastaId, List<Object> rawFiguritasId) {
-    Usuario usuarioOrigen = this.repoUsuario.findById(userId);
-    Usuario usuarioDestino = this.repoUsuario.findById(usuarioDestinoId);
-    Subasta subasta = this.repoSubasta.findById(subastaId);
+    Usuario usuarioOrigen = this.repoUsuario.buscarPorId(userId);
+    Usuario usuarioDestino = this.repoUsuario.buscarPorId(usuarioDestinoId);
+    Subasta subasta = this.repoSubasta.buscarPorId(subastaId);
     List<Figurita> figuritasOfrecidas = new ArrayList<>();
 
     Figurita figuritaBuscada = subasta.getFiguritaSubastada();
@@ -72,17 +72,17 @@ public class SubastaServiceImpl implements ISubastaService {
     }
 
     rawFiguritasId.forEach(figuritaId -> {
-      Figurita figurita = this.repoFigurita.findById((String) figuritaId);
+      Figurita figurita = this.repoFigurita.buscarPorId((String) figuritaId);
       figuritasOfrecidas.add(figurita);
     });
 
     Propuesta nuevaPropuesta = new Propuesta(usuarioOrigen, usuarioDestino, figuritasOfrecidas, figuritaBuscada, EstadoProceso.PENDIENTE);
 
-    this.repoPropuesta.save(nuevaPropuesta);
+    this.repoPropuesta.guardar(nuevaPropuesta);
 
     subasta.algoritmoSeleccionador(nuevaPropuesta);
 
-    this.repoSubasta.save(subasta);
+    this.repoSubasta.guardar(subasta);
 
     return new SubastaDto(subasta);
   }

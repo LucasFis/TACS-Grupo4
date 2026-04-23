@@ -37,11 +37,11 @@ public class RepositorioNotificacionesEnMemoriaTest {
     Notificacion notificacion4 = new Notificacion(mensaje, user2);
     Notificacion notificacion5 = new Notificacion(mensaje, user2);
 
-    this.repositorio.save(notificacion1);
-    this.repositorio.save(notificacion2);
-    this.repositorio.save(notificacion3);
-    this.repositorio.save(notificacion4);
-    this.repositorio.save(notificacion5);
+    this.repositorio.guardar(notificacion1);
+    this.repositorio.guardar(notificacion2);
+    this.repositorio.guardar(notificacion3);
+    this.repositorio.guardar(notificacion4);
+    this.repositorio.guardar(notificacion5);
 
     assertEquals(3, repositorio.buscarPorUsuario(user1).size());
   }

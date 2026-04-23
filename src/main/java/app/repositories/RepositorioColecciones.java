@@ -6,5 +6,5 @@ public interface RepositorioColecciones {
 
   public Coleccion buscarPorId(String colId);
 
-  public void save(Coleccion coleccion);
+  public void guardar(Coleccion coleccion);
 }

@@ -56,9 +56,9 @@ class UsuarioServiceImplTest {
 
     @Test
     void getOperacionesUsuario_usuarioInexistente_retornaNull() {
-        when(repositorioUsuarios.findById("u-99")).thenReturn(null);
+        when(repositorioUsuarios.buscarPorId("u-99")).thenReturn(null);
 
-        assertNull(service.getOperacionesUsuario("u-99"));
+        assertNull(service.obtenerOperacionesUsuario("u-99"));
     }
 
     @Test
@@ -73,12 +73,12 @@ class UsuarioServiceImplTest {
         List<Subasta>   subastas  = List.of(new Subasta("s-1", usuario,
                 LocalDateTime.now().minusHours(1), LocalDateTime.now().plusDays(2), null, null));
 
-        when(repositorioUsuarios.findById("u-1")).thenReturn(usuario);
-        when(repositorioPropuestas.findByOrigenId("u-1")).thenReturn(enviadas);
-        when(repositorioPropuestas.findByDestinoId("u-1")).thenReturn(recibidas);
-        when(repositorioSubastas.findByUsuarioId("u-1")).thenReturn(subastas);
+        when(repositorioUsuarios.buscarPorId("u-1")).thenReturn(usuario);
+        when(repositorioPropuestas.buscarPorOrigenId("u-1")).thenReturn(enviadas);
+        when(repositorioPropuestas.buscarPorDestinoId("u-1")).thenReturn(recibidas);
+        when(repositorioSubastas.buscarPorUsuarioId("u-1")).thenReturn(subastas);
 
-        OperacionesDto resultado = service.getOperacionesUsuario("u-1");
+        OperacionesDto resultado = service.obtenerOperacionesUsuario("u-1");
 
         assertEquals(1, resultado.getFiguritasPublicadas().size());
         assertEquals(1, resultado.getPropuestasEnviadas().size());
@@ -97,12 +97,12 @@ class UsuarioServiceImplTest {
                         LocalDateTime.now().minusDays(3), LocalDateTime.now().minusDays(1), null, null)
         );
 
-        when(repositorioUsuarios.findById("u-1")).thenReturn(usuario);
-        when(repositorioPropuestas.findByOrigenId("u-1")).thenReturn(new ArrayList<>());
-        when(repositorioPropuestas.findByDestinoId("u-1")).thenReturn(new ArrayList<>());
-        when(repositorioSubastas.findByUsuarioId("u-1")).thenReturn(subastas);
+        when(repositorioUsuarios.buscarPorId("u-1")).thenReturn(usuario);
+        when(repositorioPropuestas.buscarPorOrigenId("u-1")).thenReturn(new ArrayList<>());
+        when(repositorioPropuestas.buscarPorDestinoId("u-1")).thenReturn(new ArrayList<>());
+        when(repositorioSubastas.buscarPorUsuarioId("u-1")).thenReturn(subastas);
 
-        OperacionesDto resultado = service.getOperacionesUsuario("u-1");
+        OperacionesDto resultado = service.obtenerOperacionesUsuario("u-1");
 
         assertEquals(1, resultado.getSubastasActivas().size());
         assertEquals("s-1", resultado.getSubastasActivas().get(0).getId());
@@ -116,12 +116,12 @@ class UsuarioServiceImplTest {
         FiguritaIntercambiable fi =
             new FiguritaIntercambiable(figurita, 2, new ArrayList<>(), "u-1");
 
-        when(repositorioUsuarios.findById("u-1")).thenReturn(usuario);
+        when(repositorioUsuarios.buscarPorId("u-1")).thenReturn(usuario);
         when(repositorioFiguritasIntercambiables.buscarPorUsuarioId("u-1"))
             .thenReturn(List.of(fi));
 
         List<FiguritaIntercambiableDto> resultado =
-            service.getIntercambiablesUsuario("u-1");
+            service.obtenerIntercambiablesUsuario("u-1");
 
         assertEquals(1, resultado.size());
         assertEquals("ARG-10", resultado.get(0).getFiguritaId());
@@ -129,10 +129,10 @@ class UsuarioServiceImplTest {
 
     @Test
     void getIntercambiablesUsuario_usuarioInexistente_lanzaNotFoundException() {
-        when(repositorioUsuarios.findById("u-99")).thenReturn(null);
+        when(repositorioUsuarios.buscarPorId("u-99")).thenReturn(null);
 
         assertThrows(NotFoundException.class,
-            () -> service.getIntercambiablesUsuario("u-99"));
+            () -> service.obtenerIntercambiablesUsuario("u-99"));
     }
     @Test
     void agregarCalificacion_valida_retornaPromedio() {
@@ -141,13 +141,13 @@ class UsuarioServiceImplTest {
         // ya tiene una calificación previa
         usuario.getCalificaciones().add(6);
 
-        when(repositorioUsuarios.findById("u-1")).thenReturn(usuario);
+        when(repositorioUsuarios.buscarPorId("u-1")).thenReturn(usuario);
 
         Number resultado = service.agregarCalificacion(8, "u-1");
 
         // promedio de 6 y 8 = 7
         assertEquals(7.0, resultado.doubleValue());
-        verify(repositorioUsuarios).save(usuario);
+        verify(repositorioUsuarios).guardar(usuario);
     }
 
 

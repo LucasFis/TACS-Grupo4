@@ -56,10 +56,10 @@ class PropuestaServiceTest {
     CrearPropuestaRequest request = new CrearPropuestaRequest(
         "1000", "1001", "ARG-10", List.of("FRA-10"));
 
-    when(repositorioUsuarios.findById("1000")).thenReturn(lucas);
-    when(repositorioUsuarios.findById("1001")).thenReturn(sofia);
-    when(repositorioFiguritas.findById("ARG-10")).thenReturn(messi);
-    when(repositorioFiguritas.findById("FRA-10")).thenReturn(mbappe);
+    when(repositorioUsuarios.buscarPorId("1000")).thenReturn(lucas);
+    when(repositorioUsuarios.buscarPorId("1001")).thenReturn(sofia);
+    when(repositorioFiguritas.buscarPorId("ARG-10")).thenReturn(messi);
+    when(repositorioFiguritas.buscarPorId("FRA-10")).thenReturn(mbappe);
 
     PropuestaDto resultado = propuestaService.crearPropuesta(request);
 
@@ -67,7 +67,7 @@ class PropuestaServiceTest {
     assertEquals("1001", resultado.getUsuarioDestinoId());
     assertEquals("ARG-10", resultado.getFiguritaBuscadaId());
     assertEquals(EstadoProceso.PENDIENTE, resultado.getEstado());
-    verify(repositorioPropuestas).save(any());
+    verify(repositorioPropuestas).guardar(any());
   }
 
   @Test
@@ -75,7 +75,7 @@ class PropuestaServiceTest {
     CrearPropuestaRequest request = new CrearPropuestaRequest(
         "9999", "1001", "ARG-10", List.of("FRA-10"));
 
-    when(repositorioUsuarios.findById("9999")).thenReturn(null);
+    when(repositorioUsuarios.buscarPorId("9999")).thenReturn(null);
 
     assertThrows(NotFoundException.class,
         () -> propuestaService.crearPropuesta(request));
@@ -86,8 +86,8 @@ class PropuestaServiceTest {
     CrearPropuestaRequest request = new CrearPropuestaRequest(
         "1000", "9999", "ARG-10", List.of("FRA-10"));
 
-    when(repositorioUsuarios.findById("1000")).thenReturn(lucas);
-    when(repositorioUsuarios.findById("9999")).thenReturn(null);
+    when(repositorioUsuarios.buscarPorId("1000")).thenReturn(lucas);
+    when(repositorioUsuarios.buscarPorId("9999")).thenReturn(null);
 
     assertThrows(NotFoundException.class,
         () -> propuestaService.crearPropuesta(request));

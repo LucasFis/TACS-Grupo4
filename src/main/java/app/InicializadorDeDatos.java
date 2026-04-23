@@ -56,10 +56,10 @@ public class InicializadorDeDatos implements CommandLineRunner {
         Figurita pedri     = new Figurita("ESP-10", 10, "Pedri",     Seleccion.ESPAÑA);
         Figurita kroos     = new Figurita("GER-8",   8, "Kroos",     Seleccion.ALEMANIA);
 
-        figuritas.save(messi);
-        figuritas.save(diMaria);
-        figuritas.save(lautaro);
-        figuritas.save(vinicius);
+        figuritas.guardar(messi);
+        figuritas.guardar(diMaria);
+        figuritas.guardar(lautaro);
+        figuritas.guardar(vinicius);
 
         cargarUsuarios(messi, diMaria, lautaro, mbappe, griezmann, vinicius, pedri, kroos);
         cargarPropuestas(messi, diMaria, griezmann, mbappe, vinicius);
@@ -80,10 +80,10 @@ public class InicializadorDeDatos implements CommandLineRunner {
         coleccionLucas.getFaltantes().add(vinicius);
 
 
-        intercambiables.save(interMessi);
-        intercambiables.save(interDiMaria);
-        colecciones.save(coleccionLucas);
-        usuarios.save(new Usuario("1000", "Lucas",  coleccionLucas, "+5491100000001", new ArrayList<>()));
+        intercambiables.guardar(interMessi);
+        intercambiables.guardar(interDiMaria);
+        colecciones.guardar(coleccionLucas);
+        usuarios.guardar(new Usuario("1000", "Lucas",  coleccionLucas, "+5491100000001", new ArrayList<>()));
 
         // Sofía: tiene Mbappé y Griezmann repetidas, le falta Messi y Lautaro
         Coleccion coleccionSofia = new Coleccion();
@@ -94,10 +94,10 @@ public class InicializadorDeDatos implements CommandLineRunner {
         coleccionSofia.getRepetidas().add(interGriezmann);
         coleccionSofia.getFaltantes().add(messi);
         coleccionSofia.getFaltantes().add(lautaro);
-        intercambiables.save(interMbappe);
-        intercambiables.save(interGriezmann);
-        colecciones.save(coleccionSofia);
-        usuarios.save(new Usuario("1001", "Sofía",  coleccionSofia, "+5491100000002", new ArrayList<>()));
+        intercambiables.guardar(interMbappe);
+        intercambiables.guardar(interGriezmann);
+        colecciones.guardar(coleccionSofia);
+        usuarios.guardar(new Usuario("1001", "Sofía",  coleccionSofia, "+5491100000002", new ArrayList<>()));
 
         // Matías: tiene Vinicius repetido, le falta Pedri y Kroos
         Coleccion coleccionMatias = new Coleccion();
@@ -106,9 +106,9 @@ public class InicializadorDeDatos implements CommandLineRunner {
         coleccionMatias.getRepetidas().add(interVinicius);
         coleccionMatias.getFaltantes().add(pedri);
         coleccionMatias.getFaltantes().add(kroos);
-        intercambiables.save(interVinicius);
-        colecciones.save(coleccionMatias);
-        usuarios.save(new Usuario("1002", "Matías", coleccionMatias, "+5491100000003", new ArrayList<>()));
+        intercambiables.guardar(interVinicius);
+        colecciones.guardar(coleccionMatias);
+        usuarios.guardar(new Usuario("1002", "Matías", coleccionMatias, "+5491100000003", new ArrayList<>()));
 
         Coleccion coleccionJuan = new Coleccion();
         coleccionJuan.setId("4");
@@ -116,38 +116,38 @@ public class InicializadorDeDatos implements CommandLineRunner {
         coleccionJuan.getRepetidas().add(interPedri);
         coleccionJuan.getFaltantes().add(pedri);
         coleccionJuan.getFaltantes().add(kroos);
-        intercambiables.save(interPedri);
-        colecciones.save(coleccionJuan);
-        usuarios.save(new Usuario("1003", "Juan", coleccionJuan, "+5491100000003", new ArrayList<>()));
+        intercambiables.guardar(interPedri);
+        colecciones.guardar(coleccionJuan);
+        usuarios.guardar(new Usuario("1003", "Juan", coleccionJuan, "+5491100000003", new ArrayList<>()));
     }
 
     private void cargarPropuestas(Figurita messi, Figurita diMaria,
                                   Figurita griezmann, Figurita mbappe, Figurita vinicius) {
-        Usuario lucas  = usuarios.findById("1000");
-        Usuario sofia  = usuarios.findById("1001");
-        Usuario matias = usuarios.findById("1002");
+        Usuario lucas  = usuarios.buscarPorId("1000");
+        Usuario sofia  = usuarios.buscarPorId("1001");
+        Usuario matias = usuarios.buscarPorId("1002");
 
         // Lucas le ofrece Messi a Sofía a cambio de Mbappé — PENDIENTE
-        propuestas.save(new Propuesta("2000", lucas, sofia,  List.of(messi),     mbappe,  EstadoProceso.PENDIENTE));
+        propuestas.guardar(new Propuesta("2000", lucas, sofia,  List.of(messi),     mbappe,  EstadoProceso.PENDIENTE));
 
         // Sofía le ofrece Griezmann a Matías a cambio de Vinicius — ACEPTADO
-        propuestas.save(new Propuesta("2001", sofia, matias, List.of(griezmann), vinicius, EstadoProceso.ACEPTADO));
+        propuestas.guardar(new Propuesta("2001", sofia, matias, List.of(griezmann), vinicius, EstadoProceso.ACEPTADO));
 
         // Matías le ofrece Vinicius a Lucas a cambio de Di María — RECHAZADO
-        propuestas.save(new Propuesta("2002", matias, lucas, List.of(vinicius),  diMaria,  EstadoProceso.RECHAZADO));
+        propuestas.guardar(new Propuesta("2002", matias, lucas, List.of(vinicius),  diMaria,  EstadoProceso.RECHAZADO));
     }
 
     private void cargarSubastas(Figurita griezmann, Figurita vinicius) {
-        Usuario sofia  = usuarios.findById("1001");
-        Usuario matias = usuarios.findById("1002");
+        Usuario sofia  = usuarios.buscarPorId("1001");
+        Usuario matias = usuarios.buscarPorId("1002");
 
         // Subasta activa: Sofía subasta Griezmann, cierra en 2 días
-        subastas.save(new Subasta("3000", sofia,
+        subastas.guardar(new Subasta("3000", sofia,
                 LocalDateTime.now().minusHours(1), LocalDateTime.now().plusDays(2),
                 griezmann, null));
 
         // Subasta vencida: Matías subastó Vinicius, ya cerró
-        subastas.save(new Subasta("3001", matias,
+        subastas.guardar(new Subasta("3001", matias,
                 LocalDateTime.now().minusDays(3), LocalDateTime.now().minusDays(1),
                 vinicius, null));
     }

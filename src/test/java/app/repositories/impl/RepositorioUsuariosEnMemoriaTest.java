@@ -24,15 +24,15 @@ class RepositorioUsuariosEnMemoriaTest {
     void save_y_findById_retornaUsuario() {
         Usuario usuario = new Usuario("u-1", "Lucas", new Coleccion(), "+5491100000001", new ArrayList<>());
 
-        repositorio.save(usuario);
+        repositorio.guardar(usuario);
 
-        assertEquals(usuario, repositorio.findById("u-1"));
+        assertEquals(usuario, repositorio.buscarPorId("u-1"));
     }
 
     @Test
     void findById_inexistente_retornaNull() {
         assertThrows(NotFoundException.class, () -> {
-            repositorio.findById("inexistente");
+            repositorio.buscarPorId("inexistente");
         });
     }
 
@@ -53,9 +53,9 @@ class RepositorioUsuariosEnMemoriaTest {
 
         usuario3.getColeccion().agregarFaltante(diMaria);
 
-        repositorio.save(usuario);
-        repositorio.save(usuario2);
-        repositorio.save(usuario3);
+        repositorio.guardar(usuario);
+        repositorio.guardar(usuario2);
+        repositorio.guardar(usuario3);
 
         assertEquals(2, repositorio.buscarPorFiguritaFaltante(messi).size());
 

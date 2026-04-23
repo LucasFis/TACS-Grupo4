@@ -9,10 +9,10 @@ import app.model.notificador.Notificacion;
 import java.util.List;
 
 public interface IUsuarioService {
-    OperacionesDto getOperacionesUsuario(String userId);
+    OperacionesDto obtenerOperacionesUsuario(String userId);
 
-    List<FiguritaIntercambiableDto> getIntercambiablesUsuario(String userId);
+    List<FiguritaIntercambiableDto> obtenerIntercambiablesUsuario(String userId);
     Number agregarCalificacion(Integer calificacion, String userId);
-    List<SugerenciaDto> getSugerencias(String userId);
-    List<NotificacionesDto> getNotificaciones(String userId);
+    List<SugerenciaDto> obtenerSugerencias(String userId);
+    List<NotificacionesDto> obtenerNotificaciones(String userId);
 }

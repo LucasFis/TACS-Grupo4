@@ -17,7 +17,7 @@ public class FiguritaController {
     private final IFiguritaService figuritaService;
 
     @GetMapping("/figuritas")
-    public ResponseEntity<List<FiguritaIntercambiableDto>> getFiguritas(
+    public ResponseEntity<List<FiguritaIntercambiableDto>> obtenerFiguritas(
         @RequestParam(required = false) Integer numero,
         @RequestParam(required = false) Seleccion seleccion,
         @RequestParam(required = false) String jugador

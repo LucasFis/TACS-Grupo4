@@ -15,24 +15,24 @@ public class RepositorioSubastasEnMemoria implements RepositorioSubastas {
     private final Map<String, Subasta> storage = new HashMap<>();
 
     @Override
-    public List<Subasta> findByUsuarioId(String userId) {
+    public List<Subasta> buscarPorUsuarioId(String userId) {
         return storage.values().stream()
                 .filter(s -> s.getUsuario().getId().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Subasta> findAll() {
+    public List<Subasta> buscarTodos() {
         return new ArrayList<>(storage.values());
     }
 
     @Override
-    public int count() {
+    public int contar() {
         return storage.size();
     }
   
     @Override
-    public Subasta findById(String id) {
+    public Subasta buscarPorId(String id) {
         Subasta subasta = storage.get(id);
         if (subasta == null) {
             throw new RuntimeException("Subasta no encontrada");
@@ -41,7 +41,7 @@ public class RepositorioSubastasEnMemoria implements RepositorioSubastas {
     }
 
     @Override
-    public void save(Subasta subasta) {
+    public void guardar(Subasta subasta) {
         storage.put(subasta.getId(), subasta);
     }
 }

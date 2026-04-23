@@ -6,5 +6,5 @@ import java.util.List;
 public interface RepositorioFiguritasIntercambiables {
   List<FiguritaIntercambiable> buscarPorFiguritaIds(List<String> figuritaIds);
   List<FiguritaIntercambiable> buscarPorUsuarioId(String usuarioId);
-  void save(FiguritaIntercambiable figuritaIntercambiable);
+  void guardar(FiguritaIntercambiable figuritaIntercambiable);
 }

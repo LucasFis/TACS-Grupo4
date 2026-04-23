@@ -52,11 +52,11 @@ class PropuestaControllerTest {
         }
         """;
 
-        when(repoUser.findById("1000")).thenReturn(subastador);
-        when(repoUser.findById("1001")).thenReturn(userPropuesta);
+        when(repoUser.buscarPorId("1000")).thenReturn(subastador);
+        when(repoUser.buscarPorId("1001")).thenReturn(userPropuesta);
 
-        when(repoFigurita.findById("ARG-10")).thenReturn(buscada);
-        when(repoFigurita.findById("FRA-10")).thenReturn(ofrecida);
+        when(repoFigurita.buscarPorId("ARG-10")).thenReturn(buscada);
+        when(repoFigurita.buscarPorId("FRA-10")).thenReturn(ofrecida);
 
         mockMvc.perform(post("/propuestas")
                 .contentType("application/json")
@@ -72,7 +72,7 @@ class PropuestaControllerTest {
 
         propuesta.setId("1000");
 
-        when(repoPropuesta.findById("1000")).thenReturn(propuesta);
+        when(repoPropuesta.buscarPorId("1000")).thenReturn(propuesta);
 
         mockMvc.perform(patch("/propuestas/1000/aceptar"))
                 .andExpect(status().isNoContent());
@@ -86,7 +86,7 @@ class PropuestaControllerTest {
 
         propuesta.setId("1000");
 
-        when(repoPropuesta.findById("1000")).thenReturn(propuesta);
+        when(repoPropuesta.buscarPorId("1000")).thenReturn(propuesta);
 
         mockMvc.perform(patch("/propuestas/1000/rechazar"))
                 .andExpect(status().isNoContent());

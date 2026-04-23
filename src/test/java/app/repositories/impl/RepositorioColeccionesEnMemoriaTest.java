@@ -20,7 +20,7 @@ public class RepositorioColeccionesEnMemoriaTest {
   void findByIdNoEncuentraYtiraExcepcion() {
     Coleccion coleccion = new Coleccion("10");
 
-    repositorio.save(coleccion);
+    repositorio.guardar(coleccion);
 
     assertThrows(RuntimeException.class, () -> {repositorio.buscarPorId("11");});
   }
@@ -29,7 +29,7 @@ public class RepositorioColeccionesEnMemoriaTest {
   void findByIdValido() {
     Coleccion coleccion = new Coleccion("10");
 
-    repositorio.save(coleccion);
+    repositorio.guardar(coleccion);
 
     assertEquals(coleccion.getId(), repositorio.buscarPorId("10").getId());
   }

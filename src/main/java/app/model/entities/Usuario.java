@@ -15,7 +15,7 @@ public class Usuario {
     private String telefono;
     private List<Integer> calificaciones;
 
-    public Float getCalificacionMedia() {
+    public Float obtenerCalificacionMedia() {
         return (float) calificaciones.stream()
             .mapToInt(Integer::intValue)
             .average()

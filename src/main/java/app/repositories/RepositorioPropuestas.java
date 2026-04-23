@@ -5,11 +5,11 @@ import java.util.List;
 
 public interface RepositorioPropuestas {
     // Propuestas enviadas
-    List<Propuesta> findByOrigenId(String userId);
+    List<Propuesta> buscarPorOrigenId(String userId);
     // Propuestas recibidas
-    List<Propuesta> findByDestinoId(String userId);
-    List<Propuesta> findAll();
-    Propuesta findById(String id);
-    int count();
-    void save(Propuesta propuesta);
+    List<Propuesta> buscarPorDestinoId(String userId);
+    List<Propuesta> buscarTodos();
+    Propuesta buscarPorId(String id);
+    int contar();
+    void guardar(Propuesta propuesta);
 }
