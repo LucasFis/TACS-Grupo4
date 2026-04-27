@@ -24,7 +24,9 @@ jobs:
           cache: maven
 
       - name: Correr tests y validaciones
+        working-directory: ./backend
         run: mvn verify
 
       - name: Verificar build de Docker
+        working-directory: ./backend
         run: docker build -t tacs-g4 .
