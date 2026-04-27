@@ -1,10 +1,10 @@
 .button {
   background-color: var(--color-primary);
   color: var(--color-text);
-  border: solid var(--border-weight) var(--border-color);
+  border: solid var(--border-weight) var(--border-color-dark);
   font-weight: 600;
   font-family: var(--font-family);
-  font-size: 0.9rem;
+  font-size: 1rem;
   padding: 8px 20px;
   border-radius: 6px;
   transition: background-color 0.2s ease, opacity 0.2s ease;

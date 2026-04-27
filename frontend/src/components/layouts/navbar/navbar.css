@@ -28,7 +28,7 @@
 
 .navbar-link {
   color: var(--color-primary) !important;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
 .navbar-link--active {

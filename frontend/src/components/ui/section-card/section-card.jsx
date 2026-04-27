@@ -1,7 +1,10 @@
 import styles from './section-card.module.css';
+import React from 'react';
+
+const Section = ({ children }) => <>{children}</>;
 
 const SectionCard = ({ children }) => {
-  const sections = Array.isArray(children) ? children : [children];
+  const sections = React.Children.toArray(children);
 
   return (
     <div className={styles.card}>
@@ -13,5 +16,7 @@ const SectionCard = ({ children }) => {
     </div>
   );
 };
+
+SectionCard.Section = Section;
 
 export default SectionCard;

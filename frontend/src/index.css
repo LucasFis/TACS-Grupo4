@@ -1,23 +1,25 @@
 :root {
   --color-primary: #ffffff;
-  --color-primary-acent: #E6E6E6;
+  --color-primary-acent: #e6e6e6;
 
   --color-secondary: #175a2d;
   --color-secondary-acent: #b1f5c7;
-  
+
   --color-terciary: #d49a2c;
 
-  --color-background: #FAF9F5;
+  --color-background: #faf9f5;
   --color-text: #212529;
+  --color-subtitle: #596061;
 
-  --font-family: 'Inter', sans-serif;
+  --font-family: "Inter", sans-serif;
 
   --font-size-h1: 2rem;
   --font-size-h2: 1.5rem;
   --font-size-p: 1rem;
 
-  --border-color: #E4E3E3;
-  --border-weight: 1px;
+  --border-color-light: #e4e3e3;
+  --border-color-dark: #C8C8C8;
+  --border-weight: 2px;
 }
 
 * {
@@ -40,6 +42,15 @@ body {
   flex-direction: column;
 }
 
-h1 { font-size: var(--font-size-h1); }
-h2 { font-size: var(--font-size-h2); }
-p  { font-size: var(--font-size-p); margin: 0; }
+h1 {
+  font-size: var(--font-size-h1);
+  margin: 0;
+}
+h2 {
+  font-size: var(--font-size-h2);
+  margin: 0;
+}
+p {
+  font-size: var(--font-size-p);
+  margin: 0;
+}
