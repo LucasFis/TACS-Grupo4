@@ -1,0 +1,30 @@
+.button {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border: solid var(--border-weight) var(--border-color);
+  font-weight: 600;
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  padding: 8px 20px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  background-color: var(--color-primary-acent);
+  color: var(--color-text);
+}
+
+.button:active:not(:disabled) {
+  background-color: var(--color-primary-acent);;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.relevant {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}

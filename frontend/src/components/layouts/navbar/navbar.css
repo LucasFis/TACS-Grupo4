@@ -1,0 +1,75 @@
+.navbar-custom {
+  background-color: var(--color-secondary);
+  padding: 12px 0;
+}
+
+.navbar-logo {
+  color: var(--color-primary) !important;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-logo-icon {
+  background-color: var(--color-terciary);
+  color: var(--color-secondary);
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.navbar-toggler-custom {
+  filter: invert(1);
+}
+
+.navbar-link {
+  color: var(--color-primary) !important;
+  font-size: 0.95rem;
+}
+
+.navbar-link--active {
+  color: var(--color-terciary) !important;
+  font-weight: 600;
+}
+
+.navbar-notification-btn {
+  color: var(--color-primary) !important;
+}
+
+.navbar-badge {
+  background-color: var(--color-terciary) !important;
+  color: var(--color-secondary);
+  font-size: 0.6rem;
+}
+
+.navbar-avatar {
+  width: 36px;
+  height: 36px;
+  background-color: var(--color-terciary);
+  color: var(--color-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.navbar-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .navbar-collapse {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+  }
+}

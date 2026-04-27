@@ -1,0 +1,15 @@
+.card {
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: #fff;
+  margin-bottom: 1rem;
+}
+
+.section {
+  padding: 1rem 1.25rem;
+}
+
+.section + .section {
+  border-top: 1px solid var(--border-color);
+}
