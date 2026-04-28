@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import Home from "./views/public/home/home"
 import Layout from './components/layouts/layout/layout';
+import MisFiguritas from "./views/public/mis-figuritas/mis-figuritas.jsx";
 
 
 const publics = [
@@ -8,6 +9,10 @@ const publics = [
         path: '/',
         element: <Home />,
     },
+    {
+        path: '/figuritas',
+        element: <MisFiguritas />
+    }
 ];
 
 const privates = [];

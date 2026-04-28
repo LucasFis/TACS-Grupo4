@@ -1,0 +1,76 @@
+/* Repetidas.module.css */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Skeleton ────────────────────────────────── */
+.skeletonRow {
+  margin-top: 0;
+}
+
+.skeleton {
+  height: 220px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Load more ───────────────────────────────── */
+.loadMoreWrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.loadMoreBtn {
+  padding: 10px 32px;
+  border: 1.5px solid #16a34a;
+  border-radius: 999px;
+  background: transparent;
+  color: #16a34a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.loadMoreBtn:hover {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+/* ── Empty state ─────────────────────────────── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 0;
+  color: #9ca3af;
+}
+
+.emptyState span {
+  font-size: 2.5rem;
+}
+
+.emptyState p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ── Error ───────────────────────────────────── */
+.error {
+  color: #dc2626;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 24px 0;
+}

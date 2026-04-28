@@ -1,0 +1,81 @@
+/* FiguritaTabs.module.css */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Tab bar ─────────────────────────────────── */
+.tabBar {
+  display: flex;
+  border-bottom: 2px solid #e5e7eb;
+  gap: 0;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: #111827;
+}
+
+.tabActive {
+  color: #16a34a;
+  border-bottom-color: #16a34a;
+  font-weight: 700;
+}
+
+/* ── Stats row ───────────────────────────────── */
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.statBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 12px;
+  gap: 2px;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1;
+}
+
+.statValueWarning {
+  color: #ea580c;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}

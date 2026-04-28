@@ -1,0 +1,122 @@
+/* FiguritaCard.module.css */
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.09);
+  transform: translateY(-2px);
+}
+
+/* Subasta cards get a slight tinted background */
+.cardSubasta {
+  background: #fff8f5;
+}
+
+/* ── Header ─────────────────────────────────── */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardNumber {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: lowercase;
+}
+
+.badgeIntercambio {
+  color: #16a34a;
+  background: #dcfce7;
+}
+
+.badgeSubasta {
+  color: #ea580c;
+  background: #ffedd5;
+}
+
+.badgeAmbos {
+  color: #7c3aed;
+  background: #ede9fe;
+}
+
+/* ── Emoji ───────────────────────────────────── */
+.cardEmoji {
+  font-size: 2.8rem;
+  text-align: center;
+  line-height: 1;
+  padding: 6px 0;
+}
+
+/* ── Info ────────────────────────────────────── */
+.cardInfo {
+  text-align: center;
+}
+
+.cardName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.cardSubtitle {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin: 2px 0 0;
+}
+
+/* ── Footer ──────────────────────────────────── */
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cardAvailable {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.cardExtra {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ea580c;
+}
+
+.actionBtn {
+  width: 100%;
+  padding: 8px 0;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: transparent;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.actionBtn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
