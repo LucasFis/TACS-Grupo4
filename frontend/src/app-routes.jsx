@@ -10,7 +10,7 @@ const publics = [
         element: <Home />,
     },
     {
-        path: '/figuritas',
+        path: '/mis-figuritas',
         element: <MisFiguritas />
     }
 ];

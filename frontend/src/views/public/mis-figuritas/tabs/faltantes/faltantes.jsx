@@ -1,18 +1,34 @@
-import useFiguritasPaginadas from '../../../hooks/useFiguritasPaginadas';
-import FiguritaCard from '../../../components/ui/figurita-card/FiguritaCard';
-import styles from './Faltantes.module.css';
-
-// ── API ───────────────────────────────────────────────────────────────────────
-// Reemplazá esta función con tu llamada real al backend.
-const fetchFaltantes = async (page) => {
-  const response = await fetch(`/api/figuritas/faltantes?page=${page}&limit=8`);
-  if (!response.ok) throw new Error('Error al cargar faltantes');
-  return response.json(); // { data: [...], hasMore: true/false }
-};
+import FiguritaCard from '../../../../../components/ui/figurita-card/figurita-card';
+import styles from './faltantes.module.css';
+import {useEffect, useState} from "react";
+import {buscarFaltantes} from "../../../../../services/coleccionService.js";
 
 // ── Component ─────────────────────────────────────────────────────────────────
-const Faltantes = () => {
-  const { figuritas, loading, error, hasMore, loadMore } = useFiguritasPaginadas(fetchFaltantes);
+const Faltantes = ({colId}) => {
+
+    const [faltantes, setFaltantes] = useState([]);
+    const [filtros, setFiltros] = useState({});
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+
+
+
+    useEffect(() => {
+        const cargarFaltantes = async (filtros = {}) => {
+            try {
+                setLoading(true)
+                const faltantesApi = await buscarFaltantes(colId)
+                setFaltantes(faltantesApi)
+            } catch (error) {
+                setError(true);
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        cargarFaltantes();
+    }, [filtros]);
 
   if (error) {
     return <p className={styles.error}>{error}</p>;
@@ -22,18 +38,18 @@ const Faltantes = () => {
     <div className={styles.wrapper}>
       {/* Cards grid */}
       <div className="row g-3">
-        {figuritas.map((fig) => (
+        {faltantes.map((fig) => (
           <div key={fig.id} className="col-6 col-md-4 col-lg-3">
             <FiguritaCard
-              number={fig.number}
-              type={fig.type}
-              emoji={fig.emoji}
-              name={fig.name}
-              subtitle={fig.subtitle}
-              available={fig.available}
-              extra={fig.extra}
-              actionLabel={fig.actionLabel}
-              onAction={() => console.log('acción faltante', fig.id)}
+              number={fig.id}
+              // type={fig.type}
+              // emoji={fig.emoji}
+              // name={fig.name}
+              // subtitle={fig.subtitle}
+              // available={fig.available}
+              // extra={fig.extra}
+              // actionLabel={fig.actionLabel}
+              // onAction={() => console.log('acción faltante', fig.id)}
             />
           </div>
         ))}
@@ -51,21 +67,21 @@ const Faltantes = () => {
       )}
 
       {/* Load more */}
-      {!loading && hasMore && (
-        <div className={styles.loadMoreWrapper}>
-          <button className={styles.loadMoreBtn} onClick={loadMore}>
-            Ver más
-          </button>
-        </div>
-      )}
+      {/*{!loading && hasMore && (*/}
+      {/*  <div className={styles.loadMoreWrapper}>*/}
+      {/*    <button className={styles.loadMoreBtn} onClick={loadMore}>*/}
+      {/*      Ver más*/}
+      {/*    </button>*/}
+      {/*  </div>*/}
+      {/*)}*/}
 
       {/* Empty state */}
-      {!loading && figuritas.length === 0 && (
-        <div className={styles.emptyState}>
-          <span>🎉</span>
-          <p>¡Tenés todas las figuritas!</p>
-        </div>
-      )}
+      {/*{!loading && figuritas.length === 0 && (*/}
+      {/*  <div className={styles.emptyState}>*/}
+      {/*    <span>🎉</span>*/}
+      {/*    <p>¡Tenés todas las figuritas!</p>*/}
+      {/*  </div>*/}
+      {/*)}*/}
     </div>
   );
 };
