@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/colecciones")
 @RequiredArgsConstructor
@@ -41,6 +43,28 @@ public class ColeccionController {
             request.getFigId(), request.getCantidadExistente(), request.getModosIntercambio());
 
         return ResponseEntity.status(201).build();
+    }
+
+    @GetMapping("/{col_id}/faltantes")
+    public ResponseEntity<List<Figurita>> buscarFaltantes(
+        @PathVariable String col_id) {
+
+        List<Figurita> faltantes = coleccionService.buscarFaltantes(col_id);
+
+        return ResponseEntity.ok(faltantes);
+    }
+
+    @GetMapping("/{col_id}/repetidas")
+    public ResponseEntity<List<FiguritaIntercambiable>> buscarRepetidas(
+        @PathVariable String col_id,
+        @RequestParam(defaultValue = "false") boolean subasta,
+        @RequestParam(defaultValue = "false") boolean intercambio,
+        @RequestParam(defaultValue = "false") boolean ambos
+        ) {
+
+        List<FiguritaIntercambiable> faltantes = coleccionService.buscarRepetidas(col_id, subasta, intercambio, ambos);
+
+        return ResponseEntity.ok(faltantes);
     }
 
 }

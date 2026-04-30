@@ -61,4 +61,36 @@ public class ColeccionService implements IColeccionService {
 
     this.notificacionService.notificarInteresados(interesados, cuerpo);
   }
+
+  public List<Figurita> buscarFaltantes(String colId) {
+    Coleccion coleccion = this.repositorioColecciones.buscarPorId(colId);
+    return coleccion.getFaltantes();
+  }
+
+  public List<FiguritaIntercambiable> buscarRepetidas(String colId, boolean subasta, boolean intercambio, boolean ambos) {
+    Coleccion coleccion = this.repositorioColecciones.buscarPorId(colId);
+    List<FiguritaIntercambiable> repetidas = coleccion.getRepetidas();
+
+    if (subasta) {
+      repetidas = repetidas.stream()
+          .filter(fig -> fig.getMetodos().contains(MetodoIntercambio.SUBASTA)
+              || fig.getMetodos().contains(MetodoIntercambio.SUBASTA_E_INTERCAMBIO))
+          .toList();
+    }
+
+    if (intercambio) {
+      repetidas = repetidas.stream()
+          .filter(fig -> fig.getMetodos().contains(MetodoIntercambio.INTERCAMBIO)
+              || fig.getMetodos().contains(MetodoIntercambio.SUBASTA_E_INTERCAMBIO))
+          .toList();
+    }
+
+    if (ambos) {
+      repetidas = repetidas.stream()
+          .filter(fig -> fig.getMetodos().contains(MetodoIntercambio.SUBASTA_E_INTERCAMBIO))
+          .toList();
+    }
+
+    return repetidas;
+  }
 }

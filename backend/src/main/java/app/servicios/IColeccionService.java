@@ -8,5 +8,7 @@ public interface IColeccionService {
   void agregarFaltante(String colId, String figId);
   void agregarRepetida(String colId, String userId, String figId, Integer
       cantidadDisponible, List<String> modosIntercambio);
+  List<Figurita> buscarFaltantes(String colId);
+  List<FiguritaIntercambiable> buscarRepetidas(String colId, boolean subasta, boolean intercambio, boolean ambos);
 
 }
