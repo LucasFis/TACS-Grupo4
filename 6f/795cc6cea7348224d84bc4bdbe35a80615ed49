@@ -1,0 +1,46 @@
+backend/src/main/java/app/CorsConfig.java
+  s_6d5bf0ea969ceb::t_532373a826d624 3,12-13,17
+  s_6d5bf0ea969ceb::t_b470134cadcbe2 11
+frontend/nginx.conf
+  s_6d5bf0ea969ceb::t_389bd84e78d43b 1-10
+docker-compose.yml
+  h_ecc1dc77ab0242 2
+  s_6d5bf0ea969ceb::t_52e5ad90a3f377 11,13-15,26-27
+  s_6d5bf0ea969ceb::t_24bc81d3b6d994 12
+  s_6d5bf0ea969ceb::t_f143d4df4f52b1 7
+  s_6d5bf0ea969ceb::t_50abaf26712f6d 10,24
+  s_6d5bf0ea969ceb::t_c97a0edef0b1dc 16
+README.md
+  s_6d5bf0ea969ceb::t_adf53aa2baf509 40,44-45,47,50,52-53,55,57
+  h_ecc1dc77ab0242 8,10,21-29,31,43,46,51,60,172,180,189,251,253,262
+  s_6d5bf0ea969ceb::t_c30f39d6b500ec 7,18-20,30,35
+  s_6d5bf0ea969ceb::t_769e06db57a7af 246-250,252,254-261,263-267
+frontend/Dockerfile
+  h_ecc1dc77ab0242 11,16
+  s_6d5bf0ea969ceb::t_df6cd211933cd2 20
+backend/src/main/resources/application.properties
+  s_6d5bf0ea969ceb::t_1af32aeb184120 5-6
+frontend/README.md
+  h_ecc1dc77ab0242 3,18,20,23,30,42-43,45,50,84-86,92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "6f795cc6cea7348224d84bc4bdbe35a80615ed49",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_6d5bf0ea969ceb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f401ba7e-fc07-4005-a075-da3b9bbf13c0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
