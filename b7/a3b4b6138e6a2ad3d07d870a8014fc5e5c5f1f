@@ -1,0 +1,30 @@
+README.md
+  s_6d5bf0ea969ceb::t_750eb000b42e24 60,62,64-68
+  s_6d5bf0ea969ceb::t_e0591ee3dc5948 265,267,269-292,296-297,299
+  s_6d5bf0ea969ceb::t_931c4d30d644cf 38,40,44,46-51,59,69
+  h_ecc1dc77ab0242 42,45,58,61,63
+  s_6d5bf0ea969ceb::t_8265eee8e3088e 320,323-324,328,331
+Makefile
+  s_6d5bf0ea969ceb::t_e9cde59c1b0ede 1,28-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "b7a3b4b6138e6a2ad3d07d870a8014fc5e5c5f1f",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_6d5bf0ea969ceb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f401ba7e-fc07-4005-a075-da3b9bbf13c0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
