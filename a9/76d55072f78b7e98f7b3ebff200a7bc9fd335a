@@ -1,0 +1,28 @@
+frontend/nginx.conf
+  s_6d5bf0ea969ceb::t_42c489f13b519c 2
+frontend/Dockerfile
+  s_6d5bf0ea969ceb::t_7870a0c0f4ac88 20-21,26
+docker-compose.yml
+  s_6d5bf0ea969ceb::t_a4762a7efb089a 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "a976d55072f78b7e98f7b3ebff200a7bc9fd335a",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_6d5bf0ea969ceb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f401ba7e-fc07-4005-a075-da3b9bbf13c0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": null
+    }
+  }
+}
