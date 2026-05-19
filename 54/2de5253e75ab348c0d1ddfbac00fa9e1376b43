@@ -1,0 +1,29 @@
+backend/src/main/resources/application.properties
+  h_ecc1dc77ab0242 8
+backend/src/main/java/app/repositories/mongodb/RepositorioFiguritasMongoDB.java
+  h_ecc1dc77ab0242 3,8-13,15-17,20-21,24-29,34-35,38-39,42-43,46-47,50-51,54-56,61
+  s_2d0377afcd52f8::t_41653eec5055bb 36-37,40-41,44-45,48-49,52-53
+backend/src/main/java/app/model/entities/Figurita.java
+  h_ecc1dc77ab0242 6-7,12,14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "542de5253e75ab348c0d1ddfbac00fa9e1376b43",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_2d0377afcd52f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "689c10c0-7bbb-42d7-a3fe-229b6495139e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
