@@ -1,0 +1,16 @@
+backend/src/main/java/app/model/entities/FiguritaIntercambiable.java
+  h_ecc1dc77ab0242 3,8-11,16,18-21,23-24,26-27,29,31,33,35,37,41
+backend/src/main/java/app/repositories/mongodb/RepositorioFiguritasIntercambiablesMongoDB.java
+  h_ecc1dc77ab0242 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "93eb6f131414465f3b80a02323b3f94bae38adfa",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
