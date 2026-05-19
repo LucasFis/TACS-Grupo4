@@ -1,0 +1,44 @@
+backend/src/main/java/app/repositories/memoria/RepositorioColeccionesEnMemoria.java
+  h_ecc1dc77ab0242 1,18-19,22
+backend/src/main/java/app/repositories/memoria/RepositorioFiguritasEnMemoria.java
+  h_ecc1dc77ab0242 1,10,14
+backend/src/main/java/app/repositories/memoria/RepositorioNotificacionesEnMemoria.java
+  h_ecc1dc77ab0242 1-43
+backend/src/main/java/app/repositories/mongodb/RepositorioFiguritasMongoDB.java
+  h_ecc1dc77ab0242 1-24
+backend/src/test/java/app/repositories/memoria/RepositorioPropuestasEnMemoriaTest.java
+  h_ecc1dc77ab0242 1-76
+backend/src/test/java/app/repositories/memoria/RepositorioFiguritasEnMemoriaTest.java
+  h_ecc1dc77ab0242 1
+backend/src/main/java/app/repositories/memoria/RepositorioPropuestasEnMemoria.java
+  h_ecc1dc77ab0242 1-59
+backend/src/main/java/app/repositories/memoria/RepositorioPerfilesEnMemoria.java
+  h_ecc1dc77ab0242 1-60
+backend/src/test/java/app/servicios/impl/SubastaServiceTest.java
+  h_ecc1dc77ab0242 14
+backend/src/test/java/app/repositories/memoria/RepositorioPerfilesEnMemoriaTest.java
+  h_ecc1dc77ab0242 1-68
+backend/src/test/java/app/repositories/memoria/RepositorioSubastasEnMemoriaTest.java
+  h_ecc1dc77ab0242 1-56
+backend/src/main/java/app/repositories/memoria/RepositorioFiguritasIntercambiablesEnMemoria.java
+  h_ecc1dc77ab0242 1,12,16
+backend/src/test/java/app/repositories/memoria/RepositorioFiguritasIntercambiablesEnMemoriaTest.java
+  h_ecc1dc77ab0242 1
+backend/src/test/java/app/repositories/memoria/RepositorioColeccionesEnMemoriaTest.java
+  h_ecc1dc77ab0242 1
+backend/src/main/java/app/repositories/memoria/RepositorioSubastasEnMemoria.java
+  h_ecc1dc77ab0242 1-58
+backend/src/test/java/app/repositories/memoria/RepositorioNotificacionesEnMemoriaTest.java
+  h_ecc1dc77ab0242 1-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "bbb444907da7ea88eb1aee93e25350f844b7f757",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
