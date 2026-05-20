@@ -1,0 +1,16 @@
+backend/src/main/java/app/repositories/mongodb/RepositorioPropuestasMongoDB.java
+  h_ecc1dc77ab0242 1-63
+backend/src/main/java/app/model/entities/Propuesta.java
+  h_ecc1dc77ab0242 10-12,17,19,21-22,24-25,27-28,30-31,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "8cafdca256b4c77c352d3a7d9218b3e93a50a6df",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
