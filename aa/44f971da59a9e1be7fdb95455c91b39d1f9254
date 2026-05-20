@@ -1,0 +1,26 @@
+backend/src/main/java/app/repositories/mongodb/RepositorioColeccionesMongoDB.java
+  s_2d0377afcd52f8::t_c80a8f59cf3ad4 4,8-10,14-15
+  h_ecc1dc77ab0242 1-3,5-7,11-13,16-44,46,51,74,77-79,96-97
+  s_2d0377afcd52f8::t_af85f2b3441e15 45,47-50,52-73,75-76,80-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "aa44f971da59a9e1be7fdb95455c91b39d1f9254",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_2d0377afcd52f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "689c10c0-7bbb-42d7-a3fe-229b6495139e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
