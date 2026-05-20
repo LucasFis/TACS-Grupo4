@@ -1,0 +1,20 @@
+backend/src/main/java/app/model/entities/Coleccion.java
+  h_ecc1dc77ab0242 9-11,16,18,20-25
+backend/src/main/java/app/model/entities/Calificacion.java
+  h_ecc1dc77ab0242 6,12,14,16,20
+backend/src/main/java/app/model/entities/Perfil.java
+  h_ecc1dc77ab0242 9,21-22,24
+backend/src/main/java/app/repositories/mongodb/RepositorioPerfilesMongoDB.java
+  h_ecc1dc77ab0242 1-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "48f64b4c211df0d68415f5c860fccc661558c907",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
