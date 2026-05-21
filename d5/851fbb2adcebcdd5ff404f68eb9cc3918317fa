@@ -1,0 +1,48 @@
+backend/src/main/java/app/InicializadorDeDatos.java
+  s_2d0377afcd52f8::t_b8ba8daff585d5 140-144
+  s_2d0377afcd52f8::t_487989b5bbe871 81-84
+  s_2d0377afcd52f8::t_3be7667e1718a2 165-167,170
+backend/src/main/java/app/model/entities/FiguritaIntercambiable.java
+  s_2d0377afcd52f8::t_36caa57db9b819 14-15
+  s_2d0377afcd52f8::t_8b524e48da2e1e 7
+backend/src/main/java/app/model/entities/Perfil.java
+  s_2d0377afcd52f8::t_cf9d59fb9ce095 5
+  s_2d0377afcd52f8::t_89277ea8e795a0 6,13-14
+backend/src/main/java/app/model/entities/Propuesta.java
+  s_2d0377afcd52f8::t_cf9d59fb9ce095 8
+  s_2d0377afcd52f8::t_89277ea8e795a0 9,16-17
+backend/src/main/java/app/repositories/mongodb/RepositorioColeccionesMongoDB.java
+  s_2d0377afcd52f8::t_ff7cba044f087b 39-43
+backend/src/main/java/app/model/entities/Subasta.java
+  s_2d0377afcd52f8::t_cf9d59fb9ce095 8
+  s_2d0377afcd52f8::t_89277ea8e795a0 9,17-18
+backend/src/main/java/app/servicios/impl/PerfilService.java
+  s_2d0377afcd52f8::t_c196ea7a2bf5c5 138
+  h_ecc1dc77ab0242 141,143
+backend/src/main/java/app/servicios/impl/EstadisticasServiceImpl.java
+  h_ecc1dc77ab0242 18,37
+  s_2d0377afcd52f8::t_a2508ab4eaeb47 36
+backend/src/main/java/app/repositories/mongodb/RepositorioPerfilesMongoDB.java
+  s_2d0377afcd52f8::t_203f9fd9b89d5f 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.12",
+  "base_commit_sha": "d5851fbb2adcebcdd5ff404f68eb9cc3918317fa",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_2d0377afcd52f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "689c10c0-7bbb-42d7-a3fe-229b6495139e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
