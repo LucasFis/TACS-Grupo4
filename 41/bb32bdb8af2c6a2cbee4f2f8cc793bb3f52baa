@@ -1,0 +1,51 @@
+backend/src/main/java/app/model/entities/Calificacion.java
+  s_2d0377afcd52f8::t_8df03c9b0229cd 5
+  s_2d0377afcd52f8::t_410322e777fec2 9
+backend/src/main/java/app/model/entities/Figurita.java
+  s_2d0377afcd52f8::t_2b2981c8834f6d 4
+  s_2d0377afcd52f8::t_410322e777fec2 10
+backend/src/main/java/app/model/entities/MedioDeContacto.java
+  s_2d0377afcd52f8::t_8b6beb8e4d76f5 4
+  s_2d0377afcd52f8::t_410322e777fec2 7
+backend/src/main/java/app/model/entities/Perfil.java
+  s_2d0377afcd52f8::t_7000746be2826b 5
+  s_2d0377afcd52f8::t_410322e777fec2 12
+backend/src/main/java/app/model/entities/Usuario.java
+  s_2d0377afcd52f8::t_cbc8e297c3e4da 4
+  s_2d0377afcd52f8::t_410322e777fec2 6
+backend/src/main/java/app/model/entities/Subasta.java
+  s_2d0377afcd52f8::t_c5a663a0a6a12a 8
+  s_2d0377afcd52f8::t_410322e777fec2 16
+backend/src/main/java/app/model/entities/FiguritaIntercambiable.java
+  s_2d0377afcd52f8::t_1fd5cfd36ad9b6 6
+  s_2d0377afcd52f8::t_410322e777fec2 14
+  h_ecc1dc77ab0242 46-48
+  s_2d0377afcd52f8::t_44efba46b4097c 45
+backend/src/main/java/app/model/entities/Propuesta.java
+  s_2d0377afcd52f8::t_410322e777fec2 15
+  s_2d0377afcd52f8::t_1207f886623b04 8
+backend/src/main/java/app/model/entities/EstadoPropuesta.java
+  s_2d0377afcd52f8::t_374c7423be8690 5
+  s_2d0377afcd52f8::t_410322e777fec2 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "41bb32bdb8af2c6a2cbee4f2f8cc793bb3f52baa",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_2d0377afcd52f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "689c10c0-7bbb-42d7-a3fe-229b6495139e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
