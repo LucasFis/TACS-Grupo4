@@ -1,0 +1,26 @@
+backend/src/main/java/app/model/entities/Calificacion.java
+  s_2d0377afcd52f8::t_5c59cd9c4b9e0c 15
+  s_2d0377afcd52f8::t_bc4c9f493c0c3e 6
+  h_ecc1dc77ab0242 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "eeaaa64df4db3ff03d93b599748cffa6985bfbe2",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_2d0377afcd52f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "689c10c0-7bbb-42d7-a3fe-229b6495139e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
