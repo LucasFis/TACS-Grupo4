@@ -1,0 +1,39 @@
+Makefile
+  s_2d0377afcd52f8::t_8517f11664da70 1
+docker-compose.dev.yml
+  s_2d0377afcd52f8::t_d67d41ba077a64 3-7,10-11,18,27,30
+  s_2d0377afcd52f8::t_4b5fc254072d9b 31-34
+  h_ecc1dc77ab0242 2
+  s_2d0377afcd52f8::t_135d5fa72a0867 12,14-17,28-29
+  s_2d0377afcd52f8::t_7dfa6547d33b1e 56-59
+  s_2d0377afcd52f8::t_2cef0856ca3ffc 13
+  s_2d0377afcd52f8::t_ede74ed2c38215 8-9
+docker-compose.yml
+  s_2d0377afcd52f8::t_1bd50b52c1f3ed 3-10,17,26,29-32
+  s_2d0377afcd52f8::t_d82dbda1550bde 50-53
+  s_2d0377afcd52f8::t_dccb142f63379c 33
+  s_2d0377afcd52f8::t_970b42bdf0113f 11-16,27-28
+backend/src/main/resources/application.properties
+  s_2d0377afcd52f8::t_51e23964a9f24a 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "4190281033109cb5df3af821bd8fd46ba5c4c8c8",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_2d0377afcd52f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "689c10c0-7bbb-42d7-a3fe-229b6495139e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
