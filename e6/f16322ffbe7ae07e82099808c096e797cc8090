@@ -1,0 +1,49 @@
+backend/src/main/java/app/repositories/mongodb/RepositorioSubastasMongoDB.java
+  s_2d0377afcd52f8::t_e5a6eb518fdac1 6
+  s_2d0377afcd52f8::t_895ed7b829423d 63-70
+backend/src/main/java/app/repositories/RepositorioPropuestas.java
+  s_2d0377afcd52f8::t_846833b5fa2719 3,6
+  s_2d0377afcd52f8::t_e5284cca3119ae 16-18
+backend/src/main/java/app/repositories/mongodb/RepositorioFiguritasIntercambiablesMongoDB.java
+  s_2d0377afcd52f8::t_dc4369803d76d9 105-108
+backend/src/main/java/app/repositories/memoria/RepositorioPropuestasEnMemoria.java
+  s_2d0377afcd52f8::t_7ccaa5d434faf6 60-69
+  s_2d0377afcd52f8::t_bef0b1a35620f5 3
+backend/src/main/java/app/servicios/impl/EstadisticasServiceImpl.java
+  s_2d0377afcd52f8::t_bb97c3fea69ee0 10,29,35,39,51,54-56,75
+backend/src/main/java/app/repositories/memoria/RepositorioFiguritasIntercambiablesEnMemoria.java
+  s_2d0377afcd52f8::t_4c1d4c9e1839ee 65-68
+  s_2d0377afcd52f8::t_a5cc05735be2a1 8
+backend/src/main/java/app/repositories/RepositorioSubastas.java
+  s_2d0377afcd52f8::t_576025c5be87d4 17-18
+backend/src/main/java/app/repositories/memoria/RepositorioSubastasEnMemoria.java
+  s_2d0377afcd52f8::t_48b2b3c2099121 36-40
+backend/src/main/java/app/repositories/mongodb/RepositorioPropuestasMongoDB.java
+  s_2d0377afcd52f8::t_8ad148591d975d 65-79
+  s_2d0377afcd52f8::t_c8fae3a063fc6f 4,8-9,11,14
+backend/src/main/java/app/repositories/RepositorioFiguritasIntercambiables.java
+  s_2d0377afcd52f8::t_3279d789590772 26
+backend/src/test/java/app/servicios/impl/EstadisticasServiceImplTest.java
+  s_2d0377afcd52f8::t_900f86b18de15d 8,13,18,31,53,55-56,61,83-85,87-88,101,103-104,125,127-132,144,146-150,177-179,181-182,203-210,212-213,229-232,234-235,241
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "e6f16322ffbe7ae07e82099808c096e797cc8090",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_2d0377afcd52f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "689c10c0-7bbb-42d7-a3fe-229b6495139e",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
