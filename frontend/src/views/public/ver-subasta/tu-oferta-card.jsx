@@ -2,7 +2,7 @@ import OfertaCard from "./oferta-card.jsx";
 import Button from "../../../components/ui/button/button.jsx";
 import {useNavigate, useParams} from "react-router";
 
-const TuOfertaCard = ({oferta, subastaAbierta}) => {
+const TuOfertaCard = ({oferta, subastaAbierta, subasta}) => {
     const navigate = useNavigate()
     const {subId} = useParams()
 
@@ -13,7 +13,7 @@ const TuOfertaCard = ({oferta, subastaAbierta}) => {
                 subastaAbierta &&
                     <>
                         <p>Podés mejorar tu oferta antes de que finalice!</p>
-                        <Button onClick={() => navigate(`/subastas/${subId}/ofertas/${oferta.id}`)}>Mejorar oferta</Button>
+                        <Button onClick={() => navigate(`/subastas/${subId}/ofertas/${oferta.id}/editar`, { state: { oferta, subasta } })}>Editar oferta</Button>
                     </>
             }
         </div>

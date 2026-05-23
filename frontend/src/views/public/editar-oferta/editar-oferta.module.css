@@ -1,0 +1,134 @@
+.figuritaSubastada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: var(--color-secondary);
+}
+
+.figuritaImagen {
+  min-height: 360px;
+  max-height: 480px;
+  min-width: 240px;
+  max-width: 360px;
+}
+
+.figuritaSubastada h4,
+.figuritaSubastada h6 {
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.figRequerida {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  background-color: color-mix(in srgb, var(--color-secondary-acent) 40%, transparent);
+}
+
+.figNumero {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-secondary);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--color-secondary-acent);
+}
+
+.figJugador {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  margin: 0;
+}
+
+.figSeleccion {
+  font-size: 0.72rem;
+  color: var(--color-secondary);
+  margin: 0;
+}
+
+.label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-subtitle);
+  margin: 0;
+}
+
+.hint {
+  font-size: 0.72rem;
+  color: var(--color-subtitle);
+  margin: 0;
+}
+
+.sinRestriccion {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--color-subtitle);
+  margin: 0;
+}
+
+.calificacionDivider {
+  border-top: 0.5px solid var(--color-secondary-acent);
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+  background-color: color-mix(in srgb, var(--color-secondary-acent) 40%, transparent);
+}
+
+.calBadgeNumero {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+}
+
+.calBadgeLabel {
+  font-size: 0.82rem;
+  color: var(--color-secondary);
+}
+
+.calSinMinimo {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+  background-color: var(--color-primary-acent);
+  border: 0.5px solid var(--border-color-light);
+  font-size: 0.82rem;
+  color: var(--color-subtitle);
+}
+
+.seleccionTitulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.seleccionHint {
+  font-size: 0.78rem;
+  color: var(--color-subtitle);
+  margin: 0;
+}

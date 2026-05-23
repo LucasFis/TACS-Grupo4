@@ -7,10 +7,15 @@ import styles from './selector-repetidas.module.css'
 
 const LIMITE = 10
 
-const SelectorRepetidas = ({ modo = 'unica', bloqueadas = [], onChange }) => {
+const SelectorRepetidas = ({
+  modo = 'unica',
+  bloqueadas = [],
+  onChange,
+  seleccionadasIniciales = [],
+}) => {
   const [figuritas, setFiguritas] = useState([])
   const [loading, setLoading] = useState(false)
-  const [seleccionadas, setSeleccionadas] = useState([])
+  const [seleccionadas, setSeleccionadas] = useState(seleccionadasIniciales)
   const [total, setTotal] = useState(null)
   const { handleError } = useError()
   const { showToast } = useToast()
@@ -46,10 +51,13 @@ const SelectorRepetidas = ({ modo = 'unica', bloqueadas = [], onChange }) => {
           : existe
             ? prev.filter((f) => f.figurita_id !== fig.figurita_id)
             : [...prev, fig]
-      onChange?.(next)
       return next
     })
   }
+
+  useEffect(() => {
+    onChange?.(seleccionadas)
+  }, [seleccionadas, onChange])
 
   const todasVisibles = [...bloqueadas, ...seleccionadas]
 

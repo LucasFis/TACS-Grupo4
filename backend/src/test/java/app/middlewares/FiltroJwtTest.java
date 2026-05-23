@@ -48,6 +48,7 @@ class FiltroJwtTest {
   @Test
   void shouldNotFilter_rutasPublicas_devuelveTrue() {
     when(request.getServletPath()).thenReturn("/login/test");
+    when(request.getMethod()).thenReturn("GET");
 
     assertTrue(jwtFilter.shouldNotFilter(request));
   }
@@ -55,8 +56,17 @@ class FiltroJwtTest {
   @Test
   void shouldNotFilter_rutasProtegidas_devuelveFalse() {
     when(request.getServletPath()).thenReturn("/subastas/123");
+    when(request.getMethod()).thenReturn("GET");
 
     assertFalse(jwtFilter.shouldNotFilter(request));
+  }
+
+  @Test
+  void shouldNotFilter_options_devuelveTrue() {
+    when(request.getMethod()).thenReturn("OPTIONS");
+    when(request.getServletPath()).thenReturn("/subastas/123");
+
+    assertTrue(jwtFilter.shouldNotFilter(request));
   }
 
   // -----------------------------

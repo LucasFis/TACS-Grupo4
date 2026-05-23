@@ -1,7 +1,7 @@
 import styles from './ver-subasta.module.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
-import { buscarSubasta, crearOferta } from '../../../services/subastasService.js'
+import { buscarSubasta } from '../../../services/subastasService.js'
 import Breadcrumb from '../../../components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '../../../components/ui/section-card/section-card.jsx'
 import SectionTitle from '../../../components/ui/section-title/section-title.jsx'
@@ -55,7 +55,7 @@ const VerSubasta = () => {
   const mostrarOfertaDeUsuario = (ofertas) => {
     const ofertaPropia = ofertas.find((o) => o.autor.usuario_id === userId.toString()) //Mismo Id que la sesion
     return ofertaPropia !== undefined ? (
-      <TuOfertaCard oferta={ofertaPropia} subastaAbierta={subastaAbierta} />
+      <TuOfertaCard oferta={ofertaPropia} subasta={subasta} subastaAbierta={subastaAbierta} />
     ) : (
       subastaAbierta && (
         <div className={'d-flex flex-row justify-content-center align-items-center gap-2'}>

@@ -8,10 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import app.dto.paginacion.PaginaResultado;
 import app.dto.subasta.SubastaDto;
-import app.dto.subasta.SubastasParticipoResponseDto;
-import app.model.entities.Subasta;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioSubasta;
 import jakarta.servlet.http.Cookie;
@@ -104,26 +101,45 @@ class ControladorSubastaTest {
     }
 
     @Test
-    void mejorarOferta_retorna200() throws Exception {
+    void editarOferta_retorna200() throws Exception {
 
         mockMvc.perform(
                 patch("/subastas/s-1/ofertas/o-1")
+                    .cookie(cookie)
                     .contentType("application/json")
                     .content("""
-                    {
-                      "figuritas_ofrecidas_id":[
-                        "ARG-15"
-                      ]
-                    }
-                    """)
+                {
+                  "figuritas_ofrecidas_id":[
+                    "ARG-15"
+                  ]
+                }
+                """)
             )
             .andExpect(status().isOk());
 
         verify(subastaService)
-            .mejorarOfertaEnSubasta(
+            .editarOfertaEnSubasta(
+                eq("1000"),
                 eq("s-1"),
                 eq("o-1"),
                 any()
+            );
+    }
+
+    @Test
+    void cancelarOferta_retorna200() throws Exception {
+
+        mockMvc.perform(
+                patch("/subastas/s-1/ofertas/o-1/cancelar")
+                    .cookie(cookie)
+            )
+            .andExpect(status().isOk());
+
+        verify(subastaService)
+            .cancelarOferta(
+                "1000",
+                "s-1",
+                "o-1"
             );
     }
 

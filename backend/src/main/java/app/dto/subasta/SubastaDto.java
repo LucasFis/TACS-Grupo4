@@ -1,5 +1,6 @@
 package app.dto.subasta;
 
+import app.model.entities.EstadoProceso;
 import app.dto.PerfilDto;
 import app.dto.PropuestaDto;
 import app.model.entities.Figurita;
@@ -36,6 +37,7 @@ public class SubastaDto {
     this.figurita = subasta.getFiguritaSubastada();
 
     this.ofertas = subasta.getOfertas().stream()
+        .filter(o -> o.obtenerEstadoActual().getValor() != EstadoProceso.CANCELADO)
         .map(PropuestaDto::new)
         .toList();
 

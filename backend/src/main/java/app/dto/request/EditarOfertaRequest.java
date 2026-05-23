@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class MejorarOfertaRequest {
+public class EditarOfertaRequest {
   @JsonProperty("figuritas_ofrecidas_id")
   private List<String> figuritasOfrecidasId;
 }

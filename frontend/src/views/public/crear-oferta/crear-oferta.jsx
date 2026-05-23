@@ -13,15 +13,15 @@ import styles from './crear-oferta.module.css'
 
 const obtenerBloqueadas = (repetidas, figuritasSolicitadas) => {
   if (!figuritasSolicitadas?.length) return []
-  const idsRepetidas = new Set(repetidas.map((r) => r.figuritaId))
+  const idsRepetidas = new Set(repetidas.map((r) => r.figurita_id))
   return figuritasSolicitadas
     .filter((sol) => idsRepetidas.has(sol.id))
-    .map((sol) => repetidas.find((r) => r.figuritaId === sol.id))
+    .map((sol) => repetidas.find((r) => r.figurita_id === sol.id))
 }
 
 const obtenerFaltantesRequeridas = (repetidas, figuritasSolicitadas) => {
   if (!figuritasSolicitadas?.length) return []
-  const idsRepetidas = new Set(repetidas.map((r) => r.figuritaId))
+  const idsRepetidas = new Set(repetidas.map((r) => r.figurita_id))
   return figuritasSolicitadas.filter((sol) => !idsRepetidas.has(sol.id))
 }
 
@@ -72,7 +72,7 @@ const CrearOferta = () => {
 
   const onEnviar = async () => {
     try {
-      const ids = [...bloqueadas, ...figuritasExtra].map((f) => f.figuritaId)
+      const ids = [...bloqueadas, ...figuritasExtra].map((f) => f.figurita_id ?? f.id)
       await crearOferta(subId, ids)
       navigate('/subastas')
     } catch (e) {
@@ -181,7 +181,11 @@ const CrearOferta = () => {
 
           <SelectorRepetidas modo="multiple" bloqueadas={bloqueadas} onChange={setFiguritasExtra} />
 
-          <Button label="Enviar oferta ↗" disabled={!puedeOfertar} onClick={onEnviar} />
+          <Button
+            label="Enviar oferta ↗"
+            disabled={!puedeOfertar || [...bloqueadas, ...figuritasExtra].length === 0}
+            onClick={onEnviar}
+          />
         </div>
       )}
     </div>

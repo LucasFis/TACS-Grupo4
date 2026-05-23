@@ -97,6 +97,15 @@ public class Propuesta {
         estado.add(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.CANCELADO));
     }
 
+    /**
+     * Resetea la propuesta a estado PENDIENTE. Se utiliza cuando el ofertante
+     * modifica las figuritas ofrecidas y la oferta debe ser revisada nuevamente.
+     */
+    public void resetearAPendiente(String perfilId) {
+        this.validarUsuarioAutor(perfilId);
+        estado.add(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE));
+    }
+
     private void validarPendiente() {
         if (obtenerEstadoActual().getValor() != EstadoProceso.PENDIENTE) {
             throw new BadRequestException("La propuesta ya fue respondida");

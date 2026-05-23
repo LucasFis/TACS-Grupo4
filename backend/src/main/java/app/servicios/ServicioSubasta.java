@@ -2,7 +2,7 @@ package app.servicios;
 
 import app.dto.filtros.SubastasFiltro;
 import app.dto.paginacion.PaginaResultado;
-import app.dto.request.MejorarOfertaRequest;
+import app.dto.request.EditarOfertaRequest;
 import app.dto.subasta.SubastaDto;
 import app.dto.subasta.SubastaParticipoDto;
 import app.exceptions.BadRequestException;
@@ -82,6 +82,16 @@ public class ServicioSubasta {
     List<Figurita> figuritasOfrecidas = rawFiguritasId.stream()
         .map(this.repoFigurita::buscarPorId)
         .toList();
+    
+    subasta.agregarOferta(nuevaPropuesta);
+    this.repoSubasta.guardar(subasta, camposSubasta);
+  }
+    public void editarOfertaEnSubasta(String perfilId, String subastaId, String ofertaId, EditarOfertaRequest body){
+      CamposSubasta camposSubasta = new CamposSubasta(false, true);
+      Subasta subasta = this.repoSubasta.buscarPorId(subastaId, camposSubasta);
+      Propuesta oferta = subasta.getOfertas().stream()
+          .filter(o -> o.getId().equals(ofertaId))
+          .findFirst().orElseThrow(() -> new BadRequestException("Oferta no encontrada"));
 
     Propuesta nuevaPropuesta = Propuesta.builder()
         .autor(autor)
@@ -89,9 +99,22 @@ public class ServicioSubasta {
         .figuritaBuscada(subasta.getFiguritaSubastada())
         .figuritasOfrecidas(figuritasOfrecidas).build();
 
-    subasta.agregarOferta(nuevaPropuesta);
-    this.repoSubasta.guardar(subasta, camposSubasta);
-  }
+      oferta.setFiguritasOfrecidas(nuevas_figuritas);
+      oferta.resetearAPendiente(perfilId);
+      this.repoSubasta.guardar(subasta, camposSubasta);
+    }
+
+    public void cancelarOferta(String perfilId, String subastaId, String ofertaId) {
+      CamposSubasta camposSubasta = new CamposSubasta(false, true);
+      Subasta subasta = this.repoSubasta.buscarPorId(subastaId, camposSubasta);
+      Propuesta oferta = subasta.getOfertas().stream()
+          .filter(o -> o.getId().equals(ofertaId))
+          .findFirst()
+          .orElseThrow(() -> new BadRequestException("Oferta no encontrada"));
+
+      oferta.cancelar(perfilId);
+      this.repoSubasta.guardar(subasta, camposSubasta);
+    }
 
   @Transactional
   public void mejorarOfertaEnSubasta(String subastaId, String ofertaId, MejorarOfertaRequest body){

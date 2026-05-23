@@ -3,7 +3,7 @@ package app.controllers;
 import app.dto.filtros.SubastasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.dto.request.CrearSubastaRequest;
-import app.dto.request.MejorarOfertaRequest;
+import app.dto.request.EditarOfertaRequest;
 import app.dto.request.OfertarEnSubastaRequest;
 import app.dto.subasta.SubastaDto;
 import app.servicios.ServicioJwt;
@@ -54,8 +54,25 @@ public class ControladorSubasta {
     }
 
     @PatchMapping("/{sub_id}/ofertas/{oferta_id}")
-    public ResponseEntity<Void> mejorarOfertaEnSubasta(@PathVariable String sub_id, @PathVariable String oferta_id, @RequestBody MejorarOfertaRequest body) {
-        this.subastaService.mejorarOfertaEnSubasta(sub_id, oferta_id, body);
+    public ResponseEntity<Void> editarOfertaEnSubasta(
+        @CookieValue String token,
+        @PathVariable String sub_id,
+        @PathVariable String oferta_id,
+        @RequestBody EditarOfertaRequest body
+    ) {
+        String perfilId = this.obtenerPerfilIdDeCookie(token);
+        this.subastaService.editarOfertaEnSubasta(perfilId, sub_id, oferta_id, body);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{sub_id}/ofertas/{oferta_id}/cancelar")
+    public ResponseEntity<Void> cancelarOferta(
+        @CookieValue String token,
+        @PathVariable String sub_id,
+        @PathVariable String oferta_id
+    ) {
+        String perfilId = this.obtenerPerfilIdDeCookie(token);
+        this.subastaService.cancelarOferta(perfilId, sub_id, oferta_id);
         return ResponseEntity.ok().build();
     }
 
