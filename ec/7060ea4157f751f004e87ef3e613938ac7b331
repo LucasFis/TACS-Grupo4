@@ -1,0 +1,23 @@
+backend/src/main/resources/application.properties
+  s_b665a969dacd92::t_291387f20ae50b 5
+docker-compose.dev.yml
+  s_b665a969dacd92::t_b51bbee5a3c01a 2-13,23-24,49-52
+docker-compose.yml
+  s_b665a969dacd92::t_e9bf78e782f015 3-18,28-30,47-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "ec7060ea4157f751f004e87ef3e613938ac7b331",
+  "prompts": {},
+  "sessions": {
+    "s_b665a969dacd92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bbd8a695-a35a-4f53-ab90-03fc236787ac",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
