@@ -1,0 +1,28 @@
+Makefile
+  s_b665a969dacd92::t_3f0a16bf940cba 1
+docker-compose.dev.yml
+  s_b665a969dacd92::t_f759d3a6716969 13-18,30-31
+frontend/README.md
+  s_b665a969dacd92::t_f0b5eddb84cbd4 32
+README.md
+  s_b665a969dacd92::t_9d1a4f26e2464b 304
+  s_b665a969dacd92::t_ee88686a4a3227 77
+  s_b665a969dacd92::t_c3c571c3001f1b 292
+  s_b665a969dacd92::t_ebf48a1c9bcaa1 69-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "787b4e9d2c993a2c0c57c1fe23981d26be6d660b",
+  "prompts": {},
+  "sessions": {
+    "s_b665a969dacd92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bbd8a695-a35a-4f53-ab90-03fc236787ac",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
