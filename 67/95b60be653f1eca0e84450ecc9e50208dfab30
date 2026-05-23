@@ -1,0 +1,48 @@
+backend/src/main/java/app/repositories/impl/RepositorioCalificacionesMongo.java
+  h_ecc1dc77ab0242 7
+  s_c5c0c3504b87f7::t_4052aaba50cabe 32
+backend/src/main/java/app/servicios/ServicioPerfil.java
+  h_ecc1dc77ab0242 3-8,10,16,20
+  s_c5c0c3504b87f7::t_8cc128cab11f2c 120-125
+backend/src/main/java/app/config/InicializadorDeDatos.java
+  s_61a7b90ce69d63::t_d7f8e6a68a57b9 202
+  s_61a7b90ce69d63::t_edcdb45b3fbcb1 187
+  s_61a7b90ce69d63::t_d0370e3ff1ef40 163
+  s_61a7b90ce69d63::t_c3abf5e8ca51c4 31
+  s_61a7b90ce69d63::t_5475016f3aafaf 139
+  h_ecc1dc77ab0242 24-25
+  s_61a7b90ce69d63::t_10806ce4b5672d 45
+backend/src/main/java/app/controllers/ControladorPerfil.java
+  s_c5c0c3504b87f7::t_a433830e86308f 100-109
+  h_ecc1dc77ab0242 3-7,14,17,19,24
+  s_c5c0c3504b87f7::t_758c1d1a9c5bfd 11,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "6795b60be653f1eca0e84450ecc9e50208dfab30",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_61a7b90ce69d63": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d8546574-86a8-4c83-8df7-ab791e89275d",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    },
+    "s_c5c0c3504b87f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90c1f7a2-71d2-4d88-98b4-55a75eeda824",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
