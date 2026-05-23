@@ -1,0 +1,38 @@
+mongo-scripts/init.js
+  s_b665a969dacd92::t_b4b4427eaf40ed 1-11
+mongo-init.js
+  s_b665a969dacd92::t_5087333b746834 1-4
+backend/src/main/java/app/MongoConfig.java
+  s_b665a969dacd92::t_37c1d444e6db67 1-17
+docker-compose.yml
+  s_b665a969dacd92::t_8aeaae40862421 8-9
+  s_b665a969dacd92::t_de67eb8a301b6c 14
+.env.example
+  s_b665a969dacd92::t_be3dcdc9be8e50 1,5-6
+backend/src/main/resources/application.properties
+  s_b665a969dacd92::t_9b988d78d5520d 6
+docker-compose.dev.yml
+  s_b665a969dacd92::t_342c87711ba71f 26-28
+  s_b665a969dacd92::t_3322eaac049815 39-40
+  s_b665a969dacd92::t_b4d5cb1a75108c 13
+  s_b665a969dacd92::t_74edd22f48f15b 5
+  s_b665a969dacd92::t_f8bdb667b0fbc2 12
+  s_b665a969dacd92::t_1791a2782ba44b 15-19,31,45-46
+  s_b665a969dacd92::t_861d5c14be945f 20-25,29-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "2e474b15d28148497974d6049261f242d1aef890",
+  "prompts": {},
+  "sessions": {
+    "s_b665a969dacd92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bbd8a695-a35a-4f53-ab90-03fc236787ac",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": null
+    }
+  }
+}
