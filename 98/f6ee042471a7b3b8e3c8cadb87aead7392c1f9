@@ -1,0 +1,20 @@
+frontend/src/app-routes.jsx
+  s_dd926e3caa21ac::t_c5f8f0dd0c5072 29
+  s_dd926e3caa21ac::t_6869673a8b6195 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "98f6ee042471a7b3b8e3c8cadb87aead7392c1f9",
+  "prompts": {},
+  "sessions": {
+    "s_dd926e3caa21ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dd781073-bee6-42a5-87d6-52e37f4c1919",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
