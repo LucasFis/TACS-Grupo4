@@ -18,6 +18,7 @@ import java.util.List;
 import app.repositories.impl.campos.CamposPerfil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +29,12 @@ public class ServicioPropuesta {
   private final RepositorioFiguritas repositorioFiguritas;
   private final ServicioNotificacion notificacionService;
 
+
   /**
    * Crea una propuesta de intercambio. Valida que el usuario origen,
    * destino y figuritas existan. El estado inicial es PENDIENTE.
    */
+  @Transactional
   public PropuestaDto crearPropuesta(String autorId, CrearPropuestaRequest request) {
     CamposPerfil sinCampos = new CamposPerfil(false);
     Perfil origen = repositorioPerfiles.buscarPorId(autorId, sinCampos);
