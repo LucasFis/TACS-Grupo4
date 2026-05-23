@@ -1,0 +1,19 @@
+backend/src/main/resources/application.properties
+  s_b665a969dacd92::t_e98752faa6cd4e 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "9b5233cb42e82bee9954637cbcc981a4b0eb1c15",
+  "prompts": {},
+  "sessions": {
+    "s_b665a969dacd92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bbd8a695-a35a-4f53-ab90-03fc236787ac",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
