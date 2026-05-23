@@ -20,6 +20,7 @@ import app.repositories.impl.campos.CamposColeccion;
 import app.repositories.impl.campos.CamposPerfil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class ServicioColeccion {
     repositorioColecciones.agregarFaltante(colId, faltante);
   }
 
+  @Transactional
   public void agregarRepetida(String colId, String figId, Integer
       cantidadExistente, List<MetodoIntercambio> modosIntercambio) {
 
