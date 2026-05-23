@@ -1,0 +1,24 @@
+frontend/src/views/public/sugerencias/sugerencias.jsx
+  s_25a51a46f00238::t_fa620fd9217125 71
+frontend/src/views/public/ver-subasta/ver-subasta.jsx
+  s_25a51a46f00238::t_945b148000b27d 303
+frontend/src/views/public/sugerencias/tabs/mostrador-sugerencias.jsx
+  s_25a51a46f00238::t_9dc9c00fcf56d4 36
+  s_25a51a46f00238::t_a3ac65af4c3de4 49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "58d5051f43f70a172af00aa50d0c538b8c561283",
+  "prompts": {},
+  "sessions": {
+    "s_25a51a46f00238": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d8e84e61-9d1d-4141-9ea3-bcc6bd7abd74",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
