@@ -1,0 +1,40 @@
+docker-compose.dev.yml
+  s_b665a969dacd92::t_f8bdb667b0fbc2 12
+  s_b665a969dacd92::t_254e9dbd3a630e 13
+  s_b665a969dacd92::t_861d5c14be945f 22-27,31-32
+  s_b665a969dacd92::t_342c87711ba71f 28
+  s_b665a969dacd92::t_cffcece2fd287f 29-30
+  s_b665a969dacd92::t_74edd22f48f15b 5
+  s_b665a969dacd92::t_1791a2782ba44b 17-21,33,45-46
+  s_b665a969dacd92::t_b4d5cb1a75108c 15
+docker-compose.yml
+  s_b665a969dacd92::t_8aeaae40862421 8,10
+  s_b665a969dacd92::t_34c3295ea5ae86 9
+  s_b665a969dacd92::t_de67eb8a301b6c 15
+backend/src/main/resources/application.properties
+  s_b665a969dacd92::t_9b988d78d5520d 6
+.env.example
+  s_b665a969dacd92::t_5cd255da25fe0b 1,3-9,11,14-15
+backend/src/main/java/app/MongoConfig.java
+  s_b665a969dacd92::t_37c1d444e6db67 1-17
+README.md
+  s_b665a969dacd92::t_acb0236adf64ed 74,80-81
+  s_b665a969dacd92::t_acc8353ffbe202 77
+  s_b665a969dacd92::t_ddb734e4094b1c 317-349
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "efb72a8e1ce3d3bd1ddd18b87b7f5d235749df9a",
+  "prompts": {},
+  "sessions": {
+    "s_b665a969dacd92": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bbd8a695-a35a-4f53-ab90-03fc236787ac",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
