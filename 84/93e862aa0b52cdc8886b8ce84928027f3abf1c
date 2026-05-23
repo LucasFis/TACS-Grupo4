@@ -1,0 +1,21 @@
+backend/Dockerfile
+  s_3083b604fc3894::t_a12d0189d0b751 18-19,21-22
+.github/workflows/ci.yml
+  s_3083b604fc3894::t_ce2139cc53f701 30-31,33-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "8493e862aa0b52cdc8886b8ce84928027f3abf1c",
+  "prompts": {},
+  "sessions": {
+    "s_3083b604fc3894": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a160d70e-11dd-4340-977f-9a8dcaada29c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
