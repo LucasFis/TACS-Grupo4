@@ -1,0 +1,25 @@
+frontend/src/views/public/errores/servidor-caido/servidor-caido.jsx
+  s_c5c0c3504b87f7::t_1d5a1f7e4a26f4 22
+frontend/src/components/ui/toast/toast.css
+  s_c5c0c3504b87f7::t_1002cd6bd7818d 17
+frontend/src/views/public/errores/acceso-denegado/acceso-denegado.jsx
+  s_c5c0c3504b87f7::t_3f33af766838c1 8-9
+frontend/src/views/public/errores/error-interno/error-interno.jsx
+  s_c5c0c3504b87f7::t_ed9b9e9dfb12f7 9,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "d0e8194e723d60dd0d1dbc8cd1a74bab45f23352",
+  "prompts": {},
+  "sessions": {
+    "s_c5c0c3504b87f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90c1f7a2-71d2-4d88-98b4-55a75eeda824",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
