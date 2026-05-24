@@ -1,0 +1,29 @@
+backend/src/main/java/app/dto/request/ContraseniaRequest.java
+  s_c5c0c3504b87f7::t_e94baf8f7c153a 1-13
+backend/src/main/java/app/dto/PerfilDto.java
+  s_c5c0c3504b87f7::t_45e8d20161bbdd 3,13,16,22,25
+  h_ecc1dc77ab0242 6
+backend/src/main/java/app/dto/request/PerfilRequest.java
+  s_c5c0c3504b87f7::t_e72c66e76d2356 4,11-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "0ec27132fdfb089d7a349cb47ffdee403d0785b9",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_c5c0c3504b87f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90c1f7a2-71d2-4d88-98b4-55a75eeda824",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
