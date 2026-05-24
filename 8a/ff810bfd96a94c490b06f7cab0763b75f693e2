@@ -1,0 +1,20 @@
+frontend/src/services/perfilService.js
+  s_c5c0c3504b87f7::t_f2fc384f9ac198 76-81
+  s_c5c0c3504b87f7::t_d568018d7884e3 83,85,87-92,94,96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "8aff810bfd96a94c490b06f7cab0763b75f693e2",
+  "prompts": {},
+  "sessions": {
+    "s_c5c0c3504b87f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90c1f7a2-71d2-4d88-98b4-55a75eeda824",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
