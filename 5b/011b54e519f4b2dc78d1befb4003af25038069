@@ -1,0 +1,20 @@
+backend/src/main/java/app/dto/FiguritaIntercambiableDto.java
+  s_7243af3616edae::t_2e7bd64705433b 34
+  s_7243af3616edae::t_e6868a890b96a7 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "5b011b54e519f4b2dc78d1befb4003af25038069",
+  "prompts": {},
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
