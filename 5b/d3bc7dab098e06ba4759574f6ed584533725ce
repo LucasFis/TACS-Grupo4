@@ -1,0 +1,24 @@
+frontend/src/utils/renderStars.jsx
+  s_52934bb1b3ef3e::t_59edb292bee450 1-12
+frontend/src/views/public/perfil/components/PerfilStats.jsx
+  s_52934bb1b3ef3e::t_91e1126523c1cf 3-4,7,11-18
+  s_52934bb1b3ef3e::t_23b1a5613e0cb0 1-2,5-6,8-10
+frontend/src/views/public/perfil/components/PerfilStats.module.css
+  s_52934bb1b3ef3e::t_506f2d61f43536 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "5bd3bc7dab098e06ba4759574f6ed584533725ce",
+  "prompts": {},
+  "sessions": {
+    "s_52934bb1b3ef3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "229b1f7d-c7ea-430a-a296-7d74475ae66a",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
