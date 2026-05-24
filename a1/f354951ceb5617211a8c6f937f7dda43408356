@@ -1,0 +1,29 @@
+frontend/src/views/public/perfil/components/ModalEditarPerfil/ColumnaContrasenia.jsx
+  s_52934bb1b3ef3e::t_0dd8791d0e2b21 1,3-4,6-33,35,37-79,81-85
+  s_52934bb1b3ef3e::t_130155719d8c10 2,5,34,36,80
+frontend/src/views/public/perfil/components/ModalEditarPerfil/ColumnaDatosPerfil.jsx
+  s_52934bb1b3ef3e::t_4767b3db2d73b8 1,5-19,74-75
+  s_52934bb1b3ef3e::t_d296550d6244db 86
+  s_52934bb1b3ef3e::t_30f818a4e0d529 62
+  s_52934bb1b3ef3e::t_74921c1b3cded6 2,4,20-33,35,37-43,45-56,58,60-61,63-73,76-85,87-102,104-112
+  s_52934bb1b3ef3e::t_08940a18ddf86e 3,34,36,44,57,59,103
+frontend/src/views/public/perfil/components/ModalEditarPerfil/columna.module.css
+  s_52934bb1b3ef3e::t_9f9ff319f10ea0 1-26
+  s_52934bb1b3ef3e::t_be89d9c714bfd1 27-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "a1f354951ceb5617211a8c6f937f7dda43408356",
+  "prompts": {},
+  "sessions": {
+    "s_52934bb1b3ef3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "229b1f7d-c7ea-430a-a296-7d74475ae66a",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
