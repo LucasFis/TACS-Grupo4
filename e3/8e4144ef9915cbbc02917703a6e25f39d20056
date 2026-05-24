@@ -1,0 +1,24 @@
+frontend/src/views/public/explorar/resultados/explorar-resultados.jsx
+  s_67ac46fb56d38f::t_fbcf6626588c4f 7-13,15-16,25-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "e38e4144ef9915cbbc02917703a6e25f39d20056",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_67ac46fb56d38f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "249841a7-c44c-44e9-b60b-95f52b660495",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
