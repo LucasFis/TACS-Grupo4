@@ -1,0 +1,21 @@
+frontend/src/views/public/perfil/components/CalificacionSkeleton.jsx
+  s_52934bb1b3ef3e::t_34ebee78d69147 1-14
+frontend/src/views/public/perfil/components/CalificacionSkeleton.module.css
+  s_52934bb1b3ef3e::t_cba68eedef2361 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "2754a62c3107b41e009bd0bb0460e7b18c731198",
+  "prompts": {},
+  "sessions": {
+    "s_52934bb1b3ef3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "229b1f7d-c7ea-430a-a296-7d74475ae66a",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
