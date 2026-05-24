@@ -1,0 +1,24 @@
+frontend/src/components/ui/figurita-card/figurita-card.module.css
+  s_7243af3616edae::t_77f8ce634e626e 200,202-203,210,215,220-222,226
+  s_7243af3616edae::t_ffbe21edff20c5 148,154,157,168-172,179,192
+  s_7243af3616edae::t_67b50dce478b9a 153,158-164,176,178,180
+frontend/src/components/ui/figurita-card/figurita-card.jsx
+  s_7243af3616edae::t_8d8643ed73f39b 63
+  s_7243af3616edae::t_c7d3fe95f3f3be 50-51,56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "9349d61100eeba5a2f298bd35ace38e5ba2f6e70",
+  "prompts": {},
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
