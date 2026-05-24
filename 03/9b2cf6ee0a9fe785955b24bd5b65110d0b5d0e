@@ -1,0 +1,23 @@
+frontend/src/views/public/explorar/sugerencias-banner/sugerencias-banner.jsx
+  s_7243af3616edae::t_6d038ecd49420f 1-2,4-9,14,18-19,21
+  ai_agent 10-12,15-17
+frontend/src/hooks/useFiguritas.js
+  s_7243af3616edae::t_18c184b93b11a4 15
+  s_7243af3616edae::t_d4a1dfb92d2baa 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "039b2cf6ee0a9fe785955b24bd5b65110d0b5d0e",
+  "prompts": {},
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
