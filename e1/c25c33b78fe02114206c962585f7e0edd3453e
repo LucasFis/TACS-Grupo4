@@ -1,0 +1,21 @@
+frontend/src/views/public/errores/acceso-denegado/acceso-denegado.jsx
+  s_c5c0c3504b87f7::t_3f33af766838c1 8-9
+frontend/src/views/public/errores/error-interno/error-interno.jsx
+  s_c5c0c3504b87f7::t_ed9b9e9dfb12f7 9,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "e1c25c33b78fe02114206c962585f7e0edd3453e",
+  "prompts": {},
+  "sessions": {
+    "s_c5c0c3504b87f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90c1f7a2-71d2-4d88-98b4-55a75eeda824",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
