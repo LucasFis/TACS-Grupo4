@@ -1,0 +1,39 @@
+backend/src/main/java/app/controllers/ControladorPerfil.java
+  s_c5c0c3504b87f7::t_546cda7a53bb32 107
+  s_c5c0c3504b87f7::t_7f0c5b7895512c 111-117
+  s_c5c0c3504b87f7::t_898c9039f9d8e0 11
+backend/src/main/java/app/servicios/ServicioPerfil.java
+  s_c5c0c3504b87f7::t_1369bb8c9d17a1 28
+  s_c5c0c3504b87f7::t_de60464f1481b8 130,132-134,139,144
+  s_c5c0c3504b87f7::t_97d44c181552f1 23
+  s_c5c0c3504b87f7::t_d326755eaa43f8 40
+  s_c5c0c3504b87f7::t_5e31a5b380a8b0 153-156,158-164
+  s_c5c0c3504b87f7::t_3c4d128330b87f 19
+  s_c5c0c3504b87f7::t_37e402d7bcbd45 127-129,131,135-137
+  h_ecc1dc77ab0242 11-12,29,140
+  s_c5c0c3504b87f7::t_a673a00b1156b3 145-151
+backend/src/main/java/app/repositories/impl/RepositorioUsuariosMongo.java
+  h_ecc1dc77ab0242 10
+  s_c5c0c3504b87f7::t_b43eee2d5ff21d 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "645c118ae23409875b6e01be5b10256ca39d20a4",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_c5c0c3504b87f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90c1f7a2-71d2-4d88-98b4-55a75eeda824",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
