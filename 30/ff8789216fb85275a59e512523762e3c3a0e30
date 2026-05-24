@@ -1,0 +1,30 @@
+frontend/src/views/public/perfil/hooks/useMediosContacto.js
+  s_52934bb1b3ef3e::t_f698bc5f5f3ea7 1-52
+frontend/src/hooks/usePaginacion.js
+  s_52934bb1b3ef3e::t_b6f7bed1aee7a9 1-11
+frontend/src/views/public/perfil/hooks/usePerfil.js
+  s_52934bb1b3ef3e::t_7bb4ea73595aa0 1,3-52
+  s_52934bb1b3ef3e::t_2424e4855c2ac3 2
+frontend/src/views/public/perfil/hooks/useCalificaciones.js
+  s_52934bb1b3ef3e::t_de91daf614c481 4,10
+  s_52934bb1b3ef3e::t_168910ecc4b5cf 1-3,5-9,11-30
+frontend/src/views/public/perfil/hooks/useEditarPerfil.js
+  s_52934bb1b3ef3e::t_06184a767ddb01 1-4,6-10,12-24,26-47,49-50
+  s_52934bb1b3ef3e::t_b55e61542f57df 5,11,25,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "30ff8789216fb85275a59e512523762e3c3a0e30",
+  "prompts": {},
+  "sessions": {
+    "s_52934bb1b3ef3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "229b1f7d-c7ea-430a-a296-7d74475ae66a",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
