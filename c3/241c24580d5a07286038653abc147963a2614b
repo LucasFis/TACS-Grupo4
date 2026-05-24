@@ -1,0 +1,21 @@
+frontend/vite.config.js
+  s_7243af3616edae::t_6d648e536122f6 12-16
+Makefile
+  s_7243af3616edae::t_9abd5b9622aa32 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "c3241c24580d5a07286038653abc147963a2614b",
+  "prompts": {},
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
