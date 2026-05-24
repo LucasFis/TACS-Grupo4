@@ -1,0 +1,23 @@
+frontend/src/components/ui/user-chip/user-chip.module.css
+  s_7243af3616edae::t_cecba49903074a 34,36
+  s_7243af3616edae::t_90c8523307671d 4-10,14-24,28-30,35
+frontend/src/components/ui/user-chip/user-chip.jsx
+  s_7243af3616edae::t_e9d0db57b740e2 6-9
+  s_7243af3616edae::t_aa156096451ccd 1,10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "903844763e45fb913dd647156dff01599bca28d0",
+  "prompts": {},
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
