@@ -1,0 +1,20 @@
+frontend/src/components/ui/figurita-card/figurita-card.module.css
+  s_7243af3616edae::t_906d3895dcb169 191
+  s_7243af3616edae::t_08e95fd7d75d99 128,200,220
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "34e3b1875ccd130e6db85d5ce453ffcd3e75bdcc",
+  "prompts": {},
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
