@@ -1,0 +1,23 @@
+frontend/src/views/public/perfil/perfil.jsx
+  s_c5c0c3504b87f7::t_6597bdc0938553 2-7
+  s_c5c0c3504b87f7::t_c753e5e072cadc 567-571
+  s_c5c0c3504b87f7::t_50b1a96f8fcc96 251
+  s_c5c0c3504b87f7::t_2e7b510feaa260 132
+  s_c5c0c3504b87f7::t_967fd8358651a2 560-562,575
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "4d688018d8dec246b1da7e99d3e127e5114c28b3",
+  "prompts": {},
+  "sessions": {
+    "s_c5c0c3504b87f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90c1f7a2-71d2-4d88-98b4-55a75eeda824",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
