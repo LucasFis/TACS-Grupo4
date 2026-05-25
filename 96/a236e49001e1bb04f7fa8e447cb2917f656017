@@ -1,0 +1,31 @@
+frontend/src/views/public/perfil/hooks/useCalificaciones.js
+  s_0d012ad87c7b58::t_f6c34d142f03fa 7
+  h_ecc1dc77ab0242 27
+backend/src/main/java/app/repositories/impl/RepositorioCalificacionesMongo.java
+  s_0d012ad87c7b58::t_5f24d31fb12d44 24-27
+  s_0d012ad87c7b58::t_cc68676b00fb3f 8
+  s_0d012ad87c7b58::t_bf72b96a27b5bd 70
+backend/src/main/java/app/dto/CalificacionDto.java
+  s_0d012ad87c7b58::t_fa16dc56890f84 10,18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "96a236e49001e1bb04f7fa8e447cb2917f656017",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_0d012ad87c7b58": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1066b8ee-a4bb-45c2-bdc2-ea4db4ca4703",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
