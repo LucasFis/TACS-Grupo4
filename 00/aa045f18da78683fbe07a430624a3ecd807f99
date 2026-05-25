@@ -1,0 +1,33 @@
+frontend/src/views/public/explorar/explorar.jsx
+  s_7243af3616edae::t_81371f0b757494 23
+  s_7243af3616edae::t_401a1b3a1b579f 10
+frontend/src/services/explorarService.js
+  h_ecc1dc77ab0242 9
+  s_7243af3616edae::t_998bf2690c45ee 8,11,17,28,34
+frontend/src/views/public/explorar/filtros/explorar-filtros.jsx
+  s_7243af3616edae::t_1cff25f02461da 10,15,17-18,21,36-37,46
+  h_ecc1dc77ab0242 16
+frontend/src/hooks/useFiguritas.js
+  s_7243af3616edae::t_f6f6ed4c9bb8d0 5,18,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "00aa045f18da78683fbe07a430624a3ecd807f99",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
