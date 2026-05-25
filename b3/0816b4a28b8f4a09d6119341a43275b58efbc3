@@ -1,0 +1,29 @@
+backend/src/main/java/app/config/InicializadorDeDatos.java
+  s_67ac46fb56d38f::t_19a7e40b28a823 25,50,64
+  s_67ac46fb56d38f::t_9ad15caea781a4 63,73
+  h_ecc1dc77ab0242 104,146
+backend/src/main/java/app/config/AsyncConfig.java
+  h_ecc1dc77ab0242 19
+  s_67ac46fb56d38f::t_9ad15caea781a4 1-18,20-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b30816b4a28b8f4a09d6119341a43275b58efbc3",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_67ac46fb56d38f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "249841a7-c44c-44e9-b60b-95f52b660495",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
