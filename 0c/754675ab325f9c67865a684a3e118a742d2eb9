@@ -1,0 +1,24 @@
+backend/src/test/java/app/repositories/impl/RepositorioColeccionesTest.java
+  s_cd6d56e1671b15::t_0dc7d4071c450e 242
+backend/src/main/java/app/config/InicializadorDeDatos.java
+  s_cd6d56e1671b15::t_209a4011e9fe6e 77,79
+  s_cd6d56e1671b15::t_5ed0fe9ca258d3 408,414-415
+  s_cd6d56e1671b15::t_8e33268fbb28c4 201
+  s_cd6d56e1671b15::t_5ed75a1bf5301d 485,491-492
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "0c754675ab325f9c67865a684a3e118a742d2eb9",
+  "prompts": {},
+  "sessions": {
+    "s_cd6d56e1671b15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "10ac39a9-25fc-491f-8470-8b0f1c80b711",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
