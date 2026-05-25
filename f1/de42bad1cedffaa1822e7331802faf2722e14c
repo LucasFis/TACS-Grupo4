@@ -1,0 +1,24 @@
+backend/pom.xml
+  s_d7dfaa1913a7d8::t_0540e70f55f963 98-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "f1de42bad1cedffaa1822e7331802faf2722e14c",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_d7dfaa1913a7d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f051924b-aab6-44f1-a036-7396dfdb9b93",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
