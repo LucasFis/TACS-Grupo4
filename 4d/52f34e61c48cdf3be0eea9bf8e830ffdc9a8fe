@@ -1,0 +1,21 @@
+frontend/src/views/public/explorar/filtros/useExplorarFiltros.js
+  s_ce5fd49d3f9e79::t_642aed5c445486 1-59
+frontend/src/views/public/explorar/filtros/FiltrosActivos.jsx
+  s_ce5fd49d3f9e79::t_fc1f3ba37d2cb1 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "4d52f34e61c48cdf3be0eea9bf8e830ffdc9a8fe",
+  "prompts": {},
+  "sessions": {
+    "s_ce5fd49d3f9e79": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41551456-54be-492f-aa4a-253395ee3a3c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
