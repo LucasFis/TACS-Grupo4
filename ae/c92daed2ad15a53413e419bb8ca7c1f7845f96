@@ -1,0 +1,23 @@
+backend/src/main/java/app/config/InicializadorDeDatos.java
+  s_d7dfaa1913a7d8::t_0e4c6227530177 522,528-529
+  s_d7dfaa1913a7d8::t_cb9b81c4957aed 445,451-452
+  s_d7dfaa1913a7d8::t_094e45272a2c6a 121-122,124-125
+  s_d7dfaa1913a7d8::t_bb2b9a01e6f505 200,202,205
+  s_d7dfaa1913a7d8::t_f25c88c9c314e6 278-279,281-282,285
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "aec92daed2ad15a53413e419bb8ca7c1f7845f96",
+  "prompts": {},
+  "sessions": {
+    "s_d7dfaa1913a7d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f051924b-aab6-44f1-a036-7396dfdb9b93",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
