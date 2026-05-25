@@ -1,0 +1,53 @@
+backend/src/main/java/app/controllers/ControladorFigurita.java
+  h_ecc1dc77ab0242 7
+  s_7243af3616edae::t_0982b9d76756c7 23
+  s_7243af3616edae::t_16714c99204dab 25,32,36
+backend/src/main/java/app/servicios/ServicioFigurita.java
+  s_7243af3616edae::t_06f03a8c31ef8f 26
+  s_7243af3616edae::t_a591786ea69f25 27,29,42,45
+backend/src/test/java/app/controllers/ControladorFiguritaTest.java
+  s_7243af3616edae::t_640a8bc9bba924 112,121
+  s_7243af3616edae::t_b74c7c01678412 46
+backend/src/main/java/app/repositories/impl/RepositorioFiguritasMongo.java
+  s_7243af3616edae::t_2d4691fb54f6b3 55
+backend/src/test/java/app/model/entities/filtros/FiguritasFiltroTest.java
+  s_7243af3616edae::t_52d931c4c3c08d 17,24
+  s_7243af3616edae::t_04b2b6059b79cd 40-41
+backend/src/test/java/app/repositories/impl/RepositorioFiguritasTest.java
+  s_7243af3616edae::t_04b2b6059b79cd 54
+backend/src/test/java/app/repositories/impl/RepositorioIntercambiablesTest.java
+  s_7243af3616edae::t_04b2b6059b79cd 85
+  s_7243af3616edae::t_10294f5d8154e1 100,108
+  s_7243af3616edae::t_c6bdd87e641e8c 171
+backend/src/main/java/app/dto/filtros/FiguritasFiltro.java
+  s_7243af3616edae::t_1521aeea29ec46 9
+  s_7243af3616edae::t_dee1dacdd1a306 4,11
+backend/src/main/java/app/repositories/impl/RepositorioColeccionesMongo.java
+  s_7243af3616edae::t_c92e5d2a900b00 144,146
+  s_7243af3616edae::t_098f1677f56539 167
+backend/src/test/java/app/servicios/impl/ServicioFiguritaTest.java
+  s_7243af3616edae::t_7701e5c51e671e 67
+backend/src/main/java/app/repositories/RepositorioColecciones.java
+  s_7243af3616edae::t_5383249451c6e6 35,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "eaea6f1250955c40823270096e2e7a428a6e056a",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
