@@ -1,0 +1,28 @@
+frontend/src/views/public/crear-propuesta-intercambio/useCrearPropuesta.js
+  s_7243af3616edae::t_15574a5dab3280 9,15-16,26-27,31
+frontend/src/views/public/crear-propuesta-intercambio/crear-propuesta-intercambio.jsx
+  s_7243af3616edae::t_a957b28c4601a8 41
+  s_7243af3616edae::t_059a4a1ffeb1eb 46-50
+  s_7243af3616edae::t_c8800049b3fd03 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "aed8bc07c7e8846ee70fc40a299d08831291eabf",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_7243af3616edae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d64604c-14e7-4733-850d-6e14afa7ce97",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
