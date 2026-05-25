@@ -1,0 +1,35 @@
+frontend/src/views/public/explorar/filtros/explorar-filtros.jsx
+  s_ce5fd49d3f9e79::t_2ab39398427ab3 2,5-17
+  s_ce5fd49d3f9e79::t_4eaf8945db8641 38-44,48-49,55-56,62-75
+  s_ce5fd49d3f9e79::t_2155304f4475be 58
+frontend/src/views/public/explorar/filtros/explorar-filtros.module.css
+  s_ce5fd49d3f9e79::t_bdbb02ca209cd7 97-129
+backend/src/main/java/app/middlewares/ErrorHandler.java
+  s_67ac46fb56d38f::t_87e27ae609b9b3 97-103
+  s_67ac46fb56d38f::t_46ca12053821dd 86-96
+  s_67ac46fb56d38f::t_d584e206e11924 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "9469692f06b2ef0e48334fd3a99d960f8ea7a278",
+  "prompts": {},
+  "sessions": {
+    "s_67ac46fb56d38f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "249841a7-c44c-44e9-b60b-95f52b660495",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    },
+    "s_ce5fd49d3f9e79": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41551456-54be-492f-aa4a-253395ee3a3c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": null
+    }
+  }
+}
