@@ -1,0 +1,22 @@
+backend/src/main/java/app/config/InicializadorDeDatos.java
+  s_cd6d56e1671b15::t_d18bc0afacbfd3 152
+  s_cd6d56e1671b15::t_e0889b686eea6f 96-104
+backend/src/main/java/app/model/entities/Figurita.java
+  s_cd6d56e1671b15::t_9af0cf2c9e7cc6 4,13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "cdbc1fb3da58c585cf2b705427444fe59b894aa6",
+  "prompts": {},
+  "sessions": {
+    "s_cd6d56e1671b15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "10ac39a9-25fc-491f-8470-8b0f1c80b711",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
