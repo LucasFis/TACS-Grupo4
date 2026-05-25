@@ -1,0 +1,25 @@
+backend/src/main/java/app/servicios/ServicioUsuario.java
+  s_d7dfaa1913a7d8::t_f1eb2591628525 13
+  s_d7dfaa1913a7d8::t_8ecc9d5386ffce 44-55
+backend/src/main/java/app/controllers/ControladorUsuario.java
+  s_d7dfaa1913a7d8::t_036af4e7ba6c95 3,8
+  s_d7dfaa1913a7d8::t_80cd64274eafd6 29-38
+backend/src/test/java/app/controllers/ControladorUsuarioTest.java
+  s_d7dfaa1913a7d8::t_c2727d6f0f5c9e 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "59e174391d160bc3b1c35e2545d565e1ba2ec30c",
+  "prompts": {},
+  "sessions": {
+    "s_d7dfaa1913a7d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f051924b-aab6-44f1-a036-7396dfdb9b93",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
