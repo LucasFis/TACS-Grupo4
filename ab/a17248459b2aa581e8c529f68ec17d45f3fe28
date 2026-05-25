@@ -1,0 +1,19 @@
+frontend/src/views/public/perfil/hooks/usePerfil.js
+  s_29aaf24d5d823f::t_5aa48e863110fe 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "aba17248459b2aa581e8c529f68ec17d45f3fe28",
+  "prompts": {},
+  "sessions": {
+    "s_29aaf24d5d823f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "78290d5f-61ab-47aa-b322-e4bd7049f91a",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
