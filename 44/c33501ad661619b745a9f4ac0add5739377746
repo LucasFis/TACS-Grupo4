@@ -1,0 +1,14 @@
+frontend/src/services/api.js
+  h_ecc1dc77ab0242 11-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "44c33501ad661619b745a9f4ac0add5739377746",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
