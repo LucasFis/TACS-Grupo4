@@ -1,0 +1,24 @@
+frontend/src/components/ui/cabecera-figurita/cabecera-figurita.jsx
+  s_ce5fd49d3f9e79::t_600724b5950796 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "54919e247ad8bd486215fc33d7e8c1e87901ecd7",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_ce5fd49d3f9e79": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41551456-54be-492f-aa4a-253395ee3a3c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
