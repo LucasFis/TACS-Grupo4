@@ -1,0 +1,40 @@
+backend/src/test/java/app/servicios/impl/ServicioDeAgregacionDeDatosTest.java
+  h_ecc1dc77ab0242 39,44,52,56,64,69,77,84,91,96,104,114
+  s_67ac46fb56d38f::t_188446a41530b0 12,14,65
+  s_67ac46fb56d38f::t_2ad10f9b861ee8 34
+  s_67ac46fb56d38f::t_a3b5cfb6231dfb 47,59
+  s_67ac46fb56d38f::t_55238ea69bbb88 105
+  s_67ac46fb56d38f::t_19a7e40b28a823 1-11,13,15-27,29-33,37-38,41,43,45,48-51,54-55,57-58,60-63,68,70,72-76,83,85,88-90,95,97-98,100-103,109,111,113,115-116,118-119
+  s_67ac46fb56d38f::t_754160a8dfbe2a 40,53,79,93,108,110
+  s_67ac46fb56d38f::t_1bcef7687cdee5 28
+  s_67ac46fb56d38f::t_71cd118155d862 35-36,42,46,66-67,71,78,80-82,86-87,92,94,99,106-107,112,117
+backend/src/main/java/app/servicios/impl/ServicioDeAgregacionDeDatos.java
+  s_67ac46fb56d38f::t_754160a8dfbe2a 45
+  h_ecc1dc77ab0242 7,34,47,53-55,59,67-69,71
+  s_67ac46fb56d38f::t_7a3a9d38ee32a7 50-52,56-58,60-61
+  s_67ac46fb56d38f::t_1bcef7687cdee5 21,25,28
+  s_67ac46fb56d38f::t_19a7e40b28a823 1-4,6,8-20,22-24,26-27,29-33,35-43,46,48-49,62-66,70,72-81
+  s_67ac46fb56d38f::t_188446a41530b0 5
+  s_67ac46fb56d38f::t_2d0d89967cd8f3 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7f814b324f7f5fce11c471c3e71b1cd66fbdad38",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_67ac46fb56d38f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "249841a7-c44c-44e9-b60b-95f52b660495",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
