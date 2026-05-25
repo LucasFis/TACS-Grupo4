@@ -1,0 +1,14 @@
+Makefile
+  h_ecc1dc77ab0242 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "c73c1479a0aee91482b53ddddeaa48d830ec5577",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
