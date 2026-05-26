@@ -1,0 +1,11 @@
+frontend/src/views/public/sugerencias/tabs/mostrador-sugerencias.jsx
+  ai_agent 6-7,11-13,15,24,27,38
+frontend/src/views/public/sugerencias/sugerencias.jsx
+  ai_agent 9-10,14-17,19,36,68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "246c6675d9c0383021c29e7d3bfdc54175cf26e1",
+  "prompts": {}
+}
