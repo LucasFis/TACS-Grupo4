@@ -1,0 +1,41 @@
+backend/src/main/java/app/model/entities/Figurita.java
+  s_54e482ca4baca3::t_6aba0147648146 31-35
+backend/src/main/java/app/config/InicializadorDeDatos.java
+  s_54e482ca4baca3::t_2fbbb32caa3ef5 64
+  s_54e482ca4baca3::t_195936560c42ac 104,146
+  s_54e482ca4baca3::t_0059a4e55ad7fe 50
+  s_54e482ca4baca3::t_15bde2a6019e06 25
+backend/src/test/java/app/servicios/impl/ServicioDeAgregacionDeDatosTest.java
+  s_54e482ca4baca3::t_59a40d82995d75 6,27,36-38,42,45,50-52,55,58,63-65,67,74,78-79,81,85,90-97
+backend/src/main/java/app/repositories/impl/RepositorioFiguritasMongo.java
+  s_54e482ca4baca3::t_9e6930ecd3abdc 3,7-9,11,15,20-22,30,66-67,71-97
+backend/src/main/java/app/client/TheSportsDbImagenProveedor.java
+  s_54e482ca4baca3::t_23f8f689537f97 99-100,102,109
+backend/src/main/java/app/servicios/ServicioEnriquecimiento.java
+  s_54e482ca4baca3::t_1c6223880d3e9c 1-11
+backend/src/main/java/app/servicios/impl/ServicioDeAgregacionDeDatos.java
+  s_54e482ca4baca3::t_4f6f2e9825d242 6-7,16,20,25,31,33-35,45-47,51-55,57
+backend/src/main/java/app/repositories/RepositorioFiguritas.java
+  s_54e482ca4baca3::t_292a018590f49b 5,25-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f698f9fd88eb6a611c2a44c8c018397a8471d14e",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_54e482ca4baca3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "411afa80-ac0b-4c45-b45f-fbafaaec817c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
