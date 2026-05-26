@@ -1,0 +1,20 @@
+backend/src/test/java/app/servicios/impl/ServicioPerfilTest.java
+  s_54e482ca4baca3::t_3d6ec373436a44 20
+  s_54e482ca4baca3::t_73e1540ad95886 36-37,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "21d6bcccb824e85e5d3a636d0440da87542a80da",
+  "prompts": {},
+  "sessions": {
+    "s_54e482ca4baca3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "411afa80-ac0b-4c45-b45f-fbafaaec817c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
