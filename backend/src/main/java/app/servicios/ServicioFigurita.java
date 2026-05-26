@@ -39,7 +39,7 @@ public class ServicioFigurita {
     PaginaResultado<FiguritaIntercambiable> paginaRepo =
         repositorioColecciones.buscarIntercambiablesConFiltros(filtros, pagina, tamanioPagina);
 
-    return mapearADto(paginaRepo, tipos);
+    return mapearADto(paginaRepo);
   }
   public PaginaResultado<FiguritaIntercambiableDto> buscarPorQuery(
       String q, List<MetodoIntercambio> tipos, int pagina, int tamanioPagina) {
@@ -47,7 +47,7 @@ public class ServicioFigurita {
     PaginaResultado<FiguritaIntercambiable> paginaRepo =
         repositorioColecciones.buscarIntercambiablesPorQuery(q, tipos, pagina, tamanioPagina);
 
-    return mapearADto(paginaRepo, tipos);
+    return mapearADto(paginaRepo);
   }
 
   private Map<String, String> obtenerMapaSubastasActivas(List<FiguritaIntercambiable> figuritas) {
@@ -67,7 +67,7 @@ public class ServicioFigurita {
   }
 
   private PaginaResultado<FiguritaIntercambiableDto> mapearADto(
-      PaginaResultado<FiguritaIntercambiable> paginaRepo, List<MetodoIntercambio> tipos) {
+      PaginaResultado<FiguritaIntercambiable> paginaRepo) {
 
     Map<String, String> figuritaIdASubastaId = obtenerMapaSubastasActivas(paginaRepo.contenido());
 
