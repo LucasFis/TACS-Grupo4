@@ -1,0 +1,171 @@
+frontend/src/views/public/ver-intercambio/ver-intercambio.module.css
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-69
+backend/src/main/java/app/dto/request/CrearSubastaRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 5-11,17,20-21,24,27-29
+backend/src/main/java/app/repositories/impl/campos/CamposSubasta.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 9-17
+backend/src/main/java/app/dto/request/FaltanteRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 4,11
+backend/src/test/java/app/controllers/ControladorPropuestaTest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 263-422
+frontend/src/components/layouts/navbar/navbar.css
+  s_107a1d1b80fda9::t_107593ee94b7b9 88-154
+backend/src/main/java/app/repositories/impl/RepositorioSubastasMongo.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 42-43,45,49-51,175-176,178
+backend/src/main/java/app/servicios/ServicioSubasta.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 76,106-109,112-116,118-125,131,148,162,179,199-202,210-220,222-232
+backend/src/main/java/app/repositories/impl/RepositorioNotificacionesMongo.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 1,34
+plan-migracion-documentreference.md
+  s_0c74765c91ae94::t_be05467ff585e8 1-278
+frontend/src/views/public/perfil/components/PerfilCalificaciones.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 2,28
+frontend/src/views/public/ver-intercambio/oferta-card.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-103
+backend/src/main/java/app/model/entities/Propuesta.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 15,45,49-57,90,162-164
+frontend/src/components/ui/estrellas/estrellas.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-37
+backend/src/main/java/app/dto/request/EditarOfertaRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 6,16
+comparacion-persistencia-mergeada-vs-poc.md
+  s_67ac46fb56d38f::t_d6a0273d08ded8 1-441
+backend/pom.xml
+  s_107a1d1b80fda9::t_107593ee94b7b9 170
+backend/src/main/java/app/config/FiguritasQatar2022.java
+  s_54e482ca4baca3::t_8a0469430e5936 10-20,23-33,36-46,62-72,75-85,88-98,101-111,114-124,127-137,140-150,153-163,166-176,179-189,192-202,205-215,218-228,231-241,244-254,257-267,270-280,283-293,296-306,309-319,322-332,335-345,348-358,361-371,374-384,387-397,400-410,413-423
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-9,21-22,34-35,47-48,60-61,73-74,86-87,99-100,112-113,125-126,138-139,151-152,164-165,177-178,190-191,203-204,216-217,229-230,242-243,255-256,268-269,281-282,294-295,307-308,320-321,333-334,346-347,359-360,372-373,385-386,398-399,411-412,424-462
+  s_54e482ca4baca3::t_1e5a620b9a7f8b 49-59
+backend/src/main/java/app/dto/NotificacionDto.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-23
+backend/src/main/java/app/dto/request/CalificacionRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 5-8,18-20,24,31,35
+backend/src/test/java/app/controllers/ControladorSubastaTest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 11,213-510
+frontend/src/services/subastasService.js
+  s_107a1d1b80fda9::t_107593ee94b7b9 33
+frontend/src/app-routes.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 25-26,94-96
+frontend/src/views/public/ver-subasta/ver-subasta.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 12,17,57,281
+backend/src/main/java/app/dto/request/PerfilRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 5-6,12,16
+backend/src/test/java/app/controllers/ControladorColeccionTest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 52,109,140-296
+backend/src/main/java/app/dto/PropuestaDto.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 17,27-32
+frontend/src/components/ui/perfil-simple/perfil-simple.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-3,5-6,8-17,19-21,24
+frontend/src/views/public/ver-intercambio/oferta-card.module.css
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-35
+backend/src/main/java/app/controllers/ControladorPropuesta.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 10,25,31-37
+frontend/src/components/layouts/navbar/navbar.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-2,7,11-13,24-77,79-84,95-99,102-128,134,148-149
+backend/src/main/java/app/dto/request/UsuarioNombreRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 4,10
+backend/src/main/java/app/controllers/ControladorPerfil.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 5,15-16,28,41,86,93-101,113
+backend/src/main/java/app/dto/request/RepetidaRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 5-8,18-20,23,27
+backend/src/main/java/app/dto/request/OfertarEnSubastaRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 4,16
+frontend/src/views/public/intercambios/intercambios.css
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-43
+backend/src/test/java/app/servicios/impl/ServicioNotificacionTest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 40,49
+frontend/src/views/public/ver-intercambio/figurita-card.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-32
+backend/src/main/java/app/servicios/ServicioNotificacion.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 19-38
+backend/src/main/java/app/servicios/ServicioPropuesta.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 17,77-86,107-110,123-127
+backend/src/main/java/app/servicios/ServicioPerfil.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 6,39,42,115-120,167-169
+backend/src/test/java/app/controllers/ControladorUsuarioTest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 3-7,9,20-21,36-44,71-304
+frontend/src/views/public/perfil/components/PerfilHeader.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 1,21-26,36-38,51-54
+plan-enriquecimiento-imagenes.md
+  s_67ac46fb56d38f::t_d6a0273d08ded8 1-271
+backend/src/main/java/app/controllers/ControladorUsuario.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 23,42
+backend/src/main/java/app/dto/request/MedioDeContactoRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 6-7,15,19
+backend/src/main/java/app/model/entities/Seleccion.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 4-44
+backend/src/test/java/app/controllers/ControladorPerfilTest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 6,99-115,188-477
+backend/src/main/java/app/controllers/ControladorColeccion.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 13,33,44
+backend/src/main/java/app/dto/PerfilDto.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 24-28
+frontend/src/services/propuestasService.js
+  s_107a1d1b80fda9::t_107593ee94b7b9 20-28
+frontend/src/services/perfilService.js
+  s_107a1d1b80fda9::t_107593ee94b7b9 26,29
+analisis-pr-104-persistencia.md
+  s_67ac46fb56d38f::t_d6a0273d08ded8 1-552
+backend/src/main/java/app/dto/request/ContraseniaRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 10,14
+backend/src/main/java/app/model/notificador/Notificacion.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 21-22,24,26-39
+backend/src/main/java/app/repositories/RepositorioNotificaciones.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 5,9-21,24
+backend/src/main/java/app/dto/request/LoginRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 3-4,6,8
+review-pr-explorar.md
+  s_67ac46fb56d38f::t_d6a0273d08ded8 1-77
+backend/src/main/java/app/dto/request/CrearPropuestaRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 5-7,15,19,23
+backend/src/main/java/app/dto/request/UsuarioRequest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 4-6,15,17,19
+frontend/card-proposals.html
+  s_67ac46fb56d38f::t_d6a0273d08ded8 1-1984
+analisis-pr-108-autenticacion.md
+  s_67ac46fb56d38f::t_d6a0273d08ded8 1-772
+backend/src/test/java/app/repositories/impl/RepositorioNotificacionesTest.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 51-55,57
+frontend/src/components/ui/user-chip/user-chip.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 1,10
+frontend/src/views/public/intercambios/tabs/intercambio-card/header-usuario-estado.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 2,35
+backend/src/main/java/app/repositories/impl/RepositorioColeccionesMongo.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 18,51-54,67,69,136,140,142-149,151-152,155-158,160-161
+frontend/src/views/public/crear-propuesta-intercambio/crear-propuesta-intercambio.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 7,31,33
+frontend/src/views/public/ver-intercambio/ver-intercambio.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-204
+backend/src/main/java/app/controllers/ControladorSubasta.java
+  s_107a1d1b80fda9::t_107593ee94b7b9 11,33,50,62
+frontend/src/views/public/perfil/components/ModalEditarPerfil/ModalEditarPerfil.jsx
+  s_107a1d1b80fda9::t_107593ee94b7b9 2,49
+frontend/src/services/notificacionesService.js
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-18
+frontend/src/views/public/perfil/perfil.css
+  s_107a1d1b80fda9::t_107593ee94b7b9 1-184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "13ffa75236018f6160753549658e5a852a0c6d2e",
+  "prompts": {},
+  "sessions": {
+    "s_107a1d1b80fda9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5677f647-8b05-4373-96c4-92d49606aaf3",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    },
+    "s_54e482ca4baca3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "411afa80-ac0b-4c45-b45f-fbafaaec817c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
