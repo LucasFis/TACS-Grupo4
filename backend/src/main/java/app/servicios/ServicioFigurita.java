@@ -5,7 +5,6 @@ import app.dto.FiguritaIntercambiableDto;
 import app.dto.paginacion.PaginaResultado;
 import app.exceptions.NotFoundException;
 import app.model.entities.Figurita;
-import app.model.entities.Subasta;
 import app.model.entities.FiguritaIntercambiable;
 import app.model.entities.MetodoIntercambio;
 import app.model.entities.Perfil;
@@ -13,12 +12,9 @@ import app.dto.filtros.FiguritasFiltro;
 import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioPerfiles;
-import app.repositories.RepositorioSubastas;
 import java.util.List;
 
 import app.repositories.impl.campos.CamposPerfil;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +25,6 @@ public class ServicioFigurita {
   private final RepositorioColecciones repositorioColecciones;
   private final RepositorioPerfiles repositorioPerfiles;
   private final RepositorioFiguritas repositorioFiguritas;
-  private final RepositorioSubastas repositorioSubastas;
 
   public PaginaResultado<FiguritaIntercambiableDto> buscarFiguritas(
       Integer numero, String seleccion, String jugador,
@@ -41,6 +36,7 @@ public class ServicioFigurita {
 
     return mapearADto(paginaRepo);
   }
+
   public PaginaResultado<FiguritaIntercambiableDto> buscarPorQuery(
       String q, List<MetodoIntercambio> tipos, int pagina, int tamanioPagina) {
 
@@ -72,11 +68,7 @@ public class ServicioFigurita {
     Map<String, String> figuritaIdASubastaId = obtenerMapaSubastasActivas(paginaRepo.contenido());
 
     List<FiguritaIntercambiableDto> contenido = paginaRepo.contenido().stream()
-        .map(fi -> new FiguritaIntercambiableDto(
-            fi,
-            buscarPerfil(fi.getPerfilId()),
-            figuritaIdASubastaId.get(fi.getFigurita().getId())
-        ))
+        .map(fi -> new FiguritaIntercambiableDto(fi, buscarPerfil(fi.getPerfilId())))
         .toList();
 
     return new PaginaResultado<>(contenido, paginaRepo.cantidadDeElementos(),

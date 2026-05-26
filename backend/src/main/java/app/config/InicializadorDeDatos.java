@@ -170,7 +170,7 @@ public class InicializadorDeDatos implements CommandLineRunner {
       agregarRepetidaNueva(coleccionLucas, figs.get("BRA-10"), 2, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA), lucas.getId()); // Neymar x2
       agregarRepetidaNueva(coleccionLucas, figs.get("BRA-11"), 3, List.of(MetodoIntercambio.SUBASTA),     lucas.getId());                            // Vinícius x3
       agregarRepetidaNueva(coleccionLucas, figs.get("FRA-10"), 2, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA), lucas.getId()); // Mbappé x2
-      agregarRepetidaNueva(coleccionLucas, figs.get("FRA-7"),  2, List.of(MetodoIntercambio.INTERCAMBIO ,MetodoIntercambio.SUBASTA), lucas.getId());                            // Griezmann x2
+      agregarRepetidaNueva(coleccionLucas, figs.get("FRA-7"),  2, List.of(MetodoIntercambio.INTERCAMBIO), lucas.getId());                            // Griezmann x2
 
       colecciones.guardar(coleccionLucas);
 

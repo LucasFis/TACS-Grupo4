@@ -6,12 +6,14 @@ import {useCallback, useEffect, useState} from "react";
 import {buscarContadoresSugerencias} from "@/services/perfilService.js";
 import ExtraInfo from "@/components/ui/extra-info/extra-info.jsx";
 import MostradorSugerencias from "./tabs/mostrador-sugerencias.jsx";
+import useUsuarioActual from "@/hooks/useUsuarioActual.js";
 
 const Sugerencias = () => {
 
     const [cargando, setCargando] = useState(true)
     const [error, setError] = useState(false)
     const [contadores, setContadores] = useState([])
+    const {userId} = useUsuarioActual()
 
     const TABS = [
         { key: 'todos', label: 'Todos', component: MostradorSugerencias, props: {} },

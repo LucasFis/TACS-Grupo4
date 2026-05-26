@@ -1,29 +1,21 @@
 package app.repositories.impl;
 
 import com.mongodb.DBRef;
-import org.bson.types.ObjectId;
 import app.dto.filtros.SubastasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.exceptions.NotFoundException;
-import app.model.entities.Calificacion;
 import app.model.entities.EstadoProceso;
 import app.model.entities.Perfil;
 import app.model.entities.Subasta;
 import app.repositories.RepositorioSubastas;
-import app.repositories.impl.campos.CamposPerfil;
 import app.repositories.impl.campos.CamposSubasta;
-import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -169,23 +161,6 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
     this.conCamposCargados(querySubastas, campos);
 
     return mongoTemplate.find(querySubastas, Subasta.class).stream().map(this::normalizar).toList();
-  }
-  @Override
-  public List<Subasta> buscarActivasPorFiguritasSubastadas(List<String> figuritaIds) {
-    Date ahora = new Date();
-
-    List<DBRef> refs = figuritaIds.stream()
-        .map(id -> new DBRef("figuritas", id))
-        .toList();
-
-    Query query = new Query();
-    query.addCriteria(new Criteria().andOperator(
-        Criteria.where("figuritaSubastada").in(refs),
-        Criteria.where("fechaInicio").lte(ahora),
-        Criteria.where("fechaCierre").gt(ahora)
-    ));
-
-    return mongoTemplate.find(query, Subasta.class);
   }
 
   private void conCamposCargados(Query query, CamposSubasta campos) {

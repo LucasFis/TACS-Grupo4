@@ -16,27 +16,24 @@ public class ServicioNotificacion {
 
   private final RepositorioNotificaciones repositorioNotificaciones;
 
-    //Generico para notificaciones sin link.
-    public void notificarInteresados(List<Perfil> interesados, String cuerpo) {
-        notificarInteresados(interesados, cuerpo, null);
-    }
+  //Generico para notificaciones sin link.
+  public void notificarInteresados(List<Perfil> interesados, String cuerpo) {
+      notificarInteresados(interesados, cuerpo, null);
+  }
 
-    public void notificarInteresados(List<Perfil> interesados, String cuerpo, String link) {
-        interesados.forEach(perfil -> {
-            Mensaje mensaje = new Mensaje(cuerpo, LocalDateTime.now());
-            repositorioNotificaciones.guardar(new Notificacion(mensaje, perfil, link));
-        });
-    }
+  public void notificarInteresados(List<Perfil> interesados, String cuerpo, String link) {
+      interesados.forEach(perfil -> {
+          Mensaje mensaje = new Mensaje(cuerpo, LocalDateTime.now());
+          repositorioNotificaciones.guardar(new Notificacion(mensaje, perfil, link));
+      });
+  }
 
-    public List<Notificacion> obtenerPorPerfil(String perfilId) {
-        return repositorioNotificaciones.buscarPorPerfilFechaDesc(perfilId);
-    }
+  public List<Notificacion> obtenerPorPerfil(String perfilId) {
+      return repositorioNotificaciones.buscarPorPerfilFechaDesc(perfilId);
+  }
 
-    public void marcarTodasLeidas(String perfilId) {
-        List<Notificacion> notis = repositorioNotificaciones.buscarPorPerfilFechaDesc(perfilId);
-        notis.forEach(n -> {
-            n.marcarLeida();
-            this.repositorioNotificaciones.guardar(n);
-        });
-    }
+  public void marcarTodasLeidas(String perfilId) {
+      List<Notificacion> notis = repositorioNotificaciones.buscarPorPerfilFechaDesc(perfilId);
+      this.repositorioNotificaciones.guardar(notis);
+  }
 }

@@ -22,6 +22,4 @@ public interface RepositorioSubastas {
     void guardar(Subasta subasta, CamposSubasta campos);
 
     PaginaResultado<Subasta> buscarPorAutor(String perfilId, Integer pagina, Integer limite, CamposSubasta campos);
-
-    List<Subasta> buscarActivasPorFiguritasSubastadas(List<String> figuritaIds);
 }

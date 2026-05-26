@@ -36,6 +36,7 @@ const CardBody = ({
   reputacion,
   extra,
   tipo,
+  figuritaId,
   figurita,
 }) => (
   <div className={styles.body}>
@@ -62,17 +63,18 @@ const CardBody = ({
     {(tipo === 'intercambio' || tipo === 'ambos') && (
       <CardActionBtn to="/intercambios/crear" label="Proponer intercambio ↗" state={{ figurita }} />
     )}
-    {(tipo === 'subasta' || tipo === 'ambos') && figurita.subasta_id && (
-  <CardActionBtn
-    to={`/subastas/${figurita.subasta_id}`}
-    label="Ver subasta ↗"
-    variant="subasta"
-  />
-)}
+    {(tipo === 'subasta' || tipo === 'ambos') && (
+      <CardActionBtn
+        to={`/subastas?figurita=${figuritaId}`}
+        label="Ver subasta ↗"
+        variant="subasta"
+      />
+    )}
   </div>
 )
 
 const FiguritaCard = ({
+  figuritaId,
   numero,
   metodos = [],
   strCutout,
@@ -97,6 +99,7 @@ const FiguritaCard = ({
         reputacion={reputacion}
         extra={extra}
         tipo={tipo}
+        figuritaId={figuritaId}
         figurita={figurita}
       />
     </div>

@@ -8,7 +8,6 @@ import app.model.entities.Figurita;
 import app.model.entities.Perfil;
 import app.model.entities.Sugerencia;
 import app.repositories.RepositorioPerfiles;
-import app.repositories.impl.campos.CamposColeccion;
 import app.repositories.impl.campos.CamposPerfil;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
