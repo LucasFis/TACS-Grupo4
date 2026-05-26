@@ -34,9 +34,9 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
 
         const listener = () => {
-
             setUser(undefined);
             localStorage.removeItem("sesion");
+            logout().catch(() => {}); // borra el cookie HttpOnly en el servidor; si falla (sesión ya muerta) se ignora
             navigate("/")
         };
 

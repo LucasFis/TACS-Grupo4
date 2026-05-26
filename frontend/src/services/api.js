@@ -4,7 +4,7 @@ import {useAuth} from "@/contexts/userContext.jsx";
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URI || 'http://localhost:8080',
-    timeout: 10000,
+    timeout: 30000,
     headers: {
         "Content-Type": "application/json",
     },
@@ -68,27 +68,26 @@ const handleAxiosError = (error) => {
     };
 };
 
-//Lo que hace esto, es que cuando se detecta que el JWT dejo de ser invalido, lanza un evento para
-//setear en undefined al user.
+
+// Cuando el JWT expira/es inválido, dispara el evento "logout" una sola vez.
+// La flag evita el loop: 401 → logout → navigate → más 401 → loop.
+let disparandoLogout = false
+
 api.interceptors.response.use(
-    response => response,
+  (response) => response,
 
-    async error => {
-
-        if (error.response?.status === 401) {
-
-            try {
-                await logout();
-            } finally {
-                window.dispatchEvent(
-                    new Event("logout")
-                );
-            }
-        }
-
-        return Promise.reject(error);
+  (error) => {
+    if (error.response?.status === 401 && !disparandoLogout) {
+      disparandoLogout = true
+      window.dispatchEvent(new Event('logout'))
+      setTimeout(() => {
+        disparandoLogout = false
+      }, 2000)
     }
-);
+
+    return Promise.reject(error)
+  },
+)
 
 
 export {api, handleAxiosError};
