@@ -1,0 +1,65 @@
+backend/src/main/java/app/model/entities/Calificacion.java
+  s_54e482ca4baca3::t_d256abfcd42e80 9,21,24
+backend/src/main/java/app/model/entities/Coleccion.java
+  s_107a1d1b80fda9::t_70916432047773 10,21
+backend/src/main/java/app/model/entities/Perfil.java
+  s_107a1d1b80fda9::t_923bf19bdbc25a 12,26,31
+backend/src/main/java/app/model/entities/FiguritaIntercambiable.java
+  s_107a1d1b80fda9::t_12769c8f70d9b6 10,21
+backend/src/main/java/app/model/entities/Propuesta.java
+  s_107a1d1b80fda9::t_9b426f97d174fe 13,27,30,33,36
+backend/src/main/java/app/repositories/impl/RepositorioPerfilesMongo.java
+  s_107a1d1b80fda9::t_194da59a516221 103
+  s_107a1d1b80fda9::t_570a7d9a19ff87 204
+  s_107a1d1b80fda9::t_cf49ab25389fa3 95-97
+  s_107a1d1b80fda9::t_3c0db826de7cc7 141,149
+  s_107a1d1b80fda9::t_16722968f8f3b1 133
+backend/src/main/java/app/repositories/impl/RepositorioSubastasMongo.java
+  s_107a1d1b80fda9::t_1649a3ce250056 73
+  s_107a1d1b80fda9::t_ade1919e49873a 34-37
+  s_107a1d1b80fda9::t_b8ca9159a3852e 101
+  s_107a1d1b80fda9::t_9a13916304f9a2 17
+  s_107a1d1b80fda9::t_c9adfd9b8a5ef9 124
+  s_107a1d1b80fda9::t_8ffd6e384969c1 171-173,175,177-179
+  s_107a1d1b80fda9::t_b24fcbfcf4417f 174
+backend/src/main/java/app/model/entities/Subasta.java
+  s_107a1d1b80fda9::t_5f3f0f6ddcc2ac 14,28,34,40
+backend/src/main/java/app/repositories/impl/RepositorioColeccionesMongo.java
+  s_107a1d1b80fda9::t_87fdda84252fdb 152
+  s_107a1d1b80fda9::t_3382d6a9207fd8 292
+  s_107a1d1b80fda9::t_5a5198680ef6d9 381-392
+  s_107a1d1b80fda9::t_e61803c38c1ac9 193,246,272
+backend/src/main/java/app/repositories/impl/RepositorioCalificacionesMongo.java
+  s_107a1d1b80fda9::t_08a4fcea97a414 37
+  s_107a1d1b80fda9::t_2708022f4d38be 66
+  s_107a1d1b80fda9::t_117ed0f2807d60 20-21
+  s_107a1d1b80fda9::t_94083a2f9f6656 70
+backend/src/main/java/app/model/notificador/Notificacion.java
+  s_107a1d1b80fda9::t_8537d6b3c49aac 8,19
+backend/src/main/java/app/repositories/impl/RepositorioNotificacionesMongo.java
+  s_107a1d1b80fda9::t_5ae2d812f28e72 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "074034d4b141536cd30770c4ed56ddccc2656799",
+  "prompts": {},
+  "sessions": {
+    "s_107a1d1b80fda9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5677f647-8b05-4373-96c4-92d49606aaf3",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    },
+    "s_54e482ca4baca3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "411afa80-ac0b-4c45-b45f-fbafaaec817c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
