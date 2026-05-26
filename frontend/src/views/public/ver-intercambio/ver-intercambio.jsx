@@ -10,6 +10,7 @@
         obtenerPropuesta,
         aceptarPropuesta,
         rechazarPropuesta,
+        cancelarPropuesta,
     } from "../../../services/propuestasService.js";
 
     import FiguritaCard from "./figurita-card.jsx";
@@ -66,6 +67,18 @@
             }
         };
 
+        const handleCancelar = async () => {
+            try {
+                await cancelarPropuesta(propuesta.id);
+                setPropuesta((prev) => ({
+                    ...prev,
+                    estado: "CANCELADO"
+                }));
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         if (cargando) {
             return (
                 <div className="container py-4">
@@ -88,6 +101,7 @@
         //Para que no aparezcan los botones, si ya fue ceptada o rechazada.
         const estadoActual = propuesta?.estado;
         const estaPendiente = estadoActual === "PENDIENTE" && esRecibida;
+        const puedeCancelar = estadoActual === "PENDIENTE" && esEnviada;
 
         return (
             <div className="container py-4 px-3 px-md-4">
@@ -136,6 +150,13 @@
                                     </div>
                                 )
                             }
+
+                            {puedeCancelar && (
+                                <Button
+                                    label={"Cancelar"}
+                                    onClick={handleCancelar}
+                                />
+                            )}
 
                         </div>
 
