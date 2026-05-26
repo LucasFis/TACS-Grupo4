@@ -1,0 +1,24 @@
+Makefile
+  s_f8c2eb92d16a4c::t_8544c665b73f8d 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "486384d81c787704aa09fde260520aece9f3fb16",
+  "prompts": {},
+  "humans": {
+    "h_ecc1dc77ab0242": {
+      "author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  },
+  "sessions": {
+    "s_f8c2eb92d16a4c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f4f0bb7-f339-4b1f-b401-da17a07b6074",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "ValenAquino <vaquino@frba.utn.edu.ar>"
+    }
+  }
+}
