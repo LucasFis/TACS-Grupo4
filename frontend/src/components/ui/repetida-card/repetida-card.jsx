@@ -6,7 +6,7 @@ const RepetidaCard = ({ figurita, onEditar }) => {
         cantidad_existente,
         cantidad_reservada,
         metodos,
-        foto_url,
+        imagen_url,
     } = figurita;
 
     const initials = jugador
@@ -38,9 +38,9 @@ const RepetidaCard = ({ figurita, onEditar }) => {
                     className="rounded-circle d-flex align-items-center justify-content-center overflow-hidden border"
                     style={{ width: '52px', height: '52px', backgroundColor: '#e6f1fb', flexShrink: 0 }}
                 >
-                    {foto_url ? (
+                    {imagen_url ? (
                         <img
-                            src={foto_url}
+                            src={imagen_url}
                             alt={jugador}
                             className="rounded-circle"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
