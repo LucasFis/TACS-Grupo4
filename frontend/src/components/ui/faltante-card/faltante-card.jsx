@@ -1,5 +1,5 @@
 const FaltanteCard = ({ figurita }) => {
-    const { id, numero, jugador, seleccion, foto_url } = figurita;
+    const { id, numero, jugador, seleccion, imagen_url } = figurita;
 
     const initials = jugador
         .split(' ')
@@ -21,6 +21,20 @@ const FaltanteCard = ({ figurita }) => {
                 >
                     faltante
                 </span>
+                <img
+                    src={imagen_url || '/jugador-placeholder.png'}
+                    alt={jugador}
+                    className="rounded-2"
+                    style={{ width: 40, height: 40, objectFit: 'cover', flexShrink: 0 }}
+                />
+                <div>
+                    <p className="mb-0 fw-semibold" style={{ fontSize: '0.9rem' }}>
+                        {jugador}
+                    </p>
+                    <p className="mb-0 text-muted" style={{ fontSize: '0.75rem' }}>
+                        {seleccion}
+                    </p>
+                </div>
             </div>
 
             <div className="card-body d-flex flex-column align-items-center gap-1 py-3 px-3">
@@ -28,9 +42,9 @@ const FaltanteCard = ({ figurita }) => {
                     className="rounded-circle d-flex align-items-center justify-content-center overflow-hidden border"
                     style={{ width: '52px', height: '52px', backgroundColor: '#faeeda', flexShrink: 0 }}
                 >
-                    {foto_url ? (
+                    {imagen_url ? (
                         <img
-                            src={foto_url}
+                            src={imagen_url}
                             alt={jugador}
                             className="rounded-circle"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
