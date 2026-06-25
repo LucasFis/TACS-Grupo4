@@ -1,0 +1,95 @@
+# ============================================================================
+# Render Blueprint (Infraestructura como código) — TACS Grupo 4
+# ----------------------------------------------------------------------------
+# PLANTILLA DE REFERENCIA. Implementa la separación de ambientes de observabilidad
+# (local / staging / producción) del plan R6 del análisis
+# `backend/ANALISIS_MEJORAS_OBSERVABILIDAD.md`.
+#
+# Antes de conectar este Blueprint a Render:
+#   1. Validar con: `render blueprints validate`
+#   2. Revisar nombres de servicio: deben coincidir con los servicios YA existentes
+#      en el workspace, o Render creará servicios nuevos.
+#   3. Completar en el dashboard (NO acá) todos los valores con `sync: false` (secretos).
+#   4. Conectar primero contra STAGING para confirmar antes de tocar producción.
+#
+# Lo único que cambia entre staging y producción a nivel observabilidad es
+# `deployment.environment.name` (label `deployment_environment_name` en Grafana) y
+# `service.version`. `OTEL_SERVICE_NAME` es "tacs-backend" en ambos para poder
+# compararlos lado a lado en un mismo dashboard.
+#
+# El ambiente "local" NO está acá: corre en docker-compose.dev.yml y por defecto no
+# exporta telemetría (OTEL_EXPORTER_OTLP_ENDPOINT vacío) para no gastar cuota del free tier.
+# ============================================================================
+
+# Grupo de variables compartidas por todos los ambientes que envían a Grafana Cloud.
+# El endpoint y el header de auth son los mismos (un solo stack de Grafana Cloud,
+# separado por label de ambiente, no por stack).
+envVarGroups:
+  - name: observabilidad-grafana-cloud
+    envVars:
+      # Endpoint OTLP del stack de Grafana Cloud. Secreto -> cargar en el dashboard.
+      - key: OTEL_EXPORTER_OTLP_ENDPOINT
+        sync: false
+      # Header de autenticación OTLP (Authorization=Basic ...). Secreto.
+      - key: OTEL_EXPORTER_OTLP_HEADERS
+        sync: false
+
+services:
+  # --------------------------------------------------------------------------
+  # PRODUCCIÓN — rama main
+  # --------------------------------------------------------------------------
+  - type: web
+    name: tacs-backend-production
+    runtime: docker
+    repo: https://github.com/LucasFis/TACS-Grupo4
+    branch: main
+    rootDir: .
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: oregon
+    plan: free
+    healthCheckPath: /ping
+    autoDeploy: true
+    envVars:
+      - fromGroup: observabilidad-grafana-cloud
+      # Identidad del ambiente en la telemetría. service.version: idealmente el git SHA.
+      - key: OTEL_RESOURCE_ATTRIBUTES
+        value: deployment.environment.name=production,service.version=main
+      # Config de negocio/infra (secretos -> cargar en el dashboard).
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRATION
+        value: 12h
+      - key: CORS_ORIGIN
+        sync: false
+
+  # --------------------------------------------------------------------------
+  # STAGING — rama developer. Red de seguridad para validar cambios de
+  # observabilidad (histogramas, métricas nuevas, alertas) antes de promover a prod.
+  # --------------------------------------------------------------------------
+  - type: web
+    name: tacs-backend-staging
+    runtime: docker
+    repo: https://github.com/LucasFis/TACS-Grupo4
+    branch: developer
+    rootDir: .
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: oregon
+    plan: free
+    healthCheckPath: /ping
+    autoDeploy: true
+    envVars:
+      - fromGroup: observabilidad-grafana-cloud
+      - key: OTEL_RESOURCE_ATTRIBUTES
+        value: deployment.environment.name=staging,service.version=developer
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRATION
+        value: 12h
+      - key: CORS_ORIGIN
+        sync: false

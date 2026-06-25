@@ -59,6 +59,13 @@ ENV OTEL_METRICS_EXPORTER=otlp
 ENV OTEL_LOGS_EXPORTER=none
 ENV OTEL_TRACES_SAMPLER=parentbased_always_on
 
+# Histogramas exponenciales + temporalidad delta para las metricas del agente: dan
+# percentiles precisos con muchas menos series que el histograma clasico (menor presion
+# sobre el limite de cardinalidad del free tier de Grafana Cloud). Validar percentiles
+# en staging antes de prod.
+ENV OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
+ENV OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram
+
 # Cambiamos al usuario sin privilegios
 USER appuser
 

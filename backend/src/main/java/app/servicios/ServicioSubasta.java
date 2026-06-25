@@ -131,7 +131,7 @@ public class ServicioSubasta {
 
     List<Figurita> nuevasFiguritas = this.repoFigurita.buscarPorIds(body.getFiguritasOfrecidasId());
     subasta.modificarFiguritasDeOferta(ofertaId, perfilId, nuevasFiguritas);
-    meterRegistry.counter("propuestas_transiciones_total", "estado", "pendiente").increment();
+    meterRegistry.counter("propuestas_transiciones_total", "estado", "pendiente", "origen", "subasta").increment();
 
     this.repositorioColecciones.guardar(coleccion, camposColeccion);
     this.repoSubasta.guardar(subasta, camposSubasta);
@@ -147,7 +147,7 @@ public class ServicioSubasta {
     }
 
     Propuesta oferta = subasta.cancelarOferta(ofertaId, perfilId);
-    meterRegistry.counter("propuestas_transiciones_total", "estado", "cancelado").increment();
+    meterRegistry.counter("propuestas_transiciones_total", "estado", "cancelado", "origen", "subasta").increment();
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     this.repositorioColecciones.guardar(oferta.getAutor().getColeccion(), camposColeccion);
@@ -181,7 +181,7 @@ public class ServicioSubasta {
     }
 
     Propuesta oferta = subasta.rechazarOferta(ofertaId, perfilId);
-    meterRegistry.counter("propuestas_transiciones_total", "estado", "rechazado").increment();
+    meterRegistry.counter("propuestas_transiciones_total", "estado", "rechazado", "origen", "subasta").increment();
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     this.repositorioColecciones.guardar(oferta.getAutor().getColeccion(), camposColeccion);
@@ -199,6 +199,7 @@ public class ServicioSubasta {
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cancelar(perfilId);
     registrarTransiciones(subasta, estadosAntes);
+    meterRegistry.counter("subastas_finalizadas_total", "resultado", "cancelada").increment();
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     subasta.getOfertas().stream()
@@ -249,6 +250,8 @@ public class ServicioSubasta {
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cerrar(perfilId);
     registrarTransiciones(subasta, estadosAntes);
+    meterRegistry.counter("subastas_finalizadas_total",
+        "resultado", seleccionada != null ? "adjudicada" : "sin_oferta").increment();
 
     subasta.getOfertas().stream()
         .filter(o -> seleccionada == null || !o.getId().equals(seleccionada.getId()))
@@ -317,7 +320,8 @@ public class ServicioSubasta {
 
   private void registrarTransicion(EstadoProceso antes, EstadoProceso despues) {
     if (antes != despues) {
-      meterRegistry.counter("propuestas_transiciones_total", "estado", despues.name().toLowerCase()).increment();
+      meterRegistry.counter("propuestas_transiciones_total",
+          "estado", despues.name().toLowerCase(), "origen", "subasta").increment();
     }
   }
 
