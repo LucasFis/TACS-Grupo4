@@ -16,6 +16,7 @@ import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioSubastas;
 import app.repositories.impl.campos.CamposColeccion;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -131,7 +132,7 @@ public class ServicioSubasta {
 
     List<Figurita> nuevasFiguritas = this.repoFigurita.buscarPorIds(body.getFiguritasOfrecidasId());
     subasta.modificarFiguritasDeOferta(ofertaId, perfilId, nuevasFiguritas);
-    meterRegistry.counter("propuestas_transiciones_total", "estado", "pendiente", "origen", "subasta").increment();
+    contarTransicion("pendiente");
 
     this.repositorioColecciones.guardar(coleccion, camposColeccion);
     this.repoSubasta.guardar(subasta, camposSubasta);
@@ -147,7 +148,7 @@ public class ServicioSubasta {
     }
 
     Propuesta oferta = subasta.cancelarOferta(ofertaId, perfilId);
-    meterRegistry.counter("propuestas_transiciones_total", "estado", "cancelado", "origen", "subasta").increment();
+    contarTransicion("cancelado");
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     this.repositorioColecciones.guardar(oferta.getAutor().getColeccion(), camposColeccion);
@@ -181,7 +182,7 @@ public class ServicioSubasta {
     }
 
     Propuesta oferta = subasta.rechazarOferta(ofertaId, perfilId);
-    meterRegistry.counter("propuestas_transiciones_total", "estado", "rechazado", "origen", "subasta").increment();
+    contarTransicion("rechazado");
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     this.repositorioColecciones.guardar(oferta.getAutor().getColeccion(), camposColeccion);
@@ -199,7 +200,7 @@ public class ServicioSubasta {
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cancelar(perfilId);
     registrarTransiciones(subasta, estadosAntes);
-    meterRegistry.counter("subastas_finalizadas_total", "resultado", "cancelada").increment();
+    registrarCierreSubasta(subasta, "cancelada");
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     subasta.getOfertas().stream()
@@ -250,8 +251,7 @@ public class ServicioSubasta {
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cerrar(perfilId);
     registrarTransiciones(subasta, estadosAntes);
-    meterRegistry.counter("subastas_finalizadas_total",
-        "resultado", seleccionada != null ? "adjudicada" : "sin_oferta").increment();
+    registrarCierreSubasta(subasta, seleccionada != null ? "adjudicada" : "sin_oferta");
 
     subasta.getOfertas().stream()
         .filter(o -> seleccionada == null || !o.getId().equals(seleccionada.getId()))
@@ -318,10 +318,19 @@ public class ServicioSubasta {
     return new SubastaDto(subasta);
   }
 
+  /**
+   * Única fuente del contador de transiciones de ofertas de subasta: centraliza nombre de
+   * métrica y tags ({@code origen=subasta}) para que las series no diverjan entre los
+   * caminos manuales (editar/cancelar/rechazar oferta) y los por snapshot (cerrar/cancelar/
+   * seleccionar subasta). Ningún camino usa los dos, así que no hay doble conteo.
+   */
+  private void contarTransicion(String estado) {
+    meterRegistry.counter("propuestas_transiciones_total", "estado", estado, "origen", "subasta").increment();
+  }
+
   private void registrarTransicion(EstadoProceso antes, EstadoProceso despues) {
     if (antes != despues) {
-      meterRegistry.counter("propuestas_transiciones_total",
-          "estado", despues.name().toLowerCase(), "origen", "subasta").increment();
+      contarTransicion(despues.name().toLowerCase());
     }
   }
 
@@ -333,6 +342,17 @@ public class ServicioSubasta {
   private void registrarTransiciones(Subasta subasta, Map<String, EstadoProceso> antes) {
     subasta.getOfertas().forEach(o ->
         registrarTransicion(antes.get(o.getId()), o.getEstadoActual().getValor()));
+  }
+
+  /**
+   * Registra el cierre de una subasta: el contador de resultado, la duración (inicio→cierre)
+   * y cuántas ofertas recibió. Engagement + "¿cumplió su propósito?". Tags de conjunto cerrado.
+   */
+  private void registrarCierreSubasta(Subasta subasta, String resultado) {
+    meterRegistry.counter("subastas_finalizadas_total", "resultado", resultado).increment();
+    meterRegistry.timer("subastas_duracion_segundos", "resultado", resultado)
+        .record(Duration.between(subasta.getFechaInicio(), subasta.getFechaCierre()));
+    meterRegistry.summary("subastas_ofertas_recibidas").record(subasta.getOfertas().size());
   }
 }
 

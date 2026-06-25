@@ -22,6 +22,8 @@ import java.util.List;
 
 import app.repositories.impl.campos.CamposPerfil;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -109,6 +111,7 @@ public class ServicioPropuesta {
 
     propuesta.aceptar(perfilId);
     meterRegistry.counter("propuestas_transiciones_total", "estado", "aceptado", "origen", "intercambio").increment();
+    registrarTiempoResolucion(propuesta, "aceptado");
 
     repositorioColecciones.guardar(autor.getColeccion());
     repositorioColecciones.guardar(coleccionDestinatario);
@@ -124,6 +127,7 @@ public class ServicioPropuesta {
     Propuesta propuesta = repositorioPropuestas.buscarPorId(id);
     propuesta.rechazar(perfilId);
     meterRegistry.counter("propuestas_transiciones_total", "estado", "rechazado", "origen", "intercambio").increment();
+    registrarTiempoResolucion(propuesta, "rechazado");
 
     Perfil autor = propuesta.getAutor();;
 
@@ -142,6 +146,7 @@ public class ServicioPropuesta {
     Propuesta propuesta = repositorioPropuestas.buscarPorId(id);
     propuesta.cancelar(perfilId);
     meterRegistry.counter("propuestas_transiciones_total", "estado", "cancelado", "origen", "intercambio").increment();
+    registrarTiempoResolucion(propuesta, "cancelado");
 
     Perfil autor = propuesta.getAutor();;
 
@@ -169,5 +174,15 @@ public class ServicioPropuesta {
 
       return new IntercambioDto(p, yaCalificado);
     });
+  }
+
+  /**
+   * Registra cuánto tardó la propuesta desde su primer estado PENDIENTE hasta la transición
+   * final. Insumo para decidir recordatorios por demora. Tag de conjunto cerrado.
+   */
+  private void registrarTiempoResolucion(Propuesta propuesta, String estadoFinal) {
+    LocalDateTime inicio = propuesta.getEstado().get(0).getFecha();
+    meterRegistry.timer("propuestas_tiempo_resolucion_segundos", "estado_final", estadoFinal)
+        .record(Duration.between(inicio, LocalDateTime.now()));
   }
 }
