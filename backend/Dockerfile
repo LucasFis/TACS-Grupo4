@@ -66,15 +66,6 @@ ENV OTEL_TRACES_SAMPLER=parentbased_always_on
 ENV OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
 ENV OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram
 
-# Seguridad: la API key de TheSportsDB viaja en el path de la URL. El agente captura
-# url.full en los spans del cliente HTTP saliente, lo que expondria la key en Tempo.
-# Hasta tener un Collector que la limpie, deshabilitamos la instrumentacion del cliente
-# saliente (RestTemplate -> spring-web -> HttpURLConnection). La visibilidad de TheSportsDB
-# queda cubierta por la metrica thesportsdb_busqueda_imagen_seconds (sin URL ni nombres).
-# Las trazas/metricas HTTP entrantes (spring-webmvc/servlet) no se ven afectadas.
-ENV OTEL_INSTRUMENTATION_SPRING_WEB_ENABLED=false
-ENV OTEL_INSTRUMENTATION_HTTP_URL_CONNECTION_ENABLED=false
-
 # Cambiamos al usuario sin privilegios
 USER appuser
 
