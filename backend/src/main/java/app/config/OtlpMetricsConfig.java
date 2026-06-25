@@ -1,6 +1,7 @@
 package app.config;
 
 import io.micrometer.core.instrument.Clock;
+import io.micrometer.registry.otlp.AggregationTemporality;
 import io.micrometer.registry.otlp.OtlpConfig;
 import io.micrometer.registry.otlp.OtlpMeterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,7 +31,7 @@ public class OtlpMetricsConfig {
     resourceAttributes.putIfAbsent("service.name",
         System.getenv().getOrDefault("OTEL_SERVICE_NAME", "tacs-backend"));
 
-    String url = System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT") + "/v1/metrics";
+    String url = construirUrlMetricas(System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"));
 
     OtlpConfig config = new OtlpConfig() {
       @Override
@@ -52,9 +53,25 @@ public class OtlpMetricsConfig {
       public @NonNull Map<String, String> resourceAttributes() {
         return resourceAttributes;
       }
+
+      // Misma temporalidad que el agente OTel (Dockerfile: ..._TEMPORALITY_PREFERENCE=delta)
+      // para no mezclar delta (agente) con cumulative (default de Micrometer) en el mismo stack.
+      @Override
+      public @NonNull AggregationTemporality aggregationTemporality() {
+        return AggregationTemporality.DELTA;
+      }
     };
 
     return new OtlpMeterRegistry(config, Clock.SYSTEM);
+  }
+
+  /**
+   * Arma la URL de métricas tolerando un endpoint con o sin barra final, para no generar
+   * un path inválido tipo {@code .../otlp//v1/metrics}.
+   */
+  static String construirUrlMetricas(String endpoint) {
+    String base = endpoint == null ? "" : endpoint.replaceAll("/+$", "");
+    return base + "/v1/metrics";
   }
 
   private static Map<String, String> parseKeyValues(String raw) {
