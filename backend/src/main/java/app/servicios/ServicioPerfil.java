@@ -22,6 +22,7 @@ import app.repositories.RepositorioNotificaciones;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioUsuarios;
 import app.repositories.impl.campos.CamposPerfil;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class ServicioPerfil {
   private final RepositorioNotificaciones repositorioNotificaciones;
   private final ServicioNotificacion servicioNotificacion;
   private final RepositorioUsuarios repositorioUsuarios;
+  private final MeterRegistry meterRegistry;
 
 
   public List<FiguritaDto> obtenerFaltantes(String userId) {
@@ -88,6 +90,7 @@ public class ServicioPerfil {
 
     this.repositorioCalificacion.guardar(calificacion);
     this.repositorioPerfiles.guardar(perfilDestino, sinCampos);
+    meterRegistry.counter("calificaciones_creadas_total", "valor", String.valueOf(valor)).increment();
   }
 
   public PaginaResultado<SugerenciaDto> obtenerSugerencias(String perfilId, SugerenciasFiltro filtros) {
