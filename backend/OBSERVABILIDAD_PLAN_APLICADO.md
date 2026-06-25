@@ -25,20 +25,32 @@ Notas de compatibilidad:
   en los 7 sitios → series consistentes. Los dashboards que hoy agregan sin `origen` siguen
   funcionando (suman sobre el label).
 
-## Pendiente (requiere inyectar `MeterRegistry` nuevo + ajustar constructores de test)
+## Iteración 2 — gaps resueltos con build disponible
 
-No se aplicó acá porque inyectar `MeterRegistry` en estos servicios cambia sus
-constructores y obliga a tocar los constructores de los tests (patrón `new ...(
-SimpleMeterRegistry())` del PR). Sin poder compilar/correr el build en este entorno
-(colisión con otros worktrees), aplicarlo a ciegas arriesga romper la compilación. Dejar
-para una iteración con build disponible y, según la convención del repo, **preguntar por
-los tests** antes de mergear.
+Con Java 17 + build por contenedor efímero (`docker compose -p obsplan run --rm backend
+mvn verify`, aislado para no colisionar con otros worktrees) se cerraron los gaps que
+requerían tocar servicios y compilar. Commits locales, sin push.
 
-| Plan | Métrica | Dónde | Por qué quedó pendiente |
-|------|---------|-------|-------------------------|
-| R4 | `calificaciones_creadas_total{valor=1..5}` | `ServicioPerfil.agregarCalificacion` | `ServicioPerfil` no tiene `MeterRegistry` inyectado. |
-| R4 | `figuritas_intercambiables_matches` (histograma) | `ServicioFigurita` (matching) | `ServicioFigurita` no tiene `MeterRegistry`; además el conteo de matches hay que ubicarlo con cuidado. |
-| R4 | `thesportsdb_busqueda_imagen_seconds{resultado}` (Timer) | `TheSportsDbImagenProveedor.buscarImagenInterna` | El `MeterRegistry` se usa hoy solo en el constructor (no es campo); el constructor de test no lo provee → guardar el campo requiere manejar ese caso. |
+| Gap | Cambio | Archivo |
+|-----|--------|---------|
+| **G6 / R4** | `thesportsdb_busqueda_imagen_seconds{resultado=encontrada\|no_encontrada\|rate_limited\|error}` (Timer). `MeterRegistry` ahora es campo; el constructor de test usa `SimpleMeterRegistry`. | `TheSportsDbImagenProveedor.java` |
+| **G7 / R4** | `calificaciones_creadas_total{valor=1..5}`. `MeterRegistry` inyectado; `ServicioPerfilTest` actualizado. | `ServicioPerfil.java`, `ServicioPerfilTest.java` |
+| **G8 / R4** | `figuritas_intercambiables_matches` (DistributionSummary) registrado en `mapearADto`. Inyección por contexto Spring (test `@Autowired`, sin tocar constructor). | `ServicioFigurita.java` |
+| **G9 / R4** | `propuestas_tiempo_resolucion_segundos{estado_final}` (Timer, desde el primer PENDIENTE) y `subastas_duracion_segundos{resultado}` + `subastas_ofertas_recibidas` en el cierre. | `ServicioPropuesta.java`, `ServicioSubasta.java` |
+| **G10** | Conteo de `propuestas_transiciones_total` de subastas centralizado en `contarTransicion(...)` (único lugar con el nombre+tags). Caminos manuales y por snapshot no se solapan → sin doble conteo. | `ServicioSubasta.java` |
+| **G5 / G12** | `OtlpMeterRegistry` en temporalidad **delta** (alineado al agente) y construcción de URL tolerante a barra final. | `OtlpMetricsConfig.java` |
+| **G11** | Se deshabilita la instrumentación del cliente HTTP saliente (`spring-web` + `http-url-connection`) para que la API key de TheSportsDB (en el path) **no** llegue a los spans. La visibilidad de TheSportsDB queda por la métrica G6. | `backend/Dockerfile` |
+
+### Decisiones sobre gaps que NO eran cambios de código
+
+- **G3 (executor).** Se **mantiene** `ExecutorServiceMetrics` de Micrometer: es la única
+  fuente de `executor_queue_remaining_tasks`/`executor_queued_tasks` (las que alimentan la
+  alerta de "cola llena = enriquecimientos descartados"). El agente OTel **no** emite esos
+  gauges; su instrumentación de executors es para propagar contexto de trazas a `@Async` y
+  **no** debe deshabilitarse. Conclusión: no hay duplicación real de esas series → sin cambio.
+- **G4.** Se conserva el enfoque por propiedades (`management.metrics.enable.http=false`)
+  en vez del `MeterFilter`: es suficiente para apagar `http.server.requests` de Micrometer y
+  más simple. Queda por **confirmar en Grafana** que desaparecen `http_server_requests_*`.
 
 ## Pendiente — infraestructura / fuera del repo (no son cambios de código)
 
