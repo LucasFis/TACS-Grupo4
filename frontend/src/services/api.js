@@ -70,23 +70,12 @@ const handleAxiosError = (error) => {
 
 //Lo que hace esto, es que cuando se detecta que el JWT dejo de ser invalido, lanza un evento para
 //setear en undefined al user.
-api.interceptors.request.use(config => {
-    console.log(`[API] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
-    return config;
-});
-
 api.interceptors.response.use(
-    response => {
-        console.log(`[API] ${response.status} ${response.config.url}`);
-        return response;
-    },
+    response => response,
 
     async error => {
-        const status = error.response?.status;
-        const url = error.config?.url;
-        console.error(`[API] ERROR ${status ?? "network"} ${url}`, error.message);
 
-        if (status === 401) {
+        if (error.response?.status === 401) {
 
             try {
                 await logout();
