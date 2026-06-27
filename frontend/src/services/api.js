@@ -3,7 +3,7 @@ import {logout} from "@/services/sesionService.js";
 import {useAuth} from "@/contexts/userContext.jsx";
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_BACKEND_URI || "http://localhost:8080",
+    baseURL: import.meta.env.VITE_BACKEND_URI || "/api",
     timeout: 40000,
     headers: {
         "Content-Type": "application/json",
