@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVarsFromFiles:
+      - .env
+    envVars:
+      - key: MONGO_REPLICA_SET_NAME
+        value: ""
+    healthCheckPath: /ping
+    plan: free
+
+  - type: web
+    name: frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
