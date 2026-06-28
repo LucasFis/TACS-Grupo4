@@ -74,7 +74,7 @@ class ControladorSesionTest {
         .andExpect(header().string("Set-Cookie",
             org.hamcrest.Matchers.containsString("HttpOnly")))
         .andExpect(header().string("Set-Cookie",
-            org.hamcrest.Matchers.containsString("SameSite=None")));
+            org.hamcrest.Matchers.containsString("SameSite=Lax")));
 
     verify(servicioSesion).login(any(LoginRequest.class));
   }
