@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ServicioSugerencia {
-  @Autowired
   private final RepositorioSugerencias repositorioSugerencias;
-  @Autowired
   private final RepositorioPerfiles repositorioPerfiles;
 
   /**

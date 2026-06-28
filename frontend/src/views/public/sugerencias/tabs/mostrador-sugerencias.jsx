@@ -40,7 +40,7 @@ const MostradorSugerencias = () => {
             <>
                 {
                     sugerencias.length > 0 ?
-                        sugerencias.map((s, index) => <SugerenciaCard key={index} id={s.id} perfil={s.sugerido}
+                        sugerencias.map(s => <SugerenciaCard key={s.sugerido.id} id={s.id} perfil={s.sugerido}
                                                      figuritasNecesarias = {s.figuritas_necesarias}
                                                      figuritasRecomendadas = {s.figuritas_recomendadas} favorito = {s.favorito}/>
                         ) : <h2 className="text-center text-muted py-4 fw-light">No pudimos encontrar sugerencias!</h2>

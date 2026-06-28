@@ -42,6 +42,7 @@ const SugerenciaCard = ({id, perfil, figuritasRecomendadas, figuritasNecesarias,
         abierto={modalAbierto}
         onCerrar={() => setModalAbierto(false)}
         perfil={perfil}
+        id={id} favorito={favorito}
         figuritasNecesarias={figuritasNecesarias}
         figuritasRecomendadas={figuritasRecomendadas}
         onProponer={handleProponer}
