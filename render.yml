@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: backend
+    name: figunet-back
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
@@ -13,7 +13,7 @@ services:
     plan: free
 
   - type: web
-    name: frontend
+    name: figunet-front
     runtime: docker
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
