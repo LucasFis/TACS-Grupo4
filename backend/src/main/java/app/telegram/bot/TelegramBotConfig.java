@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
 @Configuration
-@Profile("!test")
+@Profile("!test & !loadtest")
 public class TelegramBotConfig {
 
   @Value("${telegram.bot.token}")

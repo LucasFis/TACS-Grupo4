@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-@Profile("test")
+@Profile("loadtest")
 public class InicializadorDeDatosTest implements CommandLineRunner {
 
   private final RepositorioPerfiles perfiles;
