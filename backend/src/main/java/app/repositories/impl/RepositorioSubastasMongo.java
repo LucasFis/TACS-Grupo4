@@ -112,6 +112,18 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
       );
     }
 
+    if (filtros.idFiguritaSubastada() != null) {
+      query.addCriteria(
+          Criteria.where("figuritaSubastada.$id").is(filtros.idFiguritaSubastada())
+      );
+    }
+
+    if (filtros.idFiguritaOfertada() != null) {
+      query.addCriteria(
+          Criteria.where("ofertas.figuritasOfrecidas.$id").is(filtros.idFiguritaOfertada())
+      );
+    }
+
     long count = mongoTemplate.count(query, Subasta.class);
 
     query.skip((long) (filtros.pagina() - 1) * filtros.limite());
