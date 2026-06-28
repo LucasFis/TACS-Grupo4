@@ -7,7 +7,7 @@ import { crearPropuesta } from '@/services/propuestasService.js'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 
-const SugerenciaCard = ({ perfil, figuritasRecomendadas, figuritasNecesarias }) => {
+const SugerenciaCard = ({id, perfil, figuritasRecomendadas, figuritasNecesarias, favorito}) => {
   const [modalAbierto, setModalAbierto] = useState(false)
   const {showToast} = useToast()
   const {handleError, errorTemplate} = useError()
@@ -27,7 +27,7 @@ const SugerenciaCard = ({ perfil, figuritasRecomendadas, figuritasNecesarias }) 
       <div className={`p-3 ${styles.card}`}>
 
         {/* HEADER */}
-        <SugerenciaResumen perfil={perfil} figuritasNecesarias={figuritasNecesarias} figuritasRecomendadas={figuritasRecomendadas} />
+        <SugerenciaResumen id={id} perfil={perfil} figuritasNecesarias={figuritasNecesarias} figuritasRecomendadas={figuritasRecomendadas} favorito={favorito} />
 
         <hr className="my-3" />
 
@@ -42,6 +42,7 @@ const SugerenciaCard = ({ perfil, figuritasRecomendadas, figuritasNecesarias }) 
         abierto={modalAbierto}
         onCerrar={() => setModalAbierto(false)}
         perfil={perfil}
+        id={id} favorito={favorito}
         figuritasNecesarias={figuritasNecesarias}
         figuritasRecomendadas={figuritasRecomendadas}
         onProponer={handleProponer}

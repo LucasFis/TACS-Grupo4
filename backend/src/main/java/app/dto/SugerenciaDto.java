@@ -7,13 +7,19 @@ import java.util.List;
 
 @Getter
 public class SugerenciaDto {
-  PerfilDto perfil;
+  String id;
+  PerfilDto autor;
+  PerfilDto sugerido;
   List<Figurita> figuritasRecomendadas;
   List<Figurita> figuritasNecesarias;
+  Boolean favorito;
 
   public SugerenciaDto(Sugerencia sugerencia) {
-    this.perfil = new PerfilDto(sugerencia.getDestinatario());
+    this.id = sugerencia.getId();
+    this.autor = new PerfilDto(sugerencia.getAutor());
+    this.sugerido = new PerfilDto(sugerencia.getSugerido());
     this.figuritasRecomendadas = sugerencia.getFiguritasSugeridas();
     this.figuritasNecesarias = sugerencia.getFiguritasNecesarias();
+    this.favorito = sugerencia.getFavorito();
   }
 }

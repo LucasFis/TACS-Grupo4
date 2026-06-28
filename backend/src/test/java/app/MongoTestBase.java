@@ -6,6 +6,7 @@ import app.repositories.RepositorioNotificaciones;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioPropuestas;
 import app.repositories.RepositorioSubastas;
+import app.repositories.RepositorioSugerencias;
 import app.repositories.RepositorioUsuarios;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public abstract class MongoTestBase {
   protected RepositorioFiguritas repositorioFiguritas;
   @Autowired
   protected RepositorioUsuarios repositorioUsuarios;
+  @Autowired
+  protected RepositorioSugerencias repositorioSugerencias;
 
   @Autowired
   protected MongoTemplate mongoTemplate;

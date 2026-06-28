@@ -11,17 +11,6 @@ export const buscarContadoresSugerencias = async () => {
   }
 }
 
-export const buscarSugerencias = async ({ pagina, limite }) => {
-  try {
-    const { data } = await api.get(`${PERFIL_URL}/sugerencias`, {
-      params: { pagina, limite },
-    })
-    return data
-  } catch (error) {
-    handleAxiosError(error)
-  }
-}
-
 export const calificarPerfil = async (
   { destinatarioId, valor, descripcion, transactionId, tipoTransaccion },
 ) => {

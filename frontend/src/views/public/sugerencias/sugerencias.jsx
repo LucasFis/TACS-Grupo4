@@ -1,7 +1,6 @@
 import Breadcrumb from "@/components/ui/breadcrumb/breadcrumb.jsx";
 import ContadorCard from "@/components/ui/contador-card/contador-card.jsx";
 import styles from './sugerencias.module.css';
-import TabsContainer from "@/components/ui/tabs-container/tabs-container.jsx";
 import {useCallback, useEffect, useState} from "react";
 import {buscarContadoresSugerencias} from "@/services/perfilService.js";
 import ExtraInfo from "@/components/ui/extra-info/extra-info.jsx";
@@ -63,7 +62,8 @@ const Sugerencias = () => {
                 <ExtraInfo>
                     <h6 className="m-0"><strong>¿Cómo funciona?</strong></h6>
                     <p>El sistema analiza tus figuritas faltantes y repetidas, y las cruza con las colecciones
-                        de todos los usuarios.</p>
+                        de todos los usuarios. Ademas, se recalculan cada 24hs.
+                      Si queres conservar una sugerencia, dale al favorito!</p>
                 </ExtraInfo>
 
                 <MostradorSugerencias />

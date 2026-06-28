@@ -79,25 +79,6 @@ public class ControladorPerfil {
     }
 
     /**
-     * Obtiene sugerencias de intercambio para el perfil autenticado,
-     * basándose en su colección y los filtros proporcionados.
-     *
-     * @param token  token JWT del que se extrae el identificador del perfil
-     * @param filtro criterios de filtrado y paginación de las sugerencias
-     * @return 200 OK con la página de sugerencias encontradas
-     */
-    @GetMapping("/sugerencias")
-    public ResponseEntity<PaginaResultado<SugerenciaDto>> obtenerSugerencias(
-        @CookieValue String token,
-        @ModelAttribute SugerenciasFiltro filtro
-    ) {
-        String perfilId = this.servicioJwt.getPerfilId(token);
-        PaginaResultado<SugerenciaDto> sugerenciasDto = this.perfilService.obtenerSugerencias(perfilId, filtro);
-
-        return ResponseEntity.ok().body(sugerenciasDto);
-    }
-
-    /**
      * Obtiene los contadores de figuritas repetidas y faltantes del perfil autenticado.
      *
      * @param token token JWT del que se extrae el identificador del perfil

@@ -117,25 +117,6 @@ public class ServicioPerfil {
   }
 
   /**
-   * Genera sugerencias de intercambio para un perfil basándose en su colección
-   * y los filtros de búsqueda proporcionados.
-   *
-   * @param perfilId identificador del perfil para el cual se generarán sugerencias
-   * @param filtros  criterios de filtrado y paginación de las sugerencias
-   * @return página de sugerencias encontradas
-   * @throws app.exceptions.NotFoundException si no se encuentra el perfil indicado
-   */
-  public PaginaResultado<SugerenciaDto> obtenerSugerencias(String perfilId, SugerenciasFiltro filtros) {
-    CamposPerfil campos = new CamposPerfil(false);
-    Perfil perfilObjetivo = this.repositorioPerfiles.buscarPorId(perfilId, campos);
-
-    PaginaResultado<Sugerencia> sugerencias = this.repositorioPerfiles.generarSugerencias(perfilObjetivo.getColeccion(), filtros);
-
-    return new PaginaResultado<>(sugerencias.contenido().stream().map(SugerenciaDto::new).toList(),
-        sugerencias.cantidadDeElementos(), sugerencias.cantidadDePaginas(), sugerencias.numero());
-  }
-
-  /**
    * Obtiene los contadores de figuritas repetidas y faltantes de un perfil.
    *
    * @param perfilId identificador del perfil del cual se obtendrán los contadores

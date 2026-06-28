@@ -81,15 +81,4 @@ public interface RepositorioPerfiles {
      * @return lista de perfiles que tienen la figurita como faltante
      */
     List<Perfil> buscarPorFiguritaFaltante(Figurita figurita, CamposPerfil campos);
-
-    /**
-     * Genera sugerencias de intercambio para una colección objetivo, cruzando faltantes
-     * y repetidos con otras colecciones. Soporta filtros de tipo de sugerencia
-     * ({@code 1a1}, {@code Na1}, {@code 1aN}).
-     *
-     * @param coleccion colección para la cual generar sugerencias
-     * @param filtros   criterios de filtrado (tipo, paginación)
-     * @return página de sugerencias de intercambio
-     */
-    PaginaResultado<Sugerencia> generarSugerencias(Coleccion coleccion, SugerenciasFiltro filtros);
 }

@@ -34,3 +34,18 @@
     font-weight: bold;
     color: #6c757d;
 }
+
+.botonFavorito {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: #f5c518;
+    transition: transform 0.15s ease;
+}
+
+.botonFavorito:hover {
+    transform: scale(1.2);
+}

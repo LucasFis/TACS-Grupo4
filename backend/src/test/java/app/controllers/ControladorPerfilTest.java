@@ -5,7 +5,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import app.dto.*;
 import app.dto.paginacion.PaginaResultado;
 import app.model.entities.MetodoIntercambio;
@@ -15,9 +14,7 @@ import app.model.entities.Usuario;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioPerfil;
 import jakarta.servlet.http.Cookie;
-
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,16 +45,6 @@ class ControladorPerfilTest {
   void setup() {
     when(servicioJwt.getPerfilId("fake-token"))
         .thenReturn("1000");
-  }
-
-  @Test
-  void buscarSugerenciasSinPaginacion_retorna200() throws Exception {
-    mockMvc.perform(
-            get("/perfil/sugerencias")
-            .cookie(cookie)
-            .contentType("application/json")
-        )
-        .andExpect(status().isOk());
   }
 
   @Test

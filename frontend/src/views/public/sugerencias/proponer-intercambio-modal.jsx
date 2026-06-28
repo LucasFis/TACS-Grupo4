@@ -25,6 +25,8 @@ const ProponerIntercambioModal = ({
   figuritasNecesarias = [],
   figuritasRecomendadas = [],
   onProponer,
+  id,
+  favorito
 }) => {
   const backdropRef = useRef(null)
   const [repetidas, setRepetidas] = useState([])
@@ -66,7 +68,7 @@ const ProponerIntercambioModal = ({
     >
       <div className={styles.modal}>
 
-        <SugerenciaResumen perfil={perfil} figuritasNecesarias={figuritasNecesarias} figuritasRecomendadas={figuritasRecomendadas} />
+        <SugerenciaResumen id={id} favorito={favorito} perfil={perfil} figuritasNecesarias={figuritasNecesarias} figuritasRecomendadas={figuritasRecomendadas} />
 
         <hr className={styles.divisor} />
 

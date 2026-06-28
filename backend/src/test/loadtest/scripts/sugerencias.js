@@ -10,7 +10,7 @@ const BASE = 'http://backend-test:8080';
 const USUARIO = { nombre: 'lucas_fis', contrasenia: 'Gordo123!' };
 
 export function testSugerencias(authHeaders) {
-    const res = http.get(`${BASE}/perfil/sugerencias`, { headers: authHeaders });
+    const res = http.get(`${BASE}/sugerencias`, { headers: authHeaders });
     const body = res.json();
 
     checkHttp(res, 200);
@@ -18,7 +18,8 @@ export function testSugerencias(authHeaders) {
     check(body.contenido, {
         '[sugerencias] tiene recomendadas': (s) => s.every(c => Array.isArray(c.figuritas_recomendadas)),
         '[sugerencias] tiene necesarias':   (s) => s.every(c => Array.isArray(c.figuritas_necesarias)),
-        '[sugerencias] tiene perfil':       (s) => s.every(c => c.perfil != null),
+        '[sugerencias] tiene perfil sugerdo':       (s) => s.every(c => c.sugerido != null),
+        '[sugerencias] tiene perfil autor':       (s) => s.every(c => c.autor != null)
     });
 }
 
