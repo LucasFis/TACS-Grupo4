@@ -4,10 +4,10 @@ import io.micrometer.core.instrument.Clock;
 import io.micrometer.registry.otlp.AggregationTemporality;
 import io.micrometer.registry.otlp.OtlpConfig;
 import io.micrometer.registry.otlp.OtlpMeterRegistry;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,19 +19,31 @@ import java.util.Map;
  * Meters por OTLP reusando las mismas variables que ya configura el agente
  * para trazas (OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_HEADERS,
  * OTEL_RESOURCE_ATTRIBUTES).
+ *
+ * <p>Export best-effort: si no hay endpoint configurado (caso local/dev), el bean no se
+ * crea y la app arranca igual usando el MeterRegistry de fallback de Spring Boot; las
+ * metricas custom quedan en memoria sin exportarse. Se lee siempre de {@code System.getenv}
+ * (misma fuente que el agente OTel) para que ambos exporten al mismo destino o ninguno.
+ * Devolver {@code null} cuando falta el endpoint tambien suprime la autoconfig OTLP de
+ * Spring Boot, que si no apuntaria por defecto a http://localhost:4318.
  */
 @Configuration
-@ConditionalOnProperty("otel.exporter.otlp.endpoint")
 public class OtlpMetricsConfig {
 
   @Bean
+  @Nullable
   public OtlpMeterRegistry otlpMeterRegistry() {
+    String endpoint = System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+    if (endpoint == null || endpoint.isBlank()) {
+      return null;
+    }
+
     Map<String, String> headers = parseKeyValues(System.getenv("OTEL_EXPORTER_OTLP_HEADERS"));
     Map<String, String> resourceAttributes = parseKeyValues(System.getenv("OTEL_RESOURCE_ATTRIBUTES"));
     resourceAttributes.putIfAbsent("service.name",
         System.getenv().getOrDefault("OTEL_SERVICE_NAME", "tacs-backend"));
 
-    String url = construirUrlMetricas(System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"));
+    String url = construirUrlMetricas(endpoint);
 
     OtlpConfig config = new OtlpConfig() {
       @Override
