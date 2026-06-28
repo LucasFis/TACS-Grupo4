@@ -59,11 +59,15 @@ ENV OTEL_METRICS_EXPORTER=otlp
 ENV OTEL_LOGS_EXPORTER=none
 ENV OTEL_TRACES_SAMPLER=parentbased_always_on
 
-# Histogramas exponenciales + temporalidad delta para las metricas del agente: dan
-# percentiles precisos con muchas menos series que el histograma clasico (menor presion
-# sobre el limite de cardinalidad del free tier de Grafana Cloud). Validar percentiles
-# en staging antes de prod.
-ENV OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
+# Temporalidad cumulative: Grafana Cloud (Mimir) es Prometheus por debajo y rechaza con
+# HTTP 400 ("invalid temporality and type combination") varias metricas en delta. Esto se
+# verifico en dev con el OtlpMeterRegistry de Micrometer: en delta fallaba cada push, en
+# cumulative ingesta sin errores. Cumulative es el modelo nativo de Mimir.
+# Histogramas exponenciales (native histograms): mejores percentiles con muchas menos series
+# que el clasico (menor presion sobre el limite de cardinalidad del free tier). Si Grafana
+# Cloud rechazara los native histograms en prod, quitar la linea de abajo para volver al
+# explicit-bucket clasico. Validar percentiles en staging antes de prod.
+ENV OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=cumulative
 ENV OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=base2_exponential_bucket_histogram
 
 # Cambiamos al usuario sin privilegios

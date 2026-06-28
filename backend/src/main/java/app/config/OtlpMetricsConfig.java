@@ -66,11 +66,13 @@ public class OtlpMetricsConfig {
         return resourceAttributes;
       }
 
-      // Misma temporalidad que el agente OTel (Dockerfile: ..._TEMPORALITY_PREFERENCE=delta)
-      // para no mezclar delta (agente) con cumulative (default de Micrometer) en el mismo stack.
+      // Grafana Cloud (Mimir) es Prometheus por debajo: su modelo nativo es cumulative y
+      // rechaza con HTTP 400 ("invalid temporality and type combination") varios tipos en delta
+      // (counters de librerias, gauges del executor, timers, etc.). El agente OTel tambien
+      // exporta en cumulative (ver Dockerfile), asi que todo el stack queda alineado.
       @Override
       public @NonNull AggregationTemporality aggregationTemporality() {
-        return AggregationTemporality.DELTA;
+        return AggregationTemporality.CUMULATIVE;
       }
     };
 
