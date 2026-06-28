@@ -68,7 +68,7 @@ public class ServicioEstadisticas {
 
         int totalPropuestas = propuestasPeriodo.size();
 
-        SubastasFiltro filtros = new SubastasFiltro(0, 20, null, null, "ACTIVA");
+        SubastasFiltro filtros = new SubastasFiltro(0, 20, null, null, "ACTIVA", null, null);
 
         PaginaResultado<Subasta> totalSubastasActivas = repositorioSubastas.buscarTodos(filtros, new CamposSubasta(false, false));
 
