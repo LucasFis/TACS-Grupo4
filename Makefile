@@ -39,10 +39,10 @@ logs-front:
 # --- Tests ---
 
 test:
-	docker compose -f docker-compose.dev.yml run --rm backend mvn test
+	docker compose -f docker-compose.dev.yml run --rm --build backend mvn test
 
     #Todos los scripts
-	docker compose -f docker-compose.test.yml run --rm loadtest
+	docker compose -f docker-compose.test.yml run --rm --build loadtest
 
     #Un solo script
-    docker compose -f docker-compose.test.yml run --rm loadtest sugerencias.js
+    docker compose -f docker-compose.test.yml run --rm --build loadtest sugerencias.js

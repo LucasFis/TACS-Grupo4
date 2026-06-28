@@ -13,6 +13,7 @@ import app.servicios.ServicioSubasta;
 import app.telegram.bot.BotResponse;
 import app.telegram.sesion.SessionManager;
 import app.telegram.utils.MessageBuilder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
+@Profile("!test & !loadtest")
 @Order(2)
 public class SubastaHandler implements BotHandler {
 

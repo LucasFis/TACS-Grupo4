@@ -2,6 +2,7 @@ package app.telegram.handlers;
 
 import app.telegram.bot.BotResponse;
 import app.telegram.sesion.SessionManager;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -9,6 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@Profile("!test & !loadtest")
 public class CommandHandler {
 
   private final Map<String, BotHandler> comandoAHandler = new HashMap<>();

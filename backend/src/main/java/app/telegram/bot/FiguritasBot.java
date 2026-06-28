@@ -2,6 +2,7 @@ package app.telegram.bot;
 
 import app.telegram.handlers.CommandHandler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
+@Profile("!test & !loadtest")
 public class FiguritasBot implements LongPollingUpdateConsumer {
 
   private static final Logger log = LoggerFactory.getLogger(FiguritasBot.class);

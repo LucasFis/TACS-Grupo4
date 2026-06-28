@@ -2,6 +2,7 @@ package app.telegram.handlers;
 
 import app.telegram.bot.BotResponse;
 import app.telegram.sesion.SessionManager;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -9,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.Set;
 
 @Component
+@Profile("!test & !loadtest")
 @Order(1) // junto con AuthHandler, pero Spring los diferencia por tipo
 public class MenuHandler implements BotHandler {
 

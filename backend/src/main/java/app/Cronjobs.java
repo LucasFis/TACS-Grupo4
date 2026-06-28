@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@DependsOn("inicializadorDeDatos")
 @Profile("!test")
 @RequiredArgsConstructor
 public class Cronjobs implements ApplicationRunner {

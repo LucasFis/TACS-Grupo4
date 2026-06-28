@@ -4,6 +4,7 @@ import app.dto.request.LoginRequest;
 import app.servicios.ServicioSesion;
 import app.telegram.bot.BotResponse;
 import app.telegram.sesion.SessionManager;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Profile("!test & !loadtest")
 @Order(1)
 public class AuthHandler implements BotHandler {
 

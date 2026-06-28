@@ -10,7 +10,7 @@ const BASE = 'http://backend-test:8080';
 const USUARIO = { nombre: 'lucas_fis', contrasenia: 'Gordo123!' };
 
 export function testSugerencias(authHeaders) {
-    const res = http.get(`${BASE}/perfil/sugerencias`, { headers: authHeaders });
+    const res = http.get(`${BASE}/sugerencias`, { headers: authHeaders });
     const body = res.json();
 
     checkHttp(res, 200);

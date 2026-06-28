@@ -1,11 +1,13 @@
 package app.telegram.sesion;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Profile("!test & !loadtest")
 public class SessionManager {
 
   // Guarda chat_id → token JWT en memoria
