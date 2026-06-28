@@ -35,8 +35,9 @@ function elegirRuta() {
 }
 
 export default function () {
-    const cookie = login(BASE, USUARIO);
-    const authHeaders = { 'Cookie': `token=${cookie}` };
+    const token = login(BASE, USUARIO);
+    if (!token) return;
+    const authHeaders = { 'Cookie': `token=${token}` };
 
     const ruta = elegirRuta();
     ruta(authHeaders);
