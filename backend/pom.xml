@@ -111,6 +111,20 @@
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
+    <!-- Telegram-->
+
+    <dependency>
+      <groupId>org.telegram</groupId>
+      <artifactId>telegrambots-longpolling</artifactId>
+      <version>7.10.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.telegram</groupId>
+      <artifactId>telegrambots-client</artifactId>
+      <version>7.10.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -165,6 +179,9 @@
                     <exclude>app.dto.filtros</exclude>
                     <exclude>app.dto.response</exclude>
                     <exclude>app.config</exclude>
+                    <exclude>app.telegram.bot</exclude>
+                    <exclude>app.telegram.sesion</exclude>
+                    <exclude>app.telegram.utils</exclude>
                     <exclude>app</exclude>
                     <exclude>default</exclude>
                     <exclude>app.repositories</exclude>
