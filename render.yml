@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: figunet-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /ping
+    plan: free
+
+  - type: web
+    name: figunet
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
