@@ -5,9 +5,12 @@ import io.micrometer.registry.otlp.AggregationTemporality;
 import io.micrometer.registry.otlp.OtlpConfig;
 import io.micrometer.registry.otlp.OtlpMeterRegistry;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,30 +23,24 @@ import java.util.Map;
  * para trazas (OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_HEADERS,
  * OTEL_RESOURCE_ATTRIBUTES).
  *
- * <p>Export best-effort: si no hay endpoint configurado (caso local/dev), el bean no se
- * crea y la app arranca igual usando el MeterRegistry de fallback de Spring Boot; las
- * metricas custom quedan en memoria sin exportarse. Se lee siempre de {@code System.getenv}
- * (misma fuente que el agente OTel) para que ambos exporten al mismo destino o ninguno.
- * Devolver {@code null} cuando falta el endpoint tambien suprime la autoconfig OTLP de
- * Spring Boot, que si no apuntaria por defecto a http://localhost:4318.
+ * <p>Export best-effort: si no hay endpoint configurado (caso local/dev y tests), la
+ * {@link EndpointOtlpPresente condicion} no se cumple y el bean no se define, con lo que
+ * queda el MeterRegistry de fallback de Spring Boot (la app arranca igual, sin exportar).
+ * La condicion y la lectura usan la misma fuente ({@code System.getenv}) — la misma que el
+ * agente OTel — para evitar asimetrias entre "se decide crear el bean" y "se lee el valor".
  */
 @Configuration
+@Conditional(OtlpMetricsConfig.EndpointOtlpPresente.class)
 public class OtlpMetricsConfig {
 
   @Bean
-  @Nullable
   public OtlpMeterRegistry otlpMeterRegistry() {
-    String endpoint = System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT");
-    if (endpoint == null || endpoint.isBlank()) {
-      return null;
-    }
-
     Map<String, String> headers = parseKeyValues(System.getenv("OTEL_EXPORTER_OTLP_HEADERS"));
     Map<String, String> resourceAttributes = parseKeyValues(System.getenv("OTEL_RESOURCE_ATTRIBUTES"));
     resourceAttributes.putIfAbsent("service.name",
         System.getenv().getOrDefault("OTEL_SERVICE_NAME", "tacs-backend"));
 
-    String url = construirUrlMetricas(endpoint);
+    String url = construirUrlMetricas(System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"));
 
     OtlpConfig config = new OtlpConfig() {
       @Override
@@ -77,6 +74,20 @@ public class OtlpMetricsConfig {
     };
 
     return new OtlpMeterRegistry(config, Clock.SYSTEM);
+  }
+
+  /**
+   * Crea el registry solo si la env var del SO {@code OTEL_EXPORTER_OTLP_ENDPOINT} esta
+   * presente. Misma fuente ({@code System.getenv}) que usa el agente OTel y que la lectura
+   * de {@link #otlpMeterRegistry()}. Si no esta, no se define el bean y queda el
+   * MeterRegistry de fallback de Spring Boot.
+   */
+  static class EndpointOtlpPresente implements Condition {
+    @Override
+    public boolean matches(@NonNull ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
+      String endpoint = System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+      return endpoint != null && !endpoint.isBlank();
+    }
   }
 
   /**
