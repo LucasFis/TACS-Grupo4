@@ -24,7 +24,8 @@ export function testFiguritas(authHeaders) {
 }
 
 export default function () {
-    const cookie = login(BASE, USUARIO);
-    testFiguritas({ 'Cookie': `token=${cookie}` });
+    const token = login(BASE, USUARIO);
+    if (!token) return;
+    testFiguritas({ 'Cookie': `token=${token}` });
     sleep(1);
 }

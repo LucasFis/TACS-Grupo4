@@ -103,10 +103,10 @@ public class TheSportsDbImagenProveedor implements ImagenJugadorProveedor {
       TheSportsDbResponse response = restTemplate.getForObject(url, TheSportsDbResponse.class);
       Optional<String> thumb = extraerThumb(response);
       if (thumb.isPresent()) {
-        log.info("200 OK - imagen encontrada: {}", nombreJugador);
+        //log.info("200 OK - imagen encontrada: {}", nombreJugador);
         registrarTiempo(sample, "encontrada");
       } else {
-        log.warn("200 OK - sin imagen: {}", nombreJugador);
+        //log.warn("200 OK - sin imagen: {}", nombreJugador);
         registrarTiempo(sample, "no_encontrada");
       }
       return thumb;

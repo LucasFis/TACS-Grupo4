@@ -33,6 +33,7 @@ services:
     environment:
       MONGO_URI: mongodb://mongodb-test:27017/tacs-test
       SEED_DATA: "true"
+      SPRING_PROFILES_ACTIVE: loadtest
     command: mvn spring-boot:run
     depends_on:
       mongo-init-test:
@@ -51,4 +52,4 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/src/test/loadtest:/loadtest
-    entrypoint: /bin/sh /loadtest/entrypoint.sh
+    entrypoint: ["/bin/sh", "-c", "cp /loadtest/entrypoint.sh /tmp/entrypoint.sh && sed -i 's/\\r//' /tmp/entrypoint.sh && /bin/sh /tmp/entrypoint.sh"]

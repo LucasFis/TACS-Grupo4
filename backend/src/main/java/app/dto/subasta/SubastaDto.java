@@ -6,11 +6,14 @@ import app.dto.PropuestaDto;
 import app.model.entities.Figurita;
 import app.model.entities.Subasta;
 import lombok.Getter;
+import lombok.Setter;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Setter
 public class SubastaDto {
   String id;
   PerfilDto perfil;

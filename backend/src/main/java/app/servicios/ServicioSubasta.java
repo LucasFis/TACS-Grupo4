@@ -19,6 +19,7 @@ import app.repositories.impl.campos.CamposColeccion;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import app.repositories.impl.campos.CamposPerfil;
 import app.repositories.impl.campos.CamposSubasta;
@@ -124,6 +125,7 @@ public class ServicioSubasta {
         .toList();
 
     Propuesta nuevaPropuesta = Propuesta.builder()
+        .id(UUID.randomUUID().toString())
         .autor(autor)
         .destinatario(destinatario)
         .figuritaBuscada(subasta.getFiguritaSubastada())
