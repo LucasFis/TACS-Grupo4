@@ -15,6 +15,9 @@ COPY . .
 # Compila la app con Vite para producción
 FROM dev AS builder
 
+ARG VITE_BACKEND_URI
+ENV VITE_BACKEND_URI=$VITE_BACKEND_URI
+
 RUN npm run build
 
 # --- Etapa de runtime ---
@@ -22,7 +25,7 @@ RUN npm run build
 FROM nginxinc/nginx-unprivileged:alpine AS production
 
 COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 8080
 

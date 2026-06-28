@@ -62,7 +62,7 @@ public class ControladorSesion {
             ResponseCookie.from("token", token)
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ofHours(12))
                 .build();
@@ -104,7 +104,7 @@ public class ControladorSesion {
             ResponseCookie.from("token", "")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .path("/")
                 .maxAge(0)
                 .build();
