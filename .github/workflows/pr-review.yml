@@ -1,0 +1,21 @@
+name: PR Agent Review
+
+on:
+  pull_request:
+    types: [ready_for_review, opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PR Agent
+        uses: the-pr-agent/pr-agent@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI.API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENAI.API_BASE: https://api.groq.com/openai/v1
+          CONFIG.MODEL: llama-3.3-70b-versatile
+          CONFIG.MODEL_TURBO: llama-3.3-70b-versatile
+          github_action_config.auto_review: "true"
