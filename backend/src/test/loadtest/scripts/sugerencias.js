@@ -18,7 +18,8 @@ export function testSugerencias(authHeaders) {
     check(body.contenido, {
         '[sugerencias] tiene recomendadas': (s) => s.every(c => Array.isArray(c.figuritas_recomendadas)),
         '[sugerencias] tiene necesarias':   (s) => s.every(c => Array.isArray(c.figuritas_necesarias)),
-        '[sugerencias] tiene perfil':       (s) => s.every(c => c.perfil != null),
+        '[sugerencias] tiene perfil sugerdo':       (s) => s.every(c => c.sugerido != null),
+        '[sugerencias] tiene perfil autor':       (s) => s.every(c => c.autor != null)
     });
 }
 
