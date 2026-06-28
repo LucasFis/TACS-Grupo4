@@ -35,7 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("!test")
+@Profile("!test & !loadtest")
 public class InicializadorDeDatos implements CommandLineRunner {
 
   private final RepositorioPerfiles perfiles;

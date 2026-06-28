@@ -4,9 +4,12 @@ import app.model.entities.EstadoProceso;
 import app.model.entities.Propuesta;
 import app.model.entities.Figurita;
 import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 @Getter
+@Setter
 public class PropuestaDto {
   private String id;
   private PerfilDto autor;
@@ -29,5 +32,6 @@ public class PropuestaDto {
   public PropuestaDto(Propuesta propuesta, String tipo) {
       this(propuesta);
       this.tipo = tipo;
-    }
+  }
+
 }

@@ -49,6 +49,16 @@ public interface RepositorioPerfiles {
     Perfil buscarPorUsuarioId(String usuarioId, CamposPerfil campos);
 
     /**
+     * Busca un perfil por el nombre.
+     *
+     * @param nombre identificador del usuario
+     * @param campos especifica qué campos incluir
+     * @return el perfil encontrado
+     * @throws app.exceptions.NotFoundException si no existe un perfil para ese usuario
+     */
+    Perfil buscarPorNombre(String nombre, CamposPerfil campos);
+
+    /**
      * Obtiene todos los perfiles del sistema, con carga selectiva de campos.
      *
      * @param campos especifica qué campos incluir

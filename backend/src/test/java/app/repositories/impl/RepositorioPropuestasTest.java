@@ -274,6 +274,35 @@ class RepositorioPropuestasTest extends MongoTestBase {
     }
 
     @Test
+    void buscarEstadisticasPorRango_incluyeDentroYExcluyeFuera() {
+        LocalDateTime dentroDelRango = LocalDateTime.now().minusDays(3);
+        LocalDateTime fueraDelRango = LocalDateTime.now().minusDays(10);
+
+        EstadoPropuesta estadoDentro = new EstadoPropuesta(dentroDelRango, EstadoProceso.PENDIENTE);
+        Propuesta dentro = Propuesta.builder()
+            .autor(u1).destinatario(u2).figuritasOfrecidas(List.of())
+            .estado(new ArrayList<>(List.of(estadoDentro))).estadoActual(estadoDentro)
+            .build();
+
+        EstadoPropuesta estadoFuera = new EstadoPropuesta(fueraDelRango, EstadoProceso.PENDIENTE);
+        Propuesta fuera = Propuesta.builder()
+            .autor(u2).destinatario(u3).figuritasOfrecidas(List.of())
+            .estado(new ArrayList<>(List.of(estadoFuera))).estadoActual(estadoFuera)
+            .build();
+
+        repositorio.guardar(dentro);
+        repositorio.guardar(fuera);
+
+        List<Propuesta> resultado = repositorio.buscarEstadisticasPorRango(
+            LocalDateTime.now().minusDays(7),
+            LocalDateTime.now()
+        );
+
+        assertEquals(1, resultado.size());
+        assertEquals(dentro.getId(), resultado.get(0).getId());
+    }
+
+    @Test
     void buscarTodos_sinResultados_devuelveListaVacia() {
 
         PropuestasFiltro filtros =

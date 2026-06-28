@@ -93,6 +93,23 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
   }
 
   @Override
+  public Perfil buscarPorNombre(String nombre, CamposPerfil campos) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("nombre").regex("^" + nombre + "$", "i") // case-insensitive, exacto
+    );
+
+    this.conCamposCargados(query, campos);
+    Perfil perfil = mongoTemplate.findOne(query, Perfil.class);
+
+    if (perfil == null) {
+      throw new NotFoundException("Perfil no encontrado con nombre: " + nombre);
+    }
+
+    return this.normalizar(perfil);
+  }
+
+  @Override
   public List<Perfil> buscarPorFiguritaFaltante(Figurita figurita, CamposPerfil campos) {
     Query queryColecciones = new Query(
         Criteria.where("faltantes").is(figurita.getId())
