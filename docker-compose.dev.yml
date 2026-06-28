@@ -83,6 +83,5 @@ services:
           path: ./frontend/public
           target: /app/public
           initial_sync: true
-
 volumes:
   mongodb_data_dev:
