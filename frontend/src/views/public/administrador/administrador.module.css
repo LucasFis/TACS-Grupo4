@@ -1,24 +1,45 @@
 .page {
+  display: flex;
+  flex-direction: column;
+}
+
+.contenido {
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
   padding-bottom: 3rem;
 }
 
+/* ── Hero full-width ────────────────────────────────────────────────────────── */
+
 .hero {
   background-color: var(--color-secondary);
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
+  margin: -2rem -2rem 1.5rem;
+  padding: 48px 2rem;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.heroInner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .heroTitulo {
   color: var(--color-primary);
+  font-size: 2rem;
   font-weight: 700;
+  margin: 0;
 }
 
 .heroSubtitulo {
-  color: var(--color-secondary-acent);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
   margin: 0;
 }
 
@@ -31,29 +52,57 @@
   border-radius: 999px;
 }
 
+/* ── Stat Card ─────────────────────────────────────────────────────────────── */
 
 .statCard {
   background: #ffffff;
   border: 1px solid var(--border-color-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 1rem;
   height: 100%;
 }
 
+.statCardDestacado {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.statIconWrapper {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 10px;
+  background: rgba(23, 90, 45, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .statIcon {
-  font-size: 1.75rem;
-  color: var(--color-subtitle);
+  font-size: 1.4rem;
+  color: var(--color-secondary);
 }
 
 .statIconDestacado {
   color: var(--color-terciary);
 }
 
+.statIconWrapperDestacado {
+  background: rgba(212, 154, 44, 0.12);
+}
+
+.statTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
 .statNumero {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   color: var(--color-secondary);
   line-height: 1;
@@ -64,26 +113,306 @@
 }
 
 .statLabel {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   color: var(--color-subtitle);
 }
+
+/* ── Sección card genérica ──────────────────────────────────────────────────── */
 
 .seccionCard {
   background: #ffffff;
   border: 1px solid var(--border-color-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   height: 100%;
 }
 
-.seccionTitulo {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: 1.25rem;
-  color: var(--color-text);
+.seccionCardDorada {
+  background: #fffbeb;
+  border-color: #fde68a;
 }
 
-/* Skeleton */
+.seccionTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seccionTituloIcono {
+  font-size: 1rem;
+}
+
+/* ── Encabezados de sección ─────────────────────────────────────────────────── */
+
+.seccionHeading {
+  color: var(--color-secondary);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0 0 0.75rem 0;
+}
+
+/* ── Del período — fila con heading + filtro ─────────────────────────────────── */
+
+.delPeriodoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.delPeriodoLabel {
+  color: var(--color-secondary);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.delPeriodoNota {
+  font-size: 0.78rem;
+  color: var(--color-subtitle);
+  white-space: nowrap;
+}
+
+/* ── Filtro de período (barra estilo search) ─────────────────────────────────── */
+
+.heroPeriodoFiltro {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 4px 4px 4px 16px;
+  gap: 8px;
+  width: 100%;
+  max-width: 720px;
+  user-select: none;
+}
+
+.heroPeriodoLabel {
+  color: #6b7280;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.heroPeriodoCampo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: #f9fafb;
+  cursor: pointer;
+  min-width: 140px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.heroPeriodoCampo:focus-within {
+  border-color: var(--color-terciary);
+  background: #fff;
+}
+
+.heroPeriodoCampoLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+.heroPeriodoInput {
+  border: none;
+  outline: none;
+  font-size: 0.88rem;
+  background: transparent;
+  color: #374151;
+  font-family: var(--font-family);
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.heroPeriodoInput:focus {
+  outline: none;
+}
+
+.periodoFiltro {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.aplicarBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-terciary);
+  color: var(--color-primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: var(--font-family);
+}
+
+.aplicarBtn:hover {
+  background: #b8851e;
+}
+
+.aplicarBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Propuestas por estado ──────────────────────────────────────────────────── */
+
+.propuestasCard {
+  background: #ffffff;
+  border: 1px solid var(--border-color-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  height: 100%;
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.propuestasBarras {
+  flex: 1;
+  min-width: 0;
+}
+
+.totalPropuestasCard {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  min-width: 90px;
+}
+
+.totalPropuestasNumero {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #d49a2c;
+  line-height: 1;
+}
+
+.totalPropuestasLabel {
+  font-size: 0.7rem;
+  color: #92400e;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ── Ranking usuarios ───────────────────────────────────────────────────────── */
+
+.rankingItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.rankingItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rankingItem:first-child {
+  padding-top: 0;
+}
+
+.posicionBadge {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.rankingNombre {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rankingDetalle {
+  font-size: 0.78rem;
+  color: var(--color-subtitle);
+  font-weight: 400;
+}
+
+.rankingValor {
+  font-weight: 700;
+  color: var(--color-secondary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rankingVacio {
+  color: var(--color-subtitle);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Columna derecha apilada ────────────────────────────────────────────────── */
+
+.colApilada {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+/* ── Skeleton ───────────────────────────────────────────────────────────────── */
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }

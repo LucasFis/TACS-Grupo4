@@ -7,6 +7,8 @@ import lombok.Getter;
 @Getter
 public class PropuestasPorEstadoDto {
   private int pendientes;
+  private int seleccionadas;
   private int aceptadas;
   private int rechazadas;
+  private int canceladas;
 }
