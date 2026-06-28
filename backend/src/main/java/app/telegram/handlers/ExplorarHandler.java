@@ -14,10 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Order(2)
 public class ExplorarHandler implements BotHandler {
+
+  private static final Logger log = LoggerFactory.getLogger(ExplorarHandler.class);
 
   private final ServicioFigurita figuitaService;
   private final MessageBuilder messageBuilder;
@@ -105,7 +109,7 @@ public class ExplorarHandler implements BotHandler {
       return BotResponse.texto(texto);
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al explorar figuritas: {}", e.getMessage(), e);
       return BotResponse.texto("❌ Error al obtener las figuritas. Intentá de nuevo." + e.getMessage());
     }
   }

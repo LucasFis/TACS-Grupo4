@@ -24,10 +24,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Order(2)
 public class PropuestaHandler implements BotHandler {
+
+  private static final Logger log = LoggerFactory.getLogger(PropuestaHandler.class);
 
   private final ServicioPropuesta propuestaService;
   private final ServicioJwt servicioJwt;
@@ -239,7 +243,7 @@ public class PropuestaHandler implements BotHandler {
       return BotResponse.texto(sb.toString());
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al buscar propuestas para chatId {}: {}", chatId, e.getMessage(), e);
       return BotResponse.texto("❌ Error: " + e.getMessage());
     }
   }
@@ -315,10 +319,6 @@ public class PropuestaHandler implements BotHandler {
     long chatId = update.getMessage().getChatId();
     String estado = estadoPendiente.get(chatId);
     String texto = update.getMessage().getText().trim();
-
-    System.out.println(">>> PropuestaHandler.handlePendiente");
-    System.out.println(">>> estado en mapa: '" + estado + "'");
-    System.out.println(">>> texto: '" + texto + "'");
 
     if (estado == null) return null;
 
@@ -428,8 +428,6 @@ public class PropuestaHandler implements BotHandler {
       }
 
       case "propuestas:esperando_filtro" -> {
-        System.out.println(">>> texto bytes: " + Arrays.toString(texto.getBytes()));
-        System.out.println(">>> estado bytes: " + Arrays.toString(estado.getBytes()));
         EstadoProceso estadoProceso = switch (texto) {
           case "1" -> EstadoProceso.PENDIENTE;
           case "2" -> EstadoProceso.ACEPTADO;
@@ -490,7 +488,7 @@ public class PropuestaHandler implements BotHandler {
       return BotResponse.texto("✅ *¡Propuesta creada exitosamente!*\n\n🆔 ID: `" + propuesta.getId() + "`");
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al crear propuesta para chatId {}: {}", chatId, e.getMessage(), e);
       cancelarPendiente(chatId);
       return BotResponse.texto("❌ Error al crear la propuesta: " + e.getMessage());
     }

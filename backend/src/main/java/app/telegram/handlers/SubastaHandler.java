@@ -22,10 +22,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Order(2)
 public class SubastaHandler implements BotHandler {
+
+  private static final Logger log = LoggerFactory.getLogger(SubastaHandler.class);
 
   private final ServicioSubasta subastaService;
   private final ServicioJwt servicioJwt;
@@ -546,8 +550,6 @@ public class SubastaHandler implements BotHandler {
             subastaService.editarOfertaEnSubasta(perfilId, subId, ofertId, req);
             yield BotResponse.texto("✏️ Oferta editada correctamente.");
           } else {
-            OfertarEnSubastaRequest req = new OfertarEnSubastaRequest();
-            req.setFiguritasOfrecidasId(ids);
             subastaService.ofertarEnSubasta(perfilId, subId, ids);
             yield BotResponse.texto("💰 ¡Oferta realizada correctamente!");
           }
@@ -645,7 +647,7 @@ public class SubastaHandler implements BotHandler {
       return BotResponse.texto(sb.toString());
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al buscar subastas para chatId {}: {}", chatId, e.getMessage(), e);
       return BotResponse.texto("❌ Error: " + e.getMessage());
     }
   }
@@ -681,7 +683,7 @@ public class SubastaHandler implements BotHandler {
       return BotResponse.texto(sb.toString());
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al buscar participaciones para chatId {}: {}", chatId, e.getMessage(), e);
       return BotResponse.texto("❌ Error: " + e.getMessage());
     }
   }
@@ -709,7 +711,7 @@ public class SubastaHandler implements BotHandler {
       return BotResponse.texto("✅ *¡Subasta creada exitosamente!*");
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al crear subasta para chatId {}: {}", chatId, e.getMessage(), e);
       cancelarPendiente(chatId);
       return BotResponse.texto("❌ Error al crear la subasta: " + e.getMessage());
     }

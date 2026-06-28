@@ -21,10 +21,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Order(2)
 public class ColeccionHandler implements BotHandler {
+
+  private static final Logger log = LoggerFactory.getLogger(ColeccionHandler.class);
 
   private final ServicioColeccion coleccionService;
   private final ServicioJwt servicioJwt;
@@ -149,7 +153,7 @@ public class ColeccionHandler implements BotHandler {
       return BotResponse.texto(sb.toString());
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al buscar faltantes para chatId {}: {}", chatId, e.getMessage(), e);
       return BotResponse.texto("❌ Error: " + e.getMessage());
     }
   }
@@ -208,7 +212,7 @@ public class ColeccionHandler implements BotHandler {
       return BotResponse.texto(sb.toString());
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al buscar repetidas para chatId {}: {}", chatId, e.getMessage(), e);
       return BotResponse.texto("❌ Error: " + e.getMessage());
     }
   }
@@ -316,7 +320,7 @@ public class ColeccionHandler implements BotHandler {
       coleccionService.agregarFaltante(colId, figId);
       return BotResponse.texto("✅ Figurita agregada a tus faltantes correctamente.");
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al agregar faltante para chatId {}: {}", chatId, e.getMessage(), e);
       return BotResponse.texto("❌ Error al agregar faltante: " + e.getMessage());
     }
   }
@@ -336,7 +340,7 @@ public class ColeccionHandler implements BotHandler {
       coleccionService.agregarRepetida(colId, perfilId, figId, cantidad, metodos);
       return BotResponse.texto("✅ Figurita repetida agregada correctamente.");
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Error al agregar repetida para chatId {}: {}", chatId, e.getMessage(), e);
       return BotResponse.texto("❌ Error al agregar repetida: " + e.getMessage());
     }
   }
