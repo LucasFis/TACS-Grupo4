@@ -617,7 +617,10 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     if (!metodos.isEmpty()) {
       operaciones.add(
           Aggregation.match(
-              Criteria.where("repetidas.metodos").all(metodos)
+              new Criteria().andOperator(
+                  Criteria.where("repetidas.metodos").all(metodos),
+                  Criteria.where("repetidas.metodos").size(metodos.size())
+              )
           )
       );
     }

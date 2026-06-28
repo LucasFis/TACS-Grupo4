@@ -65,6 +65,8 @@ services:
     ports:
       - "5173:5173"
     command: npm run dev -- --host
+    environment:
+      - VITE_BACKEND_URI=http://localhost:8080
     depends_on:
       - backend
     develop:

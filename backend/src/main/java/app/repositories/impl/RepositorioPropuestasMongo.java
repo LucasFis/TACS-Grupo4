@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -64,6 +65,14 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
     @Override
     public List<Propuesta> buscarTodosEstadisticas() {
         return mongoTemplate.findAll(Propuesta.class);
+    }
+
+    @Override
+    public List<Propuesta> buscarEstadisticasPorRango(LocalDateTime desde, LocalDateTime hasta) {
+        Query query = new Query(
+            Criteria.where("estado.0.fecha").gte(desde).lte(hasta)
+        );
+        return mongoTemplate.find(query, Propuesta.class);
     }
 
     @Override

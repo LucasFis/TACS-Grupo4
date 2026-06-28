@@ -7,15 +7,12 @@ import app.dto.filtros.RepetidasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.dto.paginacion.Repetidas;
 import app.exceptions.NotFoundException;
-import app.model.entities.Coleccion;
-import app.model.entities.Figurita;
-import app.model.entities.FiguritaIntercambiable;
-import app.model.entities.MetodoIntercambio;
-import app.model.entities.Seleccion;
+import app.model.entities.*;
 import app.repositories.impl.campos.CamposColeccion;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -144,7 +141,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas dto = repositorioColecciones.buscarRepetidas(
         coleccion.getId(),
-        new RepetidasFiltro(null, null,10, 1),
+        new RepetidasFiltro(null, null, 10, 1),
         null
 
     );
@@ -169,7 +166,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas dto = repositorioColecciones.buscarRepetidas(
         coleccion.getId(),
-        new RepetidasFiltro(MetodoIntercambio.SUBASTA,null, 10, 1),
+        new RepetidasFiltro(MetodoIntercambio.SUBASTA, null, 10, 1),
         null
     );
 
@@ -213,7 +210,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas dto = repositorioColecciones.buscarRepetidas(
         coleccion.getId(),
-        new RepetidasFiltro(null,null, 2, 2),
+        new RepetidasFiltro(null, null, 2, 2),
         null
     );
 
@@ -310,6 +307,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
     assertEquals(0, dto.getData().cantidadDeElementos());
     assertEquals(0, dto.getData().contenido().size());
   }
+
   @Test
   void buscarRepetidasCombinaFiltroMetodoYCoincidenciaFaltantes() {
     Coleccion colLogueado = new Coleccion();
@@ -490,5 +488,21 @@ public class RepositorioColeccionesTest extends MongoTestBase {
         MetodoIntercambio.SUBASTA,
         diMariaSinCambios.getMetodos().get(0)
     );
+  }
+
+  @Test
+  void contarRepetidas_modalidadExclusiva_noContabilizaAmbos() {
+    Coleccion coleccion = new Coleccion();
+    coleccion.agregarRepetida(new FiguritaIntercambiable(messi, 1, List.of(MetodoIntercambio.INTERCAMBIO)));
+    coleccion.agregarRepetida(new FiguritaIntercambiable(diMaria, 1, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA)));
+    repositorioColecciones.guardar(coleccion);
+
+    long soloIntercambio = repositorioColecciones.contarRepetidas(List.of(MetodoIntercambio.INTERCAMBIO));
+    long soloSubasta = repositorioColecciones.contarRepetidas(List.of(MetodoIntercambio.SUBASTA));
+    long ambos = repositorioColecciones.contarRepetidas(List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA));
+
+    assertEquals(1, soloIntercambio);
+    assertEquals(0, soloSubasta);
+    assertEquals(1, ambos);
   }
 }
