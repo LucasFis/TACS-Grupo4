@@ -17,6 +17,15 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
+/**
+ * Filtro de autenticación JWT que se ejecuta en cada petición HTTP.
+ * Extrae el token de la cookie {@code token}, lo valida y, si es inválido,
+ * devuelve un error 401 con los encabezados CORS adecuados.
+ * <p>
+ * Excluye de la validación las rutas públicas: {@code /login}, {@code /usuarios},
+ * {@code /figuritas}, {@code /ping} y {@code /sesion}, así como las peticiones
+ * {@code OPTIONS} (preflight CORS).
+ */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -35,6 +44,14 @@ public class JwtFilter extends OncePerRequestFilter {
     this.corsConfigurationSource = corsConfigurationSource;
   }
 
+  /**
+   * Determina si la petición actual debe omitir el filtro JWT.
+   * Excluye rutas públicas (login, registro, figuritas, ping, sesión)
+   * y peticiones OPTIONS (preflight CORS).
+   *
+   * @param request petición HTTP entrante
+   * @return {@code true} si la ruta está excluida del filtro
+   */
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
 
@@ -49,6 +66,18 @@ public class JwtFilter extends OncePerRequestFilter {
         || path.startsWith("/sesion");
   }
 
+  /**
+   * Valida el token JWT de la cookie y, si es correcto, continúa con la cadena
+   * de filtros. Si el token es inválido o no está presente, configura los
+   * encabezados CORS para el origen solicitado y delega el error al
+   * {@link HandlerExceptionResolver}.
+   *
+   * @param request     petición HTTP entrante
+   * @param response    respuesta HTTP
+   * @param filterChain cadena de filtros a continuar
+   * @throws ServletException si ocurre un error en el filtrado
+   * @throws IOException      si ocurre un error de E/S
+   */
   @Override
   protected void doFilterInternal(
       HttpServletRequest request,
@@ -99,6 +128,13 @@ public class JwtFilter extends OncePerRequestFilter {
     }
   }
 
+  /**
+   * Extrae el token JWT de las cookies de la petición.
+   *
+   * @param request petición HTTP entrante
+   * @return valor del token JWT
+   * @throws app.exceptions.UnauthorizedException si no se encuentra la cookie {@code token}
+   */
   private String obtenerToken(HttpServletRequest request) {
 
     Cookie[] cookies = request.getCookies();

@@ -1,0 +1,18 @@
+.textoNeutro {
+  color: var(--color-subtitle);
+  font-size: 0.85rem;
+}
+
+.textoInvalido {
+  color: var(--color-caution);
+  font-size: 0.85rem;
+}
+
+.inputInvalido {
+  border-color: var(--color-caution) !important;
+}
+
+.inputValido {
+  border-color: var(--color-success) !important;
+  padding-right: 2.5rem;
+}

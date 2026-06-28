@@ -37,16 +37,18 @@ const SelectorFaltantes = ({ modo = 'multiple', onChange }) => {
       const existe = prev.some((f) => f.id === fig.id)
       const next =
         modo === 'unica'
-          ? existe
-            ? []
-            : [fig]
+          ? existe ? [] : [fig]
           : existe
             ? prev.filter((f) => f.id !== fig.id)
             : [...prev, fig]
-      onChange?.(next)
-      return next
+      return next  // ✅ solo actualiza el estado
     })
   }
+
+// Notifica al padre después del render
+  useEffect(() => {
+    onChange?.(seleccionadas)
+  }, [seleccionadas, onChange])
 
   return (
     <div className="d-flex flex-column gap-3">

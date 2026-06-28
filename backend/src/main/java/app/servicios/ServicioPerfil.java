@@ -42,6 +42,13 @@ public class ServicioPerfil {
   private final MeterRegistry meterRegistry;
 
 
+  /**
+   * Obtiene la lista de figuritas faltantes del perfil asociado a un usuario.
+   *
+   * @param userId identificador del usuario del cual se obtendrán las faltantes
+   * @return lista de figuritas faltantes del perfil del usuario
+   * @throws app.exceptions.NotFoundException si no se encuentra un perfil para el {@code userId} indicado
+   */
   public List<FiguritaDto> obtenerFaltantes(String userId) {
     CamposPerfil campos = new CamposPerfil(false);
 
@@ -52,6 +59,21 @@ public class ServicioPerfil {
   }
 
 
+  /**
+   * Agrega una calificación de un perfil a otro como parte de una transacción
+   * (intercambio o subasta). Valida que el valor esté entre 1 y 5, y que el
+   * autor no haya calificado previamente la misma transacción.
+   *
+   * @param autorId        identificador del perfil que emite la calificación
+   * @param destinoId      identificador del perfil que recibe la calificación
+   * @param valor          puntuación de la calificación (1-5)
+   * @param descripcion    comentario opcional de la calificación
+   * @param transaccionId  identificador de la transacción asociada
+   * @param tipoTransaccion tipo de transacción (INTERCAMBIO o SUBASTA)
+   * @throws app.exceptions.BadRequestException si el valor es nulo, está fuera del rango 1-5,
+   *         o si el autor ya calificó esta transacción
+   * @throws app.exceptions.NotFoundException si alguno de los perfiles indicados no existe
+   */
   @Transactional
   public void agregarCalificacion(String autorId, String destinoId,
                                   Integer valor, String descripcion, String transaccionId,
@@ -91,18 +113,38 @@ public class ServicioPerfil {
     this.repositorioCalificacion.guardar(calificacion);
     this.repositorioPerfiles.guardar(perfilDestino, sinCampos);
     meterRegistry.counter("calificaciones_creadas_total", "valor", String.valueOf(valor)).increment();
+
+    // Notificación al destinatario de que fue calificado
+    String cuerpo = autor.getNombre() + " te calificó con " + valor + " estrella" + (valor == 1 ? "" : "s");
+    servicioNotificacion.notificarInteresados(List.of(perfilDestino), cuerpo, "/perfil");
   }
 
+  /**
+   * Genera sugerencias de intercambio para un perfil basándose en su colección
+   * y los filtros de búsqueda proporcionados.
+   *
+   * @param perfilId identificador del perfil para el cual se generarán sugerencias
+   * @param filtros  criterios de filtrado y paginación de las sugerencias
+   * @return página de sugerencias encontradas
+   * @throws app.exceptions.NotFoundException si no se encuentra el perfil indicado
+   */
   public PaginaResultado<SugerenciaDto> obtenerSugerencias(String perfilId, SugerenciasFiltro filtros) {
     CamposPerfil campos = new CamposPerfil(false);
     Perfil perfilObjetivo = this.repositorioPerfiles.buscarPorId(perfilId, campos);
 
     PaginaResultado<Sugerencia> sugerencias = this.repositorioPerfiles.generarSugerencias(perfilObjetivo.getColeccion(), filtros);
 
-    //TODO: sigue en implementacion
-    return new PaginaResultado<>(sugerencias.contenido().stream().map(SugerenciaDto::new).toList(), 0, 0, 0);
+    return new PaginaResultado<>(sugerencias.contenido().stream().map(SugerenciaDto::new).toList(),
+        sugerencias.cantidadDeElementos(), sugerencias.cantidadDePaginas(), sugerencias.numero());
   }
 
+  /**
+   * Obtiene los contadores de figuritas repetidas y faltantes de un perfil.
+   *
+   * @param perfilId identificador del perfil del cual se obtendrán los contadores
+   * @return lista con dos contadores: cantidad de repetidas y cantidad de faltantes
+   * @throws app.exceptions.NotFoundException si no se encuentra el perfil indicado
+   */
   public List<ContadorDto> obtenerContadores(String perfilId) {
     CamposPerfil campos = new CamposPerfil(false);
     Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, campos);
@@ -115,19 +157,41 @@ public class ServicioPerfil {
     return contadores;
   }
 
-    public List<NotificacionDto> obtenerNotificaciones(String perfilId) {
-        return this.servicioNotificacion.obtenerPorPerfil(perfilId)
-                .stream()
-                .map(NotificacionDto::new)
-                .toList();
-    }
+  /**
+   * Obtiene las notificaciones de un perfil convertidas a DTO.
+   *
+   * @param perfilId identificador del perfil del cual se obtendrán las notificaciones
+   * @return lista de notificaciones del perfil como {@link NotificacionDto}
+   */
+  public List<NotificacionDto> obtenerNotificaciones(String perfilId) {
+    return this.servicioNotificacion.obtenerPorPerfil(perfilId)
+        .stream()
+        .map(NotificacionDto::new)
+        .toList();
+  }
 
+  /**
+   * Obtiene los datos completos de un perfil, incluyendo los medios de contacto.
+   *
+   * @param perfilId identificador del perfil a obtener
+   * @return datos del perfil como {@link PerfilDto}
+   * @throws app.exceptions.NotFoundException si no se encuentra el perfil indicado
+   */
   public PerfilDto obtenerPerfil(String perfilId) {
     Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, new CamposPerfil(true));
     if (perfil == null) throw new NotFoundException("Perfil no encontrado para el usuario: " + perfilId);
     return new PerfilDto(perfil);
   }
 
+  /**
+   * Edita los datos de un perfil: nombre, nombre de usuario y/o medios de contacto.
+   * Si se cambia el nombre de usuario, valida que no esté en uso.
+   *
+   * @param perfilId identificador del perfil a editar
+   * @param body     datos actualizados del perfil
+   * @throws app.exceptions.BadRequestException si el nuevo nombre de usuario ya está en uso
+   * @throws app.exceptions.NotFoundException  si no se encuentra el perfil indicado
+   */
   @Transactional
   public void editarPerfil(String perfilId, PerfilRequest body) {
     boolean actualizaMedios = body.getMediosDeContacto() != null;
@@ -158,6 +222,14 @@ public class ServicioPerfil {
   }
 
 
+  /**
+   * Obtiene las calificaciones recibidas por un perfil, de forma paginada.
+   *
+   * @param perfilId identificador del perfil del cual se obtendrán las calificaciones
+   * @param pagina   número de página solicitado (base 0)
+   * @param limite   cantidad máxima de resultados por página
+   * @return página de calificaciones recibidas por el perfil
+   */
   public PaginaResultado<CalificacionDto> obtenerCalificaciones(String perfilId, Integer pagina, Integer limite) {
     PaginaResultado<Calificacion> resultado = this.repositorioCalificacion.buscarPorDestinatario(perfilId, pagina, limite);
 
@@ -168,6 +240,11 @@ public class ServicioPerfil {
         resultado.numero());
   }
 
+  /**
+   * Marca todas las notificaciones de un perfil como leídas.
+   *
+   * @param perfilId identificador del perfil cuyas notificaciones se marcarán como leídas
+   */
   public void marcarTodasNotifsLeidas(String perfilId) {
       servicioNotificacion.marcarTodasLeidas(perfilId);
   }

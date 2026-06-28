@@ -144,7 +144,7 @@ public class InicializadorDeDatos implements CommandLineRunner {
   // ─── ADMIN ────────────────────────────────────────────────────────────────
 
   private void cargarAdmin() {
-    Usuario admin = crearUsuario("admin", "admin", Rol.ADMINISTRADOR);
+    Usuario admin = crearUsuario("admin", "Admin12!", Rol.ADMINISTRADOR);
     Coleccion coleccion = crearColeccion();
     crearPerfil("admin-id-001", "admin", admin, coleccion, "admin");
   }
@@ -166,7 +166,7 @@ public class InicializadorDeDatos implements CommandLineRunner {
           figs.get("POR-7"),  // Ronaldo
           figs.get("ESP-10")  // Pedri
       ));
-      Usuario userLucas = crearUsuario("lucas_fis", "gordo123", Rol.USUARIO);
+      Usuario userLucas = crearUsuario("lucas_fis", "Gordo123!", Rol.USUARIO);
       Perfil lucas = crearPerfil("lucas-id-001", "Lucas", userLucas, coleccionLucas, "@lucas");
 
       agregarRepetidaNueva(coleccionLucas, figs.get("ARG-10"), 3, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA), lucas.getId()); // Messi x3
@@ -196,7 +196,7 @@ public class InicializadorDeDatos implements CommandLineRunner {
           figs.get("FRA-7"), //Griezmann
           figs.get("ARG-8") //E. fernandez
       ));
-      Usuario userSofia = crearUsuario("sofia_ape", "password", Rol.USUARIO);
+      Usuario userSofia = crearUsuario("sofia_ape", "Password1@", Rol.USUARIO);
       Perfil sofia = crearPerfil("sofia-id-001", "Sofía", userSofia, coleccionSofia, "@sofia");
 
       agregarRepetidaNueva(coleccionSofia, figs.get("ESP-10"), 2, List.of(MetodoIntercambio.INTERCAMBIO), sofia.getId()); // Pedri x2
@@ -221,7 +221,7 @@ public class InicializadorDeDatos implements CommandLineRunner {
           figs.get("POR-7"),  // Ronaldo
           figs.get("POR-10")  // B. Silva
       ));
-      Usuario userMatias = crearUsuario("mati_crim", "wordpass", Rol.USUARIO);
+      Usuario userMatias = crearUsuario("mati_crim", "Wordpass1$", Rol.USUARIO);
       Perfil matias = crearPerfil("matias-id-001", "Matías", userMatias, coleccionMatias, "@matias");
 
       agregarRepetidaNueva(coleccionMatias, figs.get("URU-9"),  2, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA), matias.getId()); // D. Núñez x2
@@ -243,7 +243,7 @@ public class InicializadorDeDatos implements CommandLineRunner {
           figs.get("ARG-9"),  // J. Álvarez
           figs.get("ARG-8")   // E. Fernández
       ));
-      Usuario userJuan = crearUsuario("juan_jose", "una_contrasenia", Rol.USUARIO);
+      Usuario userJuan = crearUsuario("juan_jose", "Una_contrasenia1", Rol.USUARIO);
       Perfil juan = crearPerfil("juan-id-001", "Juan", userJuan, coleccionJuan, "@juan");
 
       agregarRepetidaNueva(coleccionJuan, figs.get("MAR-7"),  2, List.of(MetodoIntercambio.INTERCAMBIO), juan.getId()); // Ziyech x2
@@ -265,7 +265,7 @@ public class InicializadorDeDatos implements CommandLineRunner {
           figs.get("FRA-10"), // Mbappé
           figs.get("ENG-9")   // Kane
       ));
-      Usuario userValentina = crearUsuario("vale_gom", "passval", Rol.USUARIO);
+      Usuario userValentina = crearUsuario("vale_gom", "Passval2&", Rol.USUARIO);
       Perfil valentina = crearPerfil("valentina-id-001", "Valentina", userValentina, coleccionValentina, "@valentina");
 
       agregarRepetidaNueva(coleccionValentina, figs.get("MAR-7"),  2, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA), valentina.getId()); // Ziyech x2
@@ -290,7 +290,7 @@ public class InicializadorDeDatos implements CommandLineRunner {
           figs.get("KOR-7"),  // Son
           figs.get("GHA-6")   // Partey
       ));
-      Usuario userDiego = crearUsuario("diego_ram", "diegopass", Rol.USUARIO);
+      Usuario userDiego = crearUsuario("diego_ram", "Diegopass2#", Rol.USUARIO);
       Perfil diego = crearPerfil("diego-id-001", "Diego", userDiego, coleccionDiego, "@diego");
 
       agregarRepetidaNueva(coleccionDiego, figs.get("ARG-10"), 2, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA), diego.getId()); // Messi x2

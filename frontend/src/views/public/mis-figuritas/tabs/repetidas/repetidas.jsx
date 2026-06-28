@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { buscarRepetidas } from "@/services/coleccionService.js";
+import { buscarRepetidas, editarRepetida } from '@/services/coleccionService.js'
 import RepetidaCard from "../../../../../components/ui/repetida-card/repetida-card.jsx";
 import FilterChip from "../../../../../components/ui/filter-chip/filter-chip.jsx";
 import Button from "../../../../../components/ui/button/button.jsx";
@@ -7,12 +7,16 @@ import { useNavigate } from "react-router";
 import Paginacion from "../../../../../components/ui/paginacion/paginacion.jsx";
 import {useError} from "@/contexts/errorContext.jsx";
 import { useToast } from '@/contexts/toastContext.jsx'
+import EditarRepetidaModal from '@/components/ui/editar-repetida-modal/editar-repetida-modal.jsx'
 
 const Repetidas = () => {
     const [repetidas, setRepetidas] = useState({});
     const [filtros, setFiltros] = useState({
         metodoIntercambio: "",
     });
+
+    const [showModal, setShowModal] = useState(false);
+    const [repetidaSeleccionada, setRepetidaSeleccionada] = useState(undefined);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -57,6 +61,44 @@ const Repetidas = () => {
 
         setPagina(1);
     };
+
+    const abrirModalEdicion = (figurita) => {
+      setRepetidaSeleccionada(figurita);
+      setShowModal(true);
+    };
+
+    const cerrarModalEdicion = () => {
+      setShowModal(false);
+      setRepetidaSeleccionada(null);
+    };
+
+  const guardarCambiosRepetida = async (payload) => {
+    try {
+      await editarRepetida(
+        repetidaSeleccionada.figurita_id,
+        payload
+      );
+
+      setRepetidas((prev) => ({
+        ...prev,
+        contenido: prev.contenido.map((item) =>
+          item.figurita_id === repetidaSeleccionada.figurita_id
+            ? {
+              ...item,
+              cantidad_existente: payload.cantidadNueva,
+              metodos: payload.metodos,
+            }
+            : item
+        ),
+      }));
+
+      showToast("Repetida actualizada", "success");
+      cerrarModalEdicion();
+    } catch (err) {
+
+      showToast(handleError(err, () => {}), "error");
+    }
+  };
 
     if (error) {
         return (
@@ -164,7 +206,10 @@ const Repetidas = () => {
                                     key={fig.figurita_id}
                                     className="col-6 col-md-4 col-lg-3 d-flex justify-content-center"
                                 >
-                                    <RepetidaCard figurita={fig} />
+                                    <RepetidaCard
+                                      figurita={fig}
+                                      onEditar={() => abrirModalEdicion(fig)}
+                                    />
                                 </div>
                             ))
                         ) : (
@@ -185,6 +230,14 @@ const Repetidas = () => {
                         onChange={setPagina}
                     />
                 </>
+            )}
+
+            {showModal && repetidaSeleccionada && (
+              <EditarRepetidaModal
+                figurita={repetidaSeleccionada}
+                onClose={cerrarModalEdicion}
+                onGuardar={guardarCambiosRepetida}
+              />
             )}
         </div>
     );

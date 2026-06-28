@@ -1,8 +1,7 @@
 package app.servicios.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import app.MongoTestBase;
+import app.dto.request.EditarRepetidaRequest;
 import app.exceptions.BadRequestException;
 import app.model.entities.*;
 import java.util.List;
@@ -15,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class ServicioColeccionTest extends MongoTestBase {
 
   @Autowired
@@ -24,6 +25,8 @@ class ServicioColeccionTest extends MongoTestBase {
 
   private Figurita messi;
   private Coleccion coleccion;
+
+  private String perfilId;
 
   @BeforeEach
   void setUp() {
@@ -41,6 +44,8 @@ class ServicioColeccionTest extends MongoTestBase {
 
     coleccion = new Coleccion();
     repositorioColecciones.guardar(coleccion);
+
+    perfilId = "10";
   }
 
   @Test
@@ -73,7 +78,7 @@ class ServicioColeccionTest extends MongoTestBase {
         .build();
     repositorioPerfiles.guardar(interesado);
 
-    service.agregarRepetida(this.coleccion.getId(),  "ARG-10", 2, List.of(MetodoIntercambio.INTERCAMBIO));
+    service.agregarRepetida(this.coleccion.getId(), perfilId, "ARG-10", 2, List.of(MetodoIntercambio.INTERCAMBIO));
 
     Coleccion coleccion = repositorioColecciones.buscarPorId(this.coleccion.getId(), new CamposColeccion(true, false));
 
@@ -83,8 +88,123 @@ class ServicioColeccionTest extends MongoTestBase {
 
   @Test
   void agregarRepetida_sinInteresados_noNotifica() {
-    service.agregarRepetida(this.coleccion.getId(), "ARG-10", 2, List.of(MetodoIntercambio.INTERCAMBIO));
+    service.agregarRepetida(this.coleccion.getId(), perfilId,"ARG-10", 2, List.of(MetodoIntercambio.INTERCAMBIO));
 
     repositorioPerfiles.buscarTodos(new CamposPerfil(false)).forEach(p -> assertEquals(0, repositorioNotificaciones.buscarPorPerfil(p).size()));
+  }
+
+  @Test
+  void editarRepetida_actualizaCantidadCorrectamente() {
+    FiguritaIntercambiable repetida = FiguritaIntercambiable.builder()
+        .figurita(messi)
+        .cantidadExistente(5)
+        .cantidadReservada(2)
+        .metodos(List.of(MetodoIntercambio.INTERCAMBIO))
+        .build();
+
+    coleccion.setRepetidas(List.of(repetida));
+    repositorioColecciones.guardar(coleccion);
+
+    EditarRepetidaRequest request = new EditarRepetidaRequest(
+        7,
+        List.of(MetodoIntercambio.INTERCAMBIO)
+    );
+
+    service.editarRepetida(coleccion.getId(), messi.getId(), request);
+
+    FiguritaIntercambiable actualizada =
+        repositorioColecciones.buscarRepetida(coleccion.getId(), messi.getId());
+
+    assertEquals(7, actualizada.getCantidadExistente());
+  }
+
+  @Test
+  void editarRepetida_lanzaErrorSiCantidadMenorAReservada() {
+    FiguritaIntercambiable repetida = FiguritaIntercambiable.builder()
+        .figurita(messi)
+        .cantidadExistente(5)
+        .cantidadReservada(3)
+        .metodos(List.of(MetodoIntercambio.INTERCAMBIO))
+        .build();
+
+    coleccion.setRepetidas(List.of(repetida));
+    repositorioColecciones.guardar(coleccion);
+
+    EditarRepetidaRequest request = new EditarRepetidaRequest(
+        2,
+        List.of(MetodoIntercambio.INTERCAMBIO)
+    );
+
+    assertThrows(
+        BadRequestException.class,
+        () -> service.editarRepetida(
+            coleccion.getId(),
+            messi.getId(),
+            request
+        )
+    );
+  }
+
+  @Test
+  void editarRepetida_permitaAgregarMetodoNuevo() {
+    FiguritaIntercambiable repetida = FiguritaIntercambiable.builder()
+        .figurita(messi)
+        .cantidadExistente(5)
+        .cantidadReservada(0)
+        .metodos(List.of(MetodoIntercambio.INTERCAMBIO))
+        .build();
+
+    coleccion.setRepetidas(List.of(repetida));
+    repositorioColecciones.guardar(coleccion);
+
+    EditarRepetidaRequest request = new EditarRepetidaRequest(
+        5,
+        List.of(
+            MetodoIntercambio.INTERCAMBIO,
+            MetodoIntercambio.SUBASTA
+        )
+    );
+
+    service.editarRepetida(coleccion.getId(), messi.getId(), request);
+
+    FiguritaIntercambiable actualizada =
+        repositorioColecciones.buscarRepetida(coleccion.getId(), messi.getId());
+
+    assertTrue(
+        actualizada.getMetodos().contains(MetodoIntercambio.INTERCAMBIO)
+    );
+    assertTrue(
+        actualizada.getMetodos().contains(MetodoIntercambio.SUBASTA)
+    );
+  }
+
+  @Test
+  void editarRepetida_fallaSiIntentaEliminarMetodo() {
+    FiguritaIntercambiable repetida = FiguritaIntercambiable.builder()
+        .figurita(messi)
+        .cantidadExistente(5)
+        .cantidadReservada(0)
+        .metodos(List.of(
+            MetodoIntercambio.INTERCAMBIO,
+            MetodoIntercambio.SUBASTA
+        ))
+        .build();
+
+    coleccion.setRepetidas(List.of(repetida));
+    repositorioColecciones.guardar(coleccion);
+
+    EditarRepetidaRequest request = new EditarRepetidaRequest(
+        5,
+        List.of(MetodoIntercambio.SUBASTA)
+    );
+
+    assertThrows(
+        BadRequestException.class,
+        () -> service.editarRepetida(
+            coleccion.getId(),
+            messi.getId(),
+            request
+        )
+    );
   }
 }

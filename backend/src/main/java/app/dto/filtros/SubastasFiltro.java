@@ -7,4 +7,12 @@ public record SubastasFiltro(
   String participanteId,
   String estado
 ) {
+  public SubastasFiltro {
+    if(limite == null){
+      limite = 10;
+    }
+    if(pagina == null){
+      pagina = 1;
+    }
+  }
 }

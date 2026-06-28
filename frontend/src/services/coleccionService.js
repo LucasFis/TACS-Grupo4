@@ -43,3 +43,16 @@ export const agregarRepetida = async (repetida) => {
     handleAxiosError(error)
   }
 }
+
+export const editarRepetida = async (figId, payload) => {
+  try {
+    const { data } = await api.patch(`${COLECCIONES_URL}/repetidas/${figId}`, {
+      cantidad_nueva: payload.cantidadNueva,
+      metodos: payload.metodos
+    })
+
+    return data
+  } catch (error) {
+    handleAxiosError(error)
+  }
+}

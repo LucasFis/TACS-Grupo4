@@ -4,7 +4,7 @@ import Paginacion from '@/components/ui/paginacion/paginacion'
 import styles from './explorar-resultados.module.css'
 
 const ExplorarResultados = ({
-  figuritas,
+  figuritas = [],
   totalElements,
   totalPages,
   page,

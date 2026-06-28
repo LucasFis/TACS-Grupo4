@@ -80,7 +80,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
 
   @Test
   void buscarConFiltros_sinFiltros_retornaTodas() {
-    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, null), 1, 10);
+    var resultado =         repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, null, null, null), 1, 10);
 
     assertEquals(2, resultado.cantidadDeElementos());
     var resultadoLucas = resultado.contenido().stream()
@@ -104,7 +104,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
     coleccion.agregarRepetida(new FiguritaIntercambiable(diMaria, 1, List.of(MetodoIntercambio.INTERCAMBIO), "perfil-1"));
     repositorioColecciones.guardar(coleccion);
 
-    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, 11, null, null, null), 1, 10);
+    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, 11, null, null, null, null, null), 1, 10);
 
     assertEquals(1, resultado.cantidadDeElementos());
     assertEquals("ARG-11", resultado.contenido().get(0).figurita().getFigurita().getId());
@@ -112,7 +112,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
 
   @Test
   void buscarConFiltros_porSeleccion_retornaCoincidencia() {
-    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, "ARGENTINA", null, null), 1, 10);
+    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, "ARGENTINA", null, null, null, null), 1, 10);
 
     assertEquals(1, resultado.cantidadDeElementos());
     assertEquals(
@@ -123,14 +123,14 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
 
   @Test
   void buscarConFiltros_porJugadorParcialCaseInsensitive_retornaCoincidencia() {
-    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, "MESSI", null), 1, 10);
+    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, "MESSI", null, null, null), 1, 10);
 
     assertEquals(1, resultado.cantidadDeElementos());
   }
 
   @Test
   void buscarConFiltros_porTipoIntercambio_retornaCoincidencia() {
-    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, List.of(MetodoIntercambio.INTERCAMBIO)), 1, 10);
+    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, List.of(MetodoIntercambio.INTERCAMBIO), null, null), 1, 10);
 
     assertEquals(1, resultado.cantidadDeElementos());
     assertTrue(resultado.contenido().get(0).figurita().soporta(MetodoIntercambio.INTERCAMBIO));
@@ -138,7 +138,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
 
   @Test
   void buscarConFiltros_porTipoSubasta_retornaCoincidencia() {
-    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, List.of(MetodoIntercambio.SUBASTA)), 1, 10);
+    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, List.of(MetodoIntercambio.SUBASTA), null, null), 1, 10);
 
     assertEquals(1, resultado.cantidadDeElementos());
     assertTrue(resultado.contenido().get(0).figurita().soporta(MetodoIntercambio.SUBASTA));
@@ -146,7 +146,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
 
   @Test
   void buscarConFiltros_sinResultados_retornaPaginaVacia() {
-    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, 99, null, null, null), 1, 10);
+    var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, 99, null, null, null, null, null), 1, 10);
 
     assertEquals(0, resultado.cantidadDeElementos());
     assertTrue(resultado.contenido().isEmpty());
@@ -170,7 +170,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
     repositorioColecciones.guardar(coleccion);
 
     var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(
-        new FiguritasFiltro("SIN-PERFIL", null, null, null, null),
+        new FiguritasFiltro("SIN-PERFIL", null, null, null, null, null, null),
         1,
         10
     );
@@ -197,7 +197,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
     repositorioColecciones.guardar(coleccion);
 
     var resultado = repositorioColecciones.buscarIntercambiablesConFiltros(
-        new FiguritasFiltro("PERFIL-INEXISTENTE", null, null, null, null),
+        new FiguritasFiltro("PERFIL-INEXISTENTE", null, null, null, null, null, null),
         1,
         10
     );
@@ -219,8 +219,8 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
     coleccion.agregarRepetida(new FiguritaIntercambiable(diMaria, 1, List.of(MetodoIntercambio.INTERCAMBIO), "perfil-1"));
     repositorioColecciones.guardar(coleccion);
 
-    var pagina0 = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, null), 1, 2);
-    var pagina1 = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, null), 2, 2);
+    var pagina0 = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, null, null, null), 1, 2);
+    var pagina1 = repositorioColecciones.buscarIntercambiablesConFiltros(new FiguritasFiltro(null, null, null, null, null, null, null), 2, 2);
 
     assertEquals(3, pagina0.cantidadDeElementos());
     assertEquals(2, pagina0.contenido().size());
@@ -328,7 +328,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
         List.of(MetodoIntercambio.INTERCAMBIO)
     );
 
-    assertEquals(7L, resultado);
+    assertEquals(3L, resultado);
   }
 
   @Test
@@ -337,7 +337,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
         List.of(MetodoIntercambio.SUBASTA)
     );
 
-    assertEquals(6L, resultado);
+    assertEquals(2L, resultado);
   }
 
   @Test

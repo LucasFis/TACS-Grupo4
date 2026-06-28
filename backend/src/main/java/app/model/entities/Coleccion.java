@@ -112,12 +112,17 @@ public class Coleccion {
   }
 
   /**
-   * Reserva la lista de figuritas dadas.
+   * Reserva cada figurita de la lista si existe en la colección,
+   * usando el método de intercambio indicado.
    */
   public void reservarRepetidas(List<Figurita> repetidas, MetodoIntercambio metodo) {
     repetidas.forEach(figurita -> {
+
       if (tieneRepetida(figurita)) {
-        obtenerRepetida(figurita).reservar(metodo);
+
+        FiguritaIntercambiable repetida = obtenerRepetida(figurita);
+
+        repetida.reservar(metodo);
       }
     });
   }

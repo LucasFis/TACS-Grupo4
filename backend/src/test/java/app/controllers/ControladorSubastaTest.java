@@ -49,6 +49,16 @@ class ControladorSubastaTest {
     }
 
     @Test
+    void buscarSubastasSinPaginacion_retorna200() throws Exception {
+        mockMvc.perform(
+                get("/subastas")
+                .cookie(cookie)
+                .contentType("application/json")
+            )
+            .andExpect(status().isOk());
+    }
+
+    @Test
     void crearSubasta_retorna200() throws Exception {
 
         mockMvc.perform(

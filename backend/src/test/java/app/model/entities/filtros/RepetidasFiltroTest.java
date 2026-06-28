@@ -29,8 +29,8 @@ class RepetidasFiltroTest {
 
     assertNull(filtro.metodoIntercambio());
     assertNull(filtro.perfilId());
-    assertNull(filtro.limite());
-    assertNull(filtro.pagina());
+    assertNotNull(filtro.limite());
+    assertNotNull(filtro.pagina());
   }
 
   @Test

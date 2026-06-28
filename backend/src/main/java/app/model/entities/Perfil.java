@@ -41,7 +41,7 @@ public class Perfil {
     private int cantidadCalificaciones = 0;
 
     /**
-     * Calcula el promedio de las calificaciones recibidas.
+     * Agrega una nueva calificación en la cantidad acumulada y actualiza el promedio.
      */
     public void agregarNuevaCalificacion(Calificacion calificacion) {
         this.cantidadCalificaciones++;

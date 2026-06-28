@@ -21,32 +21,40 @@ const ItemMedioContacto = ({
   onCancelar,
   onEditar,
   onEliminar,
+  errorMedioEditando,
 }) => {
   if (estaEditando) {
     return (
-      <>
-        <select
-          className={`form-select form-select-sm ${styles['select-editar']}`}
-          value={medioEditandoData.medio_comunicacion}
-          onChange={(e) =>
-            setMedioEditandoData((prev) => ({ ...prev, medio_comunicacion: e.target.value }))
-          }
-        >
-          <option value="TELEGRAM">Telegram</option>
-          <option value="MAIL">Mail</option>
-        </select>
-        <input
-          className={`form-control form-control-sm ${styles['input-editar']}`}
-          value={medioEditandoData.valor}
-          onChange={(e) => setMedioEditandoData((prev) => ({ ...prev, valor: e.target.value }))}
-        />
-        <button className="btn btn-sm btn-success" onClick={onConfirmar}>
-          ✓
-        </button>
-        <button className="btn btn-sm btn-outline-secondary" onClick={onCancelar}>
-          ✕
-        </button>
-      </>
+      <div className="d-flex flex-column gap-1 w-100">
+        <div className="d-flex align-items-center gap-2">
+          <select
+            className={`form-select form-select-sm ${styles['select-editar']}`}
+            value={medioEditandoData.medio_comunicacion}
+            onChange={(e) =>
+              setMedioEditandoData((prev) => ({ ...prev, medio_comunicacion: e.target.value }))
+            }
+          >
+            <option value="TELEGRAM">Telegram</option>
+            <option value="MAIL">Mail</option>
+          </select>
+          <input
+            className={`form-control form-control-sm ${styles['input-editar']} ${errorMedioEditando ? 'is-invalid' : ''}`}
+            value={medioEditandoData.valor}
+            onChange={(e) => setMedioEditandoData((prev) => ({ ...prev, valor: e.target.value }))}
+          />
+          <button className="btn btn-sm btn-success" onClick={onConfirmar}>
+            ✓
+          </button>
+          <button className="btn btn-sm btn-outline-secondary" onClick={onCancelar}>
+            ✕
+          </button>
+        </div>
+        {errorMedioEditando && (
+          <div className="text-danger" style={{ fontSize: '0.8rem' }}>
+            {errorMedioEditando}
+          </div>
+        )}
+      </div>
     )
   }
 
@@ -61,9 +69,7 @@ const ItemMedioContacto = ({
       </div>
       <div className={styles['medio-info']}>
         <div className={styles['medio-valor']}>{medio.valor}</div>
-        <span className={`badge mt-1 ${styles.badge}`}>
-          {esTelegram ? 'Telegram' : 'Mail'}
-        </span>
+        <span className={`badge mt-1 ${styles.badge}`}>{esTelegram ? 'Telegram' : 'Mail'}</span>
       </div>
       <button
         className={`btn btn-outline-secondary ${styles['btn-accion']}`}
@@ -79,10 +85,7 @@ const ItemMedioContacto = ({
           <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
         </svg>
       </button>
-      <button
-        className={`btn btn-outline-danger ${styles['btn-accion']}`}
-        onClick={onEliminar}
-      >
+      <button className={`btn btn-outline-danger ${styles['btn-accion']}`} onClick={onEliminar}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="15"

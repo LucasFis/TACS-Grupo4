@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import useFiguritas from '@/hooks/useFiguritas'
 import usePaginacion from '@/hooks/usePaginacion'
 import ExplorarSearch from './search/explorar-search'
-import SugerenciasBanner from './sugerencias-banner/sugerencias-banner'
 import ExplorarFiltros from './filtros/explorar-filtros'
 import ExplorarResultados from './resultados/explorar-resultados'
 import styles from './explorar.module.css'
@@ -40,7 +39,6 @@ const Explorar = () => {
         onQueryChange={(q) => handleAplicar({ ...FILTROS_INICIAL, q })}
       />
       <div className={styles.container}>
-        <SugerenciasBanner />
         <ExplorarFiltros
           onAplicar={(panelFiltros) => {
             if (heroInputRef.current) heroInputRef.current.value = ''

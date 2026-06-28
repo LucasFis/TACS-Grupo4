@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 public class RepositorioFiguritasMongo implements RepositorioFiguritas {
 
   private static final String STATUS_EN_PROCESO = "EN_PROCESO";
+  private static final String STATUS_COMPLETADO = "COMPLETADO";
 
   @Autowired
   MongoTemplate mongoTemplate;
@@ -59,6 +60,9 @@ public class RepositorioFiguritasMongo implements RepositorioFiguritas {
       query.addCriteria(Criteria.where("seleccion").regex(filtros.seleccion(), "i"));
     }
 
+    int tamanioPagina = filtros.tamanioPaginaEfectivo();
+    query.skip((long) filtros.paginaEfectiva() * tamanioPagina).limit(tamanioPagina);
+
     return this.mongoTemplate.find(query, Figurita.class);
   }
 
@@ -67,17 +71,34 @@ public class RepositorioFiguritasMongo implements RepositorioFiguritas {
     this.mongoTemplate.save(figurita);
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Utiliza un criteria que considera pendientes aquellas sin {@code imagenStatus}
+   * o con estado {@code EN_PROCESO} cuyo {@code imagenCreadoEn} haya expirado
+   * según el TTL provisto.
+   * </p>
+   */
   @Override
-  public List<Figurita> buscarPendientes(Duration ttl) {
-    return mongoTemplate.find(new Query(pendientesCriteria(ttl)), Figurita.class);
+  public List<Figurita> buscarPendientes(Duration ttlProcesamiento, Duration ttlRefresco, int tamanioPagina) {
+    Query query = new Query(pendientesCriteria(ttlProcesamiento, ttlRefresco)).limit(tamanioPagina);
+    return mongoTemplate.find(query, Figurita.class);
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Implementación atómica con {@code findAndModify}: actualiza el documento
+   * a {@code EN_PROCESO} solo si aún está pendiente, evitando que dos
+   * instancias procesen la misma figurita simultáneamente.
+   * </p>
+   */
   @Override
-  public Figurita reclamarParaProcesamiento(String figuritaId, Duration ttl) {
+  public Figurita reclamarParaProcesamiento(String figuritaId, Duration ttlProcesamiento, Duration ttlRefresco) {
     Query query = new Query(
         new Criteria().andOperator(
             Criteria.where("_id").is(figuritaId),
-            pendientesCriteria(ttl)
+            pendientesCriteria(ttlProcesamiento, ttlRefresco)
         )
     );
     Update update = new Update()
@@ -88,12 +109,15 @@ public class RepositorioFiguritasMongo implements RepositorioFiguritas {
         FindAndModifyOptions.options().returnNew(false), Figurita.class);
   }
 
-  private static Criteria pendientesCriteria(Duration ttl) {
-    LocalDateTime expiradoAntes = LocalDateTime.now().minus(ttl);
+  private static Criteria pendientesCriteria(Duration ttlProcesamiento, Duration ttlRefresco) {
+    LocalDateTime procesamientoExpiradoAntes = LocalDateTime.now().minus(ttlProcesamiento);
+    LocalDateTime refrescoExpiradoAntes = LocalDateTime.now().minus(ttlRefresco);
     return new Criteria().orOperator(
         Criteria.where("imagenStatus").is(null),
         Criteria.where("imagenStatus").is(STATUS_EN_PROCESO)
-                .and("imagenCreadoEn").lt(expiradoAntes)
+                .and("imagenCreadoEn").lt(procesamientoExpiradoAntes),
+        Criteria.where("imagenStatus").is(STATUS_COMPLETADO)
+                .and("imagenCreadoEn").lt(refrescoExpiradoAntes)
     );
   }
 }

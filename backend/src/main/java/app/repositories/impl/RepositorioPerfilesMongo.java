@@ -5,6 +5,7 @@ import app.dto.paginacion.PaginaResultado;
 import app.exceptions.NotFoundException;
 import app.model.entities.Coleccion;
 import app.model.entities.Figurita;
+import app.model.entities.MetodoIntercambio;
 import app.model.entities.Perfil;
 import app.model.entities.Sugerencia;
 import app.repositories.RepositorioPerfiles;
@@ -30,10 +31,12 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
   @Autowired
   private MongoTemplate mongoTemplate;
 
+  @Override
   public void guardar(Perfil perfil) {
     mongoTemplate.save(perfil);
   }
 
+  @Override
   public void guardar(Perfil perfil, CamposPerfil campos) {
     Update update = new Update();
 
@@ -56,6 +59,7 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
     );
   }
 
+  @Override
   public Perfil buscarPorId(String id, CamposPerfil campos) {
     Query query = new Query();
     query.addCriteria(
@@ -71,6 +75,7 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
     return this.normalizar(perfil);
   }
 
+  @Override
   public Perfil buscarPorUsuarioId(String usuarioId, CamposPerfil campos) {
     Query query = new Query();
     query.addCriteria(
@@ -87,6 +92,7 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
     return perfil;
   }
 
+  @Override
   public List<Perfil> buscarPorFiguritaFaltante(Figurita figurita, CamposPerfil campos) {
     Query queryColecciones = new Query(
         Criteria.where("faltantes").is(figurita.getId())
@@ -107,17 +113,20 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
     return mongoTemplate.find(queryPerfiles, Perfil.class).stream().map(this::normalizar).toList();
   }
 
+  @Override
   public List<Perfil> buscarTodos(CamposPerfil campos) {
     Query query = new Query();
     this.conCamposCargados(query, campos);
     return mongoTemplate.find(query, Perfil.class);
   }
 
+  @Override
   public long contar() {
     Query query = new Query();
     return mongoTemplate.count(query, Perfil.class);
   }
 
+  @Override
   public PaginaResultado<Sugerencia> generarSugerencias(Coleccion coleccionObjetivo, SugerenciasFiltro filtro) {
 
     List<String> faltantesObjetivo = coleccionObjetivo.getFaltantes()
@@ -136,13 +145,25 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
     ops.add(Aggregation.lookup("perfiles", "_id", "coleccion.$id", "perfil"));
     ops.add(Aggregation.unwind("perfil"));
 
+    List<String> repetidasObjetivoConIntercambio = coleccionObjetivo.getRepetidas().stream()
+        .filter(r -> r.getMetodos() != null && r.getMetodos().contains(MetodoIntercambio.INTERCAMBIO))
+        .map(r -> r.getFigurita().getId())
+        .toList();
+
     ops.add(context -> new Document("$addFields", new Document()
         .append("sugeridas", new Document("$filter", new Document()
             .append("input", "$repetidas")
             .append("as", "r")
-            .append("cond", new Document("$in", List.of(
-                new Document("$toString", "$$r.figurita.$id"),
-                faltantesObjetivo
+            .append("cond", new Document("$and", List.of(
+                new Document("$in", List.of(
+                    new Document("$toString", "$$r.figurita.$id"),
+                    faltantesObjetivo
+                )),
+                new Document("$in", List.of("INTERCAMBIO", "$$r.metodos")),
+                new Document("$gt", List.of(
+                    new Document("$subtract", List.of("$$r.cantidadExistente", "$$r.cantidadReservada")),
+                    0
+                ))
             )))
         ))
         .append("necesarias", new Document("$filter", new Document()
@@ -150,7 +171,7 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
             .append("as", "f")
             .append("cond", new Document("$in", List.of(
                 new Document("$toString", "$$f.$id"),
-                repetidasObjetivo
+                repetidasObjetivoConIntercambio
             )))
         ))
     ));
@@ -162,22 +183,6 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
         )
     ));
 
-    if (Objects.equals(filtro.tipo(), "1a1")) {
-      ops.add(Aggregation.match(
-          Criteria.where("sugeridas").size(1).and("necesarias").size(1)
-      ));
-    } else if (Objects.equals(filtro.tipo(), "Na1")) {
-      ops.add(context -> new Document("$match", new Document("$expr", new Document("$and", List.of(
-          new Document("$gt", List.of(new Document("$size", "$sugeridas"), 1)),
-          new Document("$eq", List.of(new Document("$size", "$necesarias"), 1))
-      )))));
-    } else if (Objects.equals(filtro.tipo(), "1aN")) {
-      ops.add(context -> new Document("$match", new Document("$expr", new Document("$and", List.of(
-          new Document("$eq", List.of(new Document("$size", "$sugeridas"), 1)),
-          new Document("$gt", List.of(new Document("$size", "$necesarias"), 1))
-      )))));
-    }
-
     // Count
     List<AggregationOperation> countOps = new ArrayList<>(ops);
     countOps.add(Aggregation.count().as("total"));
@@ -188,7 +193,7 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
 
     // Paginación
     List<AggregationOperation> pageOps = new ArrayList<>(ops);
-    pageOps.add(Aggregation.skip((long) (filtro.paginaActual() - 1) * filtro.limite()));
+    pageOps.add(Aggregation.skip((long) (filtro.pagina() - 1) * filtro.limite()));
     pageOps.add(Aggregation.limit(filtro.limite()));
 
     AggregationResults<Document> resultados = mongoTemplate.aggregate(
@@ -233,16 +238,30 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
         sugerencias,
         total,
         (int) Math.ceil((double) total / filtro.limite()),
-        filtro.paginaActual()
+        filtro.pagina()
     );
   }
 
+  /**
+   * Configura la proyección del query para excluir campos según los flags
+   * de {@link CamposPerfil}.
+   *
+   * @param query  query de MongoDB a modificar
+   * @param campos especifica qué campos incluir/excluir
+   */
   private void conCamposCargados(Query query, CamposPerfil campos) {
     if(!campos.getConMedioDeContacto()) {
       query.fields().exclude("mediosDeContacto");
     }
   }
 
+  /**
+   * Normaliza un perfil asegurando que la lista de medios de contacto
+   * no sea {@code null}.
+   *
+   * @param perfil perfil a normalizar
+   * @return el mismo perfil con medios de contacto inicializados
+   */
   private Perfil normalizar(Perfil perfil) {
     if(perfil.getMediosDeContacto() == null) {
       perfil.setMediosDeContacto(new ArrayList<>());

@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,7 +59,7 @@ public class ControladorUsuarioTest {
     String json = """
         {
             "nombre": "lucas",
-            "contrasenia": "gordo123",
+            "contrasenia": "Gordo123!",
             "rol": "USUARIO"
         }
         """;
@@ -73,7 +74,7 @@ public class ControladorUsuarioTest {
     String json = """
       {
           "nombre": null,
-          "contrasenia": "gordo123",
+          "contrasenia": "Gordo123!",
           "rol": "USUARIO"
       }
       """;
@@ -89,7 +90,7 @@ public class ControladorUsuarioTest {
     String json = """
       {
           "nombre": "",
-          "contrasenia": "gordo123",
+          "contrasenia": "Gordo123!",
           "rol": "USUARIO"
       }
       """;
@@ -105,7 +106,7 @@ public class ControladorUsuarioTest {
     String json = """
       {
           "nombre": "   ",
-          "contrasenia": "gordo123",
+          "contrasenia": "Gordo123!",
           "rol": "USUARIO"
       }
       """;
@@ -169,7 +170,7 @@ public class ControladorUsuarioTest {
     String json = """
       {
           "nombre": "lucas",
-          "contrasenia": "gordo123",
+          "contrasenia": "Gordo123!",
           "rol": null
       }
       """;
@@ -188,7 +189,7 @@ public class ControladorUsuarioTest {
 
     String passwordEncriptada =
         new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
-            .encode("vieja123");
+            .encode("Vieja123!");
 
     app.model.entities.Usuario usuario =
         new app.model.entities.Usuario(
@@ -211,8 +212,8 @@ public class ControladorUsuarioTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
                 {
-                    "contrasenia_actual": "vieja123",
-                    "contrasenia_nueva": "nueva123"
+                    "contrasenia_actual": "Vieja123!",
+                    "contrasenia_nueva": "Nueva123!"
                 }
                 """))
         .andExpect(status().isOk());
@@ -229,7 +230,7 @@ public class ControladorUsuarioTest {
             .content("""
               {
                   "contrasenia_actual": null,
-                  "contrasenia_nueva": "nueva123"
+                  "contrasenia_nueva": "Nueva123!"
               }
               """))
         .andExpect(status().isBadRequest());
@@ -245,7 +246,7 @@ public class ControladorUsuarioTest {
             .content("""
               {
                   "contrasenia_actual": "",
-                  "contrasenia_nueva": "nueva123"
+                  "contrasenia_nueva": "Nueva123!"
               }
               """))
         .andExpect(status().isBadRequest());
@@ -260,7 +261,7 @@ public class ControladorUsuarioTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
               {
-                  "contrasenia_actual": "vieja123",
+                  "contrasenia_actual": "Vieja123!",
                   "contrasenia_nueva": null
               }
               """))
@@ -276,7 +277,7 @@ public class ControladorUsuarioTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content("""
               {
-                  "contrasenia_actual": "vieja123",
+                  "contrasenia_actual": "Vieja123!",
                   "contrasenia_nueva": ""
               }
               """))
@@ -292,7 +293,7 @@ public class ControladorUsuarioTest {
     String json = """
         {
             "nombre": "admin",
-            "contrasenia": "admin123",
+            "contrasenia": "Admin123!",
             "rol": "USUARIO"
         }
         """;
@@ -302,5 +303,152 @@ public class ControladorUsuarioTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
         .andExpect(status().isNoContent());
+  }
+
+  @Test
+  void crearUsuarioFalla_nombreConCaracteresInvalidos() throws Exception {
+    mockMvc.perform(post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "lucas@#$",
+                    "contrasenia": "Gordo123!",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void crearUsuarioFalla_nombreMenorA3Caracteres() throws Exception {
+    mockMvc.perform(post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "ab",
+                    "contrasenia": "Gordo123!",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void crearUsuarioFalla_contraseniaSinMayuscula() throws Exception {
+    mockMvc.perform(post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "lucas",
+                    "contrasenia": "gordo123!",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void crearUsuarioFalla_contraseniaSinMinuscula() throws Exception {
+    mockMvc.perform(post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "lucas",
+                    "contrasenia": "GORDO123!",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void crearUsuarioFalla_contraseniaSinNumero() throws Exception {
+    mockMvc.perform(post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "lucas",
+                    "contrasenia": "Gordito!!",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void crearUsuarioFalla_contraseniaSinEspecial() throws Exception {
+    mockMvc.perform(post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "lucas",
+                    "contrasenia": "Gordo1234",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void crearUsuarioFalla_contraseniaCorta() throws Exception {
+    mockMvc.perform(post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "lucas",
+                    "contrasenia": "Go1!",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void crearUsuarioFalla_nombreYaExiste() throws Exception {
+    when(repositorioUsuarios.existePorNombre("lucas")).thenReturn(true);
+
+    mockMvc.perform(post("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "lucas",
+                    "contrasenia": "Gordo123!",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void registrarAdministradorFalla_rolNoAdministrador() throws Exception {
+    when(servicioJwt.getRol(anyString())).thenReturn("USUARIO");
+
+    mockMvc.perform(post("/administradores")
+            .cookie(new Cookie("token", "token-usuario"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                    "nombre": "admin",
+                    "contrasenia": "Admin123!",
+                    "rol": "ADMINISTRADOR"
+                }
+                """))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void verificarNombreDevuelve200_siExiste() throws Exception {
+    when(repositorioUsuarios.existePorNombre("lucas")).thenReturn(true);
+
+    mockMvc.perform(head("/usuarios/lucas"))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  void verificarNombreDevuelve404_siNoExiste() throws Exception {
+    when(repositorioUsuarios.existePorNombre("lucas")).thenReturn(false);
+
+    mockMvc.perform(head("/usuarios/lucas"))
+        .andExpect(status().isNotFound());
   }
 }

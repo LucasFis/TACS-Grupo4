@@ -1,58 +1,53 @@
-import Button from "../../../components/ui/button/button.jsx";
-import styles from "./sugerencia-card.module.css";
-import FiguritaRecomendadaCard from "./figurita-recomendada-card.jsx";
-import PerfilSimple from "../../../components/ui/perfil-simple/perfil-simple.jsx";
+import { useState } from 'react'
+import Button from '../../../components/ui/button/button.jsx'
+import styles from './sugerencia-card.module.css'
+import ProponerIntercambioModal from '@/views/public/sugerencias/proponer-intercambio-modal.jsx'
+import SugerenciaResumen from '@/views/public/sugerencias/sugerencia-resumen.jsx'
+import { crearPropuesta } from '@/services/propuestasService.js'
+import { useToast } from '@/contexts/toastContext.jsx'
+import { useError } from '@/contexts/errorContext.jsx'
 
-const SugerenciaCard = ({perfil, figuritasRecomendadas, figuritasNecesarias}) => {
+const SugerenciaCard = ({ perfil, figuritasRecomendadas, figuritasNecesarias }) => {
+  const [modalAbierto, setModalAbierto] = useState(false)
+  const {showToast} = useToast()
+  const {handleError, errorTemplate} = useError()
+  const [error, setErrorState] = useState(errorTemplate())
 
+  const handleProponer = async ({ repetidas, faltantes } = {}) => {
+    try {
+      await crearPropuesta(perfil.id,  faltantes[0].id, repetidas.map(re => re.figurita_id))
+      showToast(`Propuesta enviada correctamente`, "success")
+    } catch (error) {
+      showToast(handleError(error, setErrorState), "error")
+    }
+  }
 
-    return (
-        <div className={`p-3 ${styles.card}`}>
+  return (
+    <>
+      <div className={`p-3 ${styles.card}`}>
 
-            {/* HEADER */}
-            <div className="d-flex align-items-center justify-content-between">
+        {/* HEADER */}
+        <SugerenciaResumen perfil={perfil} figuritasNecesarias={figuritasNecesarias} figuritasRecomendadas={figuritasRecomendadas} />
 
-                <PerfilSimple perfil={perfil}/>
-            </div>
+        <hr className="my-3" />
 
-            <hr className="my-3"/>
-
-            <div className="d-flex flex-column justify-content-between">
-                <div className="d-flex flex-row justify-content-between gap-2">
-                    <div className="small text-muted mb-1">A ÉL LE INTERESA</div>
-
-                    <div className="small text-muted mb-1">ÉL TIENE</div>
-                </div>
-                <div className="d-flex flex-row align-items-center gap-2">
-                    <div className="flex-grow-1">
-                        {figuritasNecesarias.map(fig =>
-                            <FiguritaRecomendadaCard fig={fig} key={fig.id}/>
-                        )}
-                    </div>
-
-                    <div className={styles.swapIcon}>
-                        ⇄
-                    </div>
-
-                    <div className="flex-grow-1 text-end">
-
-                        {figuritasRecomendadas.map(fig =>
-                            <FiguritaRecomendadaCard fig={fig} key={fig.id} verde={false}/>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            <hr className="my-3"/>
-
-            <div className="d-flex justify-content-end align-items-center">
-
-                <div className="d-flex gap-2">
-                    <Button>Proponer intercambio</Button>
-                </div>
-            </div>
+        <div className="d-flex justify-content-end align-items-center">
+          <div className="d-flex gap-2">
+            <Button onClick={() => setModalAbierto(true)}>Proponer intercambio</Button>
+          </div>
         </div>
-    );
-};
+      </div>
 
-export default SugerenciaCard;
+      <ProponerIntercambioModal
+        abierto={modalAbierto}
+        onCerrar={() => setModalAbierto(false)}
+        perfil={perfil}
+        figuritasNecesarias={figuritasNecesarias}
+        figuritasRecomendadas={figuritasRecomendadas}
+        onProponer={handleProponer}
+      />
+    </>
+  )
+}
+
+export default SugerenciaCard

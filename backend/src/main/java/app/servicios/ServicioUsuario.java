@@ -28,12 +28,27 @@ public class ServicioUsuario {
   private final RepositorioColecciones repositorioColecciones;
   private final MeterRegistry meterRegistry;
 
+  /**
+   * Registra un nuevo usuario con rol {@link Rol#USUARIO}. Crea la cuenta de usuario,
+   * una colección vacía y un perfil asociado.
+   *
+   * @param request datos del usuario a registrar (nombre, contraseña)
+   * @throws app.exceptions.BadRequestException si el nombre de usuario ya está en uso
+   */
   public void registrarUsuario(UsuarioRequest request) {
     request.setRol(Rol.USUARIO);
 
     this.registrar(request);
   }
 
+  /**
+   * Registra un nuevo administrador. Solo puede ser invocada por otro administrador.
+   *
+   * @param request datos del usuario administrador a registrar
+   * @param rol     rol que debe ser {@link Rol#ADMINISTRADOR} para autorizar el registro
+   * @throws app.exceptions.UnauthorizedException si el rol proporcionado no es ADMINISTRADOR
+   * @throws app.exceptions.BadRequestException   si el nombre de usuario ya está en uso
+   */
   public void registrarAdministrador(UsuarioRequest request, Rol rol) {
 
     if(rol == Rol.ADMINISTRADOR) {
@@ -43,6 +58,16 @@ public class ServicioUsuario {
     }
   }
 
+  /**
+   * Cambia la contraseña de un usuario. Valida que la contraseña actual sea correcta
+   * antes de actualizarla.
+   *
+   * @param perfilId          identificador del perfil cuyo usuario cambiará la contraseña
+   * @param contraseniaActual contraseña actual del usuario
+   * @param contraseniaNueva  nueva contraseña a establecer
+   * @throws app.exceptions.BadRequestException si la contraseña actual es incorrecta
+   * @throws app.exceptions.NotFoundException  si no se encuentra el perfil indicado
+   */
   public void editarContrasenia(String perfilId, String contraseniaActual, String contraseniaNueva) {
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, new CamposPerfil(false));
@@ -55,10 +80,21 @@ public class ServicioUsuario {
     );
   }
 
+  /**
+   * Ejecuta la lógica común de registro: valida que el nombre no esté en uso,
+   * crea el usuario, la colección vacía y el perfil asociado.
+   *
+   * @param request datos del usuario a registrar
+   * @throws app.exceptions.BadRequestException si el nombre de usuario ya está en uso
+   */
   private void registrar(UsuarioRequest request) {
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     Usuario usuarioNuevo;
+
+    if (this.repositorioUsuarios.existePorNombre(request.getNombre())) {
+      throw new BadRequestException("El nombre de usuario ya está en uso");
+    }
 
     if(request.getRol() == null) {
       usuarioNuevo = new Usuario(request.getNombre(), passwordEncoder.encode(request.getContrasenia()), Rol.USUARIO);
@@ -80,6 +116,15 @@ public class ServicioUsuario {
         .build();
 
     this.repositorioPerfiles.guardar(perfil);
+  }
+  /**
+   * Verifica si un nombre de usuario ya está registrado en el sistema.
+   *
+   * @param nombre nombre de usuario a verificar
+   * @return {@code true} si el nombre ya existe, {@code false} en caso contrario
+   */
+  public boolean existeNombre(String nombre) {
+    return this.repositorioUsuarios.existePorNombre(nombre);
   }
 }
 

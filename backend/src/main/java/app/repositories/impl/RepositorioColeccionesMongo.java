@@ -36,10 +36,13 @@ import java.util.List;
 public class RepositorioColeccionesMongo implements RepositorioColecciones {
   @Autowired
   private MongoTemplate mongoTemplate;
+
   @Override
   public void guardar(Coleccion coleccion) {
     mongoTemplate.save(coleccion);
   }
+
+  @Override
   public void guardar(Coleccion coleccion, CamposColeccion campos) {
     Update update = new Update();
 
@@ -60,6 +63,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     );
   }
 
+  @Override
   public void agregarFaltante(String colId, Figurita figurita) {
     Query query = Query.query(
         Criteria.where("_id").is(colId)
@@ -74,6 +78,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     }
   }
 
+  @Override
   public void agregarRepetida(String colId, FiguritaIntercambiable repetida) {
     Query query = Query.query(
         Criteria.where("_id").is(colId)
@@ -89,6 +94,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     }
   }
 
+  @Override
   public Coleccion buscarPorId(String colId, CamposColeccion campos) {
     Query query = new Query();
     query.addCriteria(Criteria.where("_id").is(colId));
@@ -103,6 +109,58 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     return this.normalizar(coleccion);
   }
 
+  public FiguritaIntercambiable buscarRepetida(String colId, String figId) {
+    Aggregation aggregation = Aggregation.newAggregation(
+        Aggregation.match(
+            Criteria.where("_id").is(colId)
+        ),
+        Aggregation.unwind("repetidas"),
+        Aggregation.match(
+            Criteria.where("repetidas.figurita.$id").is(figId)
+        ),
+        Aggregation.replaceRoot("repetidas")
+    );
+
+    AggregationResults<FiguritaIntercambiable> result =
+        mongoTemplate.aggregate(
+            aggregation,
+            "colecciones",
+            FiguritaIntercambiable.class
+        );
+
+    FiguritaIntercambiable repetida = result.getUniqueMappedResult();
+
+    if (repetida == null) {
+      throw new NotFoundException("No se encontró la repetida");
+    }
+
+    return repetida;
+  }
+
+  public void actualizarRepetida(
+      String colId,
+      String figId,
+      FiguritaIntercambiable repetida
+  ) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("_id").is(colId)
+            .and("repetidas.figurita.$id").is(figId)
+    );
+
+    Update update = new Update()
+        .set("repetidas.$.cantidadExistente", repetida.getCantidadExistente())
+        .set("repetidas.$.metodos", repetida.getMetodos());
+
+    UpdateResult result =
+        mongoTemplate.updateFirst(query, update, Coleccion.class);
+
+    if (result.getMatchedCount() == 0) {
+      throw new NotFoundException("No se encontró la repetida");
+    }
+  }
+
+  @Override
   public Repetidas<FiguritaIntercambiable> buscarRepetidas(String colId, RepetidasFiltro filtros, String colIdFaltantes) {
     int pagina = filtros.pagina();
     int limite = filtros.limite();
@@ -139,6 +197,13 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     return new Repetidas<>(cantidadResultadosCrudo, cantidadResultadosDisponibles, data);
   }
 
+  /**
+   * Obtiene los IDs de las figuritas faltantes de una colección dada,
+   * a partir de los {@code DBRef} almacenados en el array {@code faltantes}.
+   *
+   * @param colIdFaltantes identificador de la colección de faltantes
+   * @return lista de IDs de figuritas faltantes
+   */
   private List<String> obtenerIdsFaltantes(String colIdFaltantes) {
     Query query = new Query(Criteria.where("_id").is(colIdFaltantes));
     query.fields().include("faltantes");
@@ -154,6 +219,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
         .toList();
   }
 
+  @Override
   public PaginaResultado<Figurita> buscarFaltantes(String colId, FaltantesFiltro filtros) {
     int pagina = filtros.pagina();
     int limite = filtros.limite();
@@ -297,6 +363,13 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     return this.mapearADominio(figuritas);
   }
 
+  /**
+   * Configura la proyección del query para excluir campos según los flags
+   * de {@link CamposColeccion}, optimizando la lectura.
+   *
+   * @param query  query de MongoDB a modificar
+   * @param campos especifica qué campos incluir/excluir
+   */
   private void conCamposCargados(Query query, CamposColeccion campos) {
     if(!campos.getConRepetidas()) {
       query.fields().exclude("repetidas");
@@ -306,6 +379,13 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     }
   }
 
+  /**
+   * Normaliza una colección asegurando que las listas de repetidas y faltantes
+   * no sean {@code null}, reemplazándolas con listas vacías si es necesario.
+   *
+   * @param coleccion colección a normalizar
+   * @return la misma colección con listas inicializadas
+   */
   private Coleccion normalizar(Coleccion coleccion) {
     if(coleccion.getRepetidas() == null) {
       coleccion.setRepetidas(new ArrayList<>());
@@ -316,6 +396,16 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     return coleccion;
   }
 
+  /**
+   * Cuenta los elementos de un array embebido en una colección aplicando
+   * un pipeline de agregación con {@code $unwind}, filtros opcionales y
+   * {@code $count}.
+   *
+   * @param colId identificador de la colección, o {@code null} para todas
+   * @param campo nombre del campo array a contar (ej. "repetidas", "faltantes")
+   * @param ops   operaciones de agregación adicionales para filtrar
+   * @return cantidad de elementos que cumplen los criterios
+   */
   private int contarCampoEnColeccion(String colId, String campo, List<AggregationOperation> ops) {
     List<AggregationOperation> operaciones = new ArrayList<>();
 
@@ -335,6 +425,18 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     return countDoc != null ? countDoc.getInteger("total") : 0;
   }
 
+  /**
+   * Busca elementos de un array embebido con paginación mediante un pipeline
+   * de agregación que hace {@code $unwind}, aplica filtros y reemplaza la raíz
+   * con el campo deseado.
+   *
+   * @param colId  identificador de la colección, o {@code null} para todas
+   * @param campo  nombre del campo array a recorrer
+   * @param ops    operaciones de agregación adicionales para filtrar
+   * @param pagina número de página (base 1)
+   * @param limite cantidad máxima de resultados
+   * @return resultados crudos de la agregación como documentos
+   */
   private AggregationResults<Document> buscarCampoEnColeccion(String colId, String campo, List<AggregationOperation> ops, int pagina, int limite) {
     List<AggregationOperation> operaciones = new ArrayList<>();
     if(colId != null) {
@@ -351,6 +453,17 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     return mongoTemplate.aggregate(aggregation, "colecciones", Document.class);
   }
 
+  /**
+   * Ejecuta un pipeline de agregación que busca figuritas intercambiables
+   * con los datos del perfil propietario. Aplica {@code $unwind} sobre
+   * {@code repetidas}, los filtros recibidos, paginación, {@code $lookup}
+   * contra la colección {@code perfiles} y proyección final.
+   *
+   * @param ops    operaciones de agregación para filtrar
+   * @param pagina número de página (base 1)
+   * @param limite cantidad máxima de resultados
+   * @return documentos con los datos de la figurita y el perfil asociado
+   */
   private AggregationResults<Document> buscarIntercambiablesConPerfil(
       List<AggregationOperation> ops,
       int pagina,
@@ -381,6 +494,15 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     );
   }
 
+  /**
+   * Suma la cantidad de ejemplares disponibles (existentes - reservados)
+   * de un array embebido, aplicando filtros opcionales mediante agregación.
+   *
+   * @param colId identificador de la colección
+   * @param campo nombre del campo array (ej. "repetidas")
+   * @param ops   operaciones de agregación adicionales
+   * @return total de ejemplares disponibles
+   */
   private int sumarDisponibles(String colId, String campo, List<AggregationOperation> ops) {
     List<AggregationOperation> operaciones = new ArrayList<>();
 
@@ -405,6 +527,13 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     return existente - reservada;
   }
 
+  /**
+   * Convierte los documentos resultado de una agregación en objetos
+   * {@link FiguritaIntercambiable} usando el {@link MongoConverter}.
+   *
+   * @param resultado resultados de la agregación
+   * @return lista de figuritas intercambiables mapeadas
+   */
   private List<FiguritaIntercambiable> mapearADominio(AggregationResults<Document> resultado) {
     MongoConverter converter = mongoTemplate.getConverter();
 
@@ -414,6 +543,13 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
         .toList();
   }
 
+  /**
+   * Convierte documentos de agregación en proyecciones {@link FiguritaIntercambiableConPerfil},
+   * extrayendo la figurita y los datos de perfil del documento anidado.
+   *
+   * @param resultado resultados de la agregación
+   * @return lista de proyecciones con figurita y resumen del perfil
+   */
   private List<FiguritaIntercambiableConPerfil> mapearIntercambiablesConPerfil(
       AggregationResults<Document> resultado
   ) {
@@ -434,6 +570,14 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
         .toList();
   }
 
+  /**
+   * Extrae los campos de resumen de un perfil desde un documento de agregación
+   * y los convierte en un {@link ResumenPerfil}.
+   *
+   * @param documento documento con campos {@code perfilId}, {@code perfilNombre}
+   *                  y {@code perfilCalificacionMedia}
+   * @return resumen del perfil, o {@code null} si no hay datos
+   */
   private ResumenPerfil mapearResumenPerfil(Document documento) {
     Object perfilId = documento.get("perfilId");
     if (perfilId == null) {
@@ -452,11 +596,18 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     );
   }
 
+  /**
+   * Intenta parsear un término como número entero.
+   *
+   * @param termino cadena a parsear
+   * @return el número entero, o {@code null} si no es numérico
+   */
   private Integer parseNumero(String termino) {
     try { return Integer.parseInt(termino); }
     catch (NumberFormatException e) { return null; }
   }
 
+  @Override
   public long contarRepetidas(List<MetodoIntercambio> metodos) {
 
     List<AggregationOperation> operaciones = new ArrayList<>();
@@ -466,7 +617,10 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     if (!metodos.isEmpty()) {
       operaciones.add(
           Aggregation.match(
-              Criteria.where("repetidas.metodos").all(metodos)
+              new Criteria().andOperator(
+                  Criteria.where("repetidas.metodos").all(metodos),
+                  Criteria.where("repetidas.metodos").size(metodos.size())
+              )
           )
       );
     }

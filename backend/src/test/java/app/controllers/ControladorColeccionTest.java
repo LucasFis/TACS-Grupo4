@@ -1,19 +1,26 @@
 package app.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import app.dto.request.EditarRepetidaRequest;
 import app.exceptions.BadRequestException;
 import app.exceptions.NotFoundException;
+import app.model.entities.MetodoIntercambio;
 import app.servicios.ServicioColeccion;
 import app.servicios.ServicioJwt;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +28,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -101,7 +110,7 @@ class ControladorColeccionTest {
 
     doThrow(new NotFoundException("No se encontro la figurita"))
         .when(serviceColeccion)
-        .agregarRepetida(eq("1"), any(), any(), any());
+        .agregarRepetida(eq("1"), any(),any(), any(), any());
 
     String json = """
             {
@@ -302,5 +311,103 @@ class ControladorColeccionTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
         .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void editarRepetida_retorna204() throws Exception {
+    mockMvc.perform(
+            patch("/colecciones/repetidas/{fig_id}", "ARG-10")
+                .cookie(cookie)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "cantidad_nueva": 5,
+                      "metodos": ["INTERCAMBIO", "SUBASTA"]
+                    }
+                """)
+        )
+        .andExpect(status().isNoContent());
+
+    verify(servicioJwt).getColeccionId("fake-token");
+
+    verify(serviceColeccion).editarRepetida(
+        eq("1"),
+        eq("ARG-10"),
+        any(EditarRepetidaRequest.class)
+    );
+  }
+
+  @Test
+  void editarRepetida_enviaRequestCorrectoAlService() throws Exception {
+    mockMvc.perform(
+            patch("/colecciones/repetidas/{fig_id}", "ARG-10")
+                .cookie(cookie)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "cantidad_nueva": 5,
+                      "metodos": ["INTERCAMBIO", "SUBASTA"]
+                    }
+                """)
+        )
+        .andExpect(status().isNoContent());
+
+    ArgumentCaptor<EditarRepetidaRequest> captor =
+        ArgumentCaptor.forClass(EditarRepetidaRequest.class);
+
+    verify(serviceColeccion).editarRepetida(
+        eq("1"),
+        eq("ARG-10"),
+        captor.capture()
+    );
+
+    EditarRepetidaRequest req = captor.getValue();
+
+    assertEquals(5, req.cantidadNueva());
+    assertEquals(
+        List.of(
+            MetodoIntercambio.INTERCAMBIO,
+            MetodoIntercambio.SUBASTA
+        ),
+        req.metodos()
+    );
+  }
+
+  @Test
+  void editarRepetida_retorna400SiServiceFalla() throws Exception {
+    doThrow(new BadRequestException("error"))
+        .when(serviceColeccion)
+        .editarRepetida(
+            anyString(),
+            anyString(),
+            any(EditarRepetidaRequest.class)
+        );
+
+    mockMvc.perform(
+            patch("/colecciones/repetidas/{fig_id}", "ARG-10")
+                .cookie(cookie)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "cantidad_nueva": 5,
+                      "metodos": ["INTERCAMBIO"]
+                    }
+                """)
+        )
+        .andExpect(status().isBadRequest());
+  }
+  @Test
+  void buscarFaltantesSinPaginacionRetorna_200() throws Exception {
+    mockMvc.perform(get("/colecciones/faltantes")
+            .cookie(cookie)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+  }
+  @Test
+  void buscarRepetidasSinPaginacionRetorna_200() throws Exception {
+    mockMvc.perform(get("/colecciones/repetidas")
+            .cookie(cookie)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
   }
 }

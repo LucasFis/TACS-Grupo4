@@ -51,6 +51,16 @@ class ControladorPerfilTest {
   }
 
   @Test
+  void buscarSugerenciasSinPaginacion_retorna200() throws Exception {
+    mockMvc.perform(
+            get("/perfil/sugerencias")
+            .cookie(cookie)
+            .contentType("application/json")
+        )
+        .andExpect(status().isOk());
+  }
+
+  @Test
   void obtenerPerfil_retorna200() throws Exception {
 
     Usuario usuario = new Usuario(

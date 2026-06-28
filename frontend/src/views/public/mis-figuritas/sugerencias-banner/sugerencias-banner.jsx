@@ -6,7 +6,7 @@ const SugerenciasBanner = () => (
     <div className={styles.text}>
       <span className={styles.icon}>↔</span>
       <div>
-        <p className={styles.title}>3 sugerencias encontradas</p>
+        <p className={styles.title}>Mirá tus sugerencias personalizadas!</p>
         <p className={styles.subtitle}>
           Tenés figuritas que otros quieren, y ellos tienen las tuyas
         </p>

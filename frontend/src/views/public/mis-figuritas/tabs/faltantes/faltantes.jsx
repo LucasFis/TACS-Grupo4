@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import Button from "../../../../../components/ui/button/button.jsx";
 import {useError} from "@/contexts/errorContext.jsx";
 import { useToast } from '@/contexts/toastContext.jsx'
+import SugerenciasBanner from './../../sugerencias-banner/sugerencias-banner.jsx'
 
 const Faltantes = () => {
 
@@ -44,6 +45,8 @@ const Faltantes = () => {
 
     return (
         <div className="container-fluid px-0 d-flex flex-column gap-4">
+
+          <SugerenciasBanner />
 
             <div className="row justify-content-center">
                 <div className="col-12 col-sm-8 col-md-6 col-lg-4">

@@ -2,7 +2,12 @@ import { useMediosContacto } from '../../hooks/useMediosContacto.js'
 import ItemMedioContacto from './ItemMedioContacto.jsx'
 import styles from './columna.module.css'
 
-const ColumnaDatosPerfil = ({ nombreEditando, setNombreEditando, mediosEditando, setMediosEditando }) => {
+const ColumnaDatosPerfil = ({
+  nombreEditando,
+  setNombreEditando,
+  mediosEditando,
+  setMediosEditando,
+}) => {
   const {
     indiceMedioEditando,
     medioEditandoData,
@@ -11,6 +16,8 @@ const ColumnaDatosPerfil = ({ nombreEditando, setNombreEditando, mediosEditando,
     setNuevoMedioTipo,
     nuevoMedioValor,
     setNuevoMedioValor,
+    errorNuevoMedio,
+    errorMedioEditando,
     agregarMedio,
     eliminarMedio,
     confirmarEdicionMedio,
@@ -74,6 +81,7 @@ const ColumnaDatosPerfil = ({ nombreEditando, setNombreEditando, mediosEditando,
               onCancelar={cancelarEdicionMedio}
               onEditar={(medioData) => iniciarEdicionMedio(i, medioData)}
               onEliminar={() => eliminarMedio(i)}
+              errorMedioEditando={errorMedioEditando}
             />
           </div>
         ))}
@@ -93,11 +101,12 @@ const ColumnaDatosPerfil = ({ nombreEditando, setNombreEditando, mediosEditando,
         </div>
         <div className="col">
           <input
-            className="form-control w-100"
-            placeholder="Ej: @usuario"
+            className={`form-control w-100 ${errorNuevoMedio ? 'is-invalid' : ''}`}
+            placeholder={nuevoMedioTipo === 'TELEGRAM' ? 'Ej: @usuario' : 'Ej: juan@mail.com'}
             value={nuevoMedioValor}
             onChange={(e) => setNuevoMedioValor(e.target.value)}
           />
+          {errorNuevoMedio && <div className="invalid-feedback">{errorNuevoMedio}</div>}
         </div>
         <div className="col-12 col-sm-auto">
           <button className={`btn w-100 ${styles['btn-agregar']}`} onClick={agregarMedio}>

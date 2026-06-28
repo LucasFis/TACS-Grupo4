@@ -1,4 +1,4 @@
-const RepetidaCard = ({ figurita }) => {
+const RepetidaCard = ({ figurita, onEditar }) => {
     const {
         figurita_id,
         jugador,
@@ -19,18 +19,19 @@ const RepetidaCard = ({ figurita }) => {
     return (
         <div className="card" style={{ width: '220px' }}>
 
-            <div className="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-2 px-3">
+          <div className="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-2 px-3">
             <span className="text-muted" style={{ fontSize: '0.75rem' }}>
-              #{figurita_id}
+                #{figurita_id}
             </span>
-                <div className="d-flex gap-1">
-                    {metodos.map((metodo) => (
-                        <span key={metodo.toString()} className="badge rounded-pill" style={{ backgroundColor: '#e1f5ee', color: '#0f6e56', fontSize: '0.7rem' }}>
-                            {metodo.toLowerCase()}
-                        </span>
-                    ))}
-                </div>
-            </div>
+
+            <button
+              className="btn btn-sm p-1 border-0 bg-transparent"
+              onClick={onEditar}
+              title="Editar"
+            >
+              ✏️
+            </button>
+          </div>
 
             <div className="card-body d-flex flex-column align-items-center gap-1 py-3 px-3">
                 <div
@@ -58,14 +59,36 @@ const RepetidaCard = ({ figurita }) => {
                 </p>
             </div>
 
-            <div className="card-footer bg-white d-flex gap-2 justify-content: space-between align-items-center px-3 py-2">
-                <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+          <div className="card-footer bg-white px-3 py-2">
+            <div
+              className="d-flex align-items-center"
+              style={{ justifyContent: 'space-between' }}
+            >
+              <span className="text-muted" style={{ fontSize: '0.75rem' }}>
                   Existentes: <strong className="text-dark">{cantidad_existente}</strong>
-                </span>
-                        <span className="text-secondary" style={{ fontSize: '0.7rem' }}>
-                  Reservadas: {cantidad_reservada}
-                </span>
+              </span>
+
+              <span className="text-secondary" style={{ fontSize: '0.7rem' }}>
+                Reservadas: {cantidad_reservada}
+              </span>
             </div>
+
+            <div className="d-flex flex-wrap gap-1 mt-2">
+              {metodos.map((metodo) => (
+                <span
+                  key={metodo}
+                  className="badge rounded-pill"
+                  style={{
+                    backgroundColor: '#e1f5ee',
+                    color: '#0f6e56',
+                    fontSize: '0.65rem'
+                  }}
+                >
+                  {metodo.toLowerCase()}
+                </span>
+              ))}
+            </div>
+          </div>
 
         </div>
     );

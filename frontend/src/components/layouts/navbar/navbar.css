@@ -57,14 +57,6 @@
   align-items: center;
 }
 
-@media (min-width: 768px) {
-  .navbar-collapse {
-    display: flex !important;
-    flex-direction: row;
-    align-items: center;
-  }
-}
-
 .navbar-avatar-link {
   text-decoration: none;
 }
@@ -74,73 +66,74 @@
   transition: transform 0.2s ease;
 }
 
-.navbar-avatar:hover {    /*Ver si sacar o no esto */
+.navbar-avatar:hover {
+  /*Ver si sacar o no esto */
   transform: scale(1.1);
 }
 
 .navbar-notifications-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .navbar-notifications-popover {
-    position: absolute;
-    top: 46px;
-    right: 0;
-    width: 300px;
-    max-height: 340px;
-    overflow-y: auto;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
-    z-index: 1050;
-    padding: 6px;
+  position: absolute;
+  top: 46px;
+  right: 0;
+  width: 300px;
+  max-height: 340px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+  z-index: 1050;
+  padding: 6px;
 }
 
 .navbar-notifications-header {
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 8px 12px 6px;
-    opacity: 0.5;
-    letter-spacing: 0.03em;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 12px 6px;
+  opacity: 0.5;
+  letter-spacing: 0.03em;
 }
 
 .navbar-notification-item {
-    padding: 10px 12px;
-    border-radius: 10px;
-    cursor: default;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: default;
 }
 
 .navbar-notification-item--no-leida {
-    background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 .navbar-notification-item:hover {
-    background-color: rgba(0, 0, 0, 0.06);
+  background-color: rgba(0, 0, 0, 0.06);
 }
 
 .navbar-notification-texto {
-    font-size: 0.9rem;
-    line-height: 1.4;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .navbar-notification-fecha {
-    font-size: 0.78rem;
-    opacity: 0.55;
-    margin-top: 3px;
+  font-size: 0.78rem;
+  opacity: 0.55;
+  margin-top: 3px;
 }
 
 .navbar-notifications-empty {
-    padding: 16px 12px;
-    font-size: 0.9rem;
-    opacity: 0.6;
-    text-align: center;
+  padding: 16px 12px;
+  font-size: 0.9rem;
+  opacity: 0.6;
+  text-align: center;
 }
 
 /*Para las que no tienen link*/
 .navbar-notification-item--clickeable {
-    cursor: pointer;
+  cursor: pointer;
 }

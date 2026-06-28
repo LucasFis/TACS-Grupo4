@@ -8,4 +8,13 @@ public record RepetidasFiltro(
     String perfilId,
     Integer limite,
     Integer pagina
-) {}
+) {
+  public RepetidasFiltro {
+    if(limite == null){
+      limite = 10;
+    }
+    if(pagina == null){
+      pagina = 1;
+    }
+  }
+}

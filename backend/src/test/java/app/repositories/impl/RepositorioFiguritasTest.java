@@ -30,7 +30,7 @@ public class RepositorioFiguritasTest extends MongoTestBase {
     repositorioFiguritas.guardar(Figurita.builder().id("ARG-10").numero(10).jugador("Messi").seleccion(Seleccion.ARGENTINA).build());
     repositorioFiguritas.guardar(Figurita.builder().id("FRA-7").numero(7).jugador("Mbappé").seleccion(Seleccion.FRANCIA).build());
 
-    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, null, null, null));
+    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, null, null, null, null, null));
 
     assertEquals(2, resultado.size());
   }
@@ -40,7 +40,7 @@ public class RepositorioFiguritasTest extends MongoTestBase {
     repositorioFiguritas.guardar(Figurita.builder().id("ARG-10").numero(10).jugador("Messi").seleccion(Seleccion.ARGENTINA).build());
     repositorioFiguritas.guardar(Figurita.builder().id("FRA-7").numero(7).jugador("Mbappé").seleccion(Seleccion.FRANCIA).build());
 
-    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, 10, null, null, null));
+    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, 10, null, null, null, null, null));
 
     assertEquals(1, resultado.size());
     assertEquals("ARG-10", resultado.get(0).getId());
@@ -51,7 +51,7 @@ public class RepositorioFiguritasTest extends MongoTestBase {
     repositorioFiguritas.guardar(Figurita.builder().id("ARG-10").numero(10).jugador("Messi").seleccion(Seleccion.ARGENTINA).build());
     repositorioFiguritas.guardar(Figurita.builder().id("FRA-7").numero(7).jugador("Mbappé").seleccion(Seleccion.FRANCIA).build());
 
-    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, "ARGENTINA", null, null));
+    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, "ARGENTINA", null, null, null, null));
 
     assertEquals(1, resultado.size());
     assertEquals("ARG-10", resultado.get(0).getId());
@@ -61,7 +61,7 @@ public class RepositorioFiguritasTest extends MongoTestBase {
   void buscarConFiltros_porJugadorExacto_retornaCoincidencia() {
     repositorioFiguritas.guardar(Figurita.builder().id("ARG-10").numero(10).jugador("Messi").seleccion(Seleccion.ARGENTINA).build());
 
-    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, null, "Messi", null));
+    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, null, "Messi", null, null, null));
 
     assertEquals(1, resultado.size());
   }
@@ -71,7 +71,7 @@ public class RepositorioFiguritasTest extends MongoTestBase {
     repositorioFiguritas.guardar(Figurita.builder().id("ARG-10").numero(10).jugador("Lionel Messi").seleccion(Seleccion.ARGENTINA).build());
     repositorioFiguritas.guardar(Figurita.builder().id("ARG-11").numero(11).jugador("Di María").seleccion(Seleccion.ARGENTINA).build());
 
-    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, null, "messi", null));
+    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, null, "messi", null, null, null));
 
     assertEquals(1, resultado.size());
     assertEquals("ARG-10", resultado.get(0).getId());
@@ -81,7 +81,7 @@ public class RepositorioFiguritasTest extends MongoTestBase {
   void buscarConFiltros_porJugadorCaseInsensitive_retornaCoincidencia() {
     repositorioFiguritas.guardar(Figurita.builder().id("ARG-10").numero(10).jugador("Messi").seleccion(Seleccion.ARGENTINA).build());
 
-    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, null, "MESSI", null));
+    var resultado = repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, null, null, "MESSI", null, null, null));
 
     assertEquals(1, resultado.size());
   }
@@ -90,6 +90,6 @@ public class RepositorioFiguritasTest extends MongoTestBase {
   void buscarConFiltros_sinResultados_daListaVacia() {
     repositorioFiguritas.guardar(Figurita.builder().id("ARG-10").numero(10).jugador("Messi").seleccion(Seleccion.ARGENTINA).build());
 
-    assertEquals(0, repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, 99, null, null, null)).size());
+    assertEquals(0, repositorioFiguritas.buscarConFiltros(new FiguritasFiltro(null, 99, null, null, null, null, null)).size());
   }
 }

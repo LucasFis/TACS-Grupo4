@@ -3,6 +3,7 @@ package app.servicios.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -34,8 +35,8 @@ class ServicioDeAgregacionDeDatosTest {
 
   @Test
   void enriquecer_figuritaPendiente_llamaApiYGuarda() {
-    when(repositorioFiguritas.buscarPendientes(any())).thenReturn(List.of(messi));
-    when(repositorioFiguritas.reclamarParaProcesamiento(eq("ARG-10"), any())).thenReturn(messi);
+    when(repositorioFiguritas.buscarPendientes(any(), any(), anyInt())).thenReturn(List.of(messi));
+    when(repositorioFiguritas.reclamarParaProcesamiento(eq("ARG-10"), any(), any())).thenReturn(messi);
     when(imagenProveedor.buscarImagen("Messi"))
         .thenReturn(Optional.of("https://img.example.com/messi.jpg"));
 
@@ -48,8 +49,8 @@ class ServicioDeAgregacionDeDatosTest {
 
   @Test
   void enriquecer_proveedorNoEncuentra_guardaConUrlNullYStatusCompletado() {
-    when(repositorioFiguritas.buscarPendientes(any())).thenReturn(List.of(messi));
-    when(repositorioFiguritas.reclamarParaProcesamiento(eq("ARG-10"), any())).thenReturn(messi);
+    when(repositorioFiguritas.buscarPendientes(any(), any(), anyInt())).thenReturn(List.of(messi));
+    when(repositorioFiguritas.reclamarParaProcesamiento(eq("ARG-10"), any(), any())).thenReturn(messi);
     when(imagenProveedor.buscarImagen("Messi")).thenReturn(Optional.empty());
 
     service.enriquecer();
@@ -61,8 +62,8 @@ class ServicioDeAgregacionDeDatosTest {
 
   @Test
   void enriquecer_otraInstanciaReclamo_seSalta() {
-    when(repositorioFiguritas.buscarPendientes(any())).thenReturn(List.of(messi));
-    when(repositorioFiguritas.reclamarParaProcesamiento(eq("ARG-10"), any())).thenReturn(null);
+    when(repositorioFiguritas.buscarPendientes(any(), any(), anyInt())).thenReturn(List.of(messi));
+    when(repositorioFiguritas.reclamarParaProcesamiento(eq("ARG-10"), any(), any())).thenReturn(null);
 
     service.enriquecer();
 
@@ -75,10 +76,10 @@ class ServicioDeAgregacionDeDatosTest {
     Figurita mbappe = Figurita.builder()
         .id("FRA-10").numero(10).jugador("Mbappé")
         .seleccion(Seleccion.FRANCIA).posicion("Delantero").build();
-    when(repositorioFiguritas.buscarPendientes(any())).thenReturn(List.of(messi, mbappe));
-    when(repositorioFiguritas.reclamarParaProcesamiento(eq("ARG-10"), any()))
+    when(repositorioFiguritas.buscarPendientes(any(), any(), anyInt())).thenReturn(List.of(messi, mbappe));
+    when(repositorioFiguritas.reclamarParaProcesamiento(eq("ARG-10"), any(), any()))
         .thenThrow(new RuntimeException("error inesperado"));
-    when(repositorioFiguritas.reclamarParaProcesamiento(eq("FRA-10"), any())).thenReturn(mbappe);
+    when(repositorioFiguritas.reclamarParaProcesamiento(eq("FRA-10"), any(), any())).thenReturn(mbappe);
     when(imagenProveedor.buscarImagen("Mbappé"))
         .thenReturn(Optional.of("https://img.example.com/mbappe.jpg"));
 
@@ -90,7 +91,7 @@ class ServicioDeAgregacionDeDatosTest {
 
   @Test
   void enriquecer_sinPendientes_noLlamaApi() {
-    when(repositorioFiguritas.buscarPendientes(any())).thenReturn(List.of());
+    when(repositorioFiguritas.buscarPendientes(any(), any(), anyInt())).thenReturn(List.of());
 
     service.enriquecer();
 

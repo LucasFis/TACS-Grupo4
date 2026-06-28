@@ -86,6 +86,15 @@ public class TheSportsDbImagenProveedor implements ImagenJugadorProveedor {
     ).get();
   }
 
+  /**
+   * Realiza la petición HTTP a TheSportsDB para buscar la imagen de un jugador.
+   * Normaliza el nombre del jugador para la URL, maneja errores HTTP (incluyendo
+   * rate limit 429) y errores inesperados.
+   *
+   * @param nombreJugador nombre del jugador a buscar
+   * @return URL de la imagen, o {@link Optional#empty()} si no se encuentra o hay error
+   * @throws app.exceptions.RateLimitException si se recibe un HTTP 429 (demasiadas solicitudes)
+   */
   private Optional<String> buscarImagenInterna(String nombreJugador) {
     String url = String.format("%s/%s/searchplayers.php?p=%s", baseUrl, apiKey, normalizarNombre(nombreJugador));
 

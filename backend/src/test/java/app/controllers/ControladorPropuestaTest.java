@@ -52,6 +52,15 @@ class ControladorPropuestaTest {
     }
 
     @Test
+    void buscarPropuestasSinPaginacion_retorna200() throws Exception {
+        mockMvc.perform(
+                get("/propuestas")
+                    .cookie(cookie)
+                    .contentType("application/json"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
     void crearPropuesta_retorna201() throws Exception {
 
         mockMvc.perform(

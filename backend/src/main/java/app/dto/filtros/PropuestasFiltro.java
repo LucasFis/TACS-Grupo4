@@ -8,4 +8,12 @@ public record PropuestasFiltro(
     Integer limite,
     EstadoProceso estado
 ) {
+  public PropuestasFiltro {
+    if(limite == null){
+      limite = 10;
+    }
+    if(pagina == null){
+      pagina = 1;
+    }
+  }
 }

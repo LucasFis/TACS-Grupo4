@@ -19,13 +19,6 @@ const Sugerencias = () => {
     const [error, setError] = useState(errorTemplate())
     const [contadores, setContadores] = useState([])
 
-    const TABS = [
-        { key: 'todos', label: 'Todos', component: MostradorSugerencias, props: {} },
-        { key:"1a1", label: "1 a 1", component: MostradorSugerencias, props: {tipo: "1a1", extraInfoChildren:<p>Sugerencias de intercambio uno a uno, para obtener dicha figurita solo se necesita una de las tuyas!</p>} },
-        { key:"na1", label: "N a 1", component: MostradorSugerencias, props: {tipo: "Na1" , extraInfoChildren: <p>Sugerencias de intercambio muchos a uno, para obtener la figurita se necesitan mas de una de las tuyas!</p>} },
-        { key:"1an", label: "1 a N", component: MostradorSugerencias, props: {tipo: "1aN", extraInfoChildren: <p>Sugerencias de intercambio uno a muchos, podrias obtener mas de una figurita a cambio de una de las tuyas!</p>}}
-    ];
-
     const cargarContadores = useCallback(async () => {
         try {
             setCargando(true)
@@ -73,7 +66,7 @@ const Sugerencias = () => {
                         de todos los usuarios.</p>
                 </ExtraInfo>
 
-                <TabsContainer tabs={TABS}/>
+                <MostradorSugerencias />
             </div>
         </div>
     )

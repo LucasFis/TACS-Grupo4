@@ -60,7 +60,7 @@ public class Propuesta {
 
     /**
      * Acepta la propuesta. Valida que {@code usuario} sea el destinatario
-     * y que la propuesta esté en estado ACEPTADO.
+     * y que la propuesta esté en estado PENDIENTE o SELECCIONADO.
      */
     public void aceptar(String perfilId) {
         validarUsuarioDestino(perfilId);
@@ -73,7 +73,7 @@ public class Propuesta {
 
     /**
      * Se selecciona la propuesta. Valida que {@code usuario} sea el destinatario
-     * y que la propuesta esté en estado SELECCIONADO. (En una subasta)
+     * y que la propuesta esté en estado PENDIENTE. (En una subasta)
      */
     public void seleccionar(String perfilId) {
         validarUsuarioDestino(perfilId);
@@ -85,7 +85,7 @@ public class Propuesta {
 
     /**
      * Rechaza la propuesta. Valida que {@code usuario} sea el destinatario
-     * y que la propuesta esté en estado RECHAZADO.
+     * y que la propuesta esté en estado PENDIENTE o SELECCIONADO.
      */
     public void rechazar(String perfilId) {
         validarUsuarioDestino(perfilId);
@@ -97,8 +97,7 @@ public class Propuesta {
     }
 
     /**
-     * Cancela la propuesta. Valida que {@code usuario} sea el autor
-     * y que la propuesta esté en estado PENDIENTE.
+     * Cancela la propuesta. Valida que {@code usuario} sea el autor.
      */
     public void cancelar(String perfilId) {
         validarUsuarioAutor(perfilId);

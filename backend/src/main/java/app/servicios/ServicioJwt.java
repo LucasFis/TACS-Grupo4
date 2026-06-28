@@ -24,7 +24,11 @@ public class ServicioJwt {
   private Duration expiration;
 
   /**
-   Metodo que genera un token con UserId, Rol, PerfilId y ColId.
+   * Genera un token JWT con los claims usuarioId, rol, perfilId y colId.
+   *
+   * @param usuario usuario autenticado del cual se extraen id y rol
+   * @param perfil  perfil asociado al usuario del cual se extraen perfilId y colId
+   * @return token JWT firmado con los datos de sesión
    */
   public String generarToken(
       Usuario usuario,
@@ -57,8 +61,8 @@ public class ServicioJwt {
   }
 
   /**
-   * Metodo que firma el token.
-  */
+   * Crea la clave de firma HMAC para el token.
+   */
   private Key getSignKey() {
 
     return Keys.hmacShaKeyFor(
@@ -67,7 +71,7 @@ public class ServicioJwt {
   }
 
   /**
-   * Metodo que valida el token. Valida tanto por expiracion como por firma (si fue modificado).
+   * Método que valida el token. Valida tanto por expiración como por firma (si fue modificado).
    */
   public Claims validarToken(String token) {
 
@@ -79,7 +83,7 @@ public class ServicioJwt {
   }
 
   /**
-   * Metodo que valida el token y devuelve los datos guardados en el.
+   * Método que valida el token y devuelve los datos guardados en el.
    */
   public SesionDto obtenerSesion(String token) {
 
@@ -93,6 +97,12 @@ public class ServicioJwt {
     );
   }
 
+  /**
+   * Parsea el token JWT y devuelve todos sus atributos (claims).
+   *
+   * @param token el token JWT a parsear
+   * @return claims contenidos en el token
+   */
   private Claims obtenerAtributos(String token) {
     return Jwts.parserBuilder()
         .setSigningKey(getSignKey())
@@ -101,21 +111,45 @@ public class ServicioJwt {
         .getBody();
   }
 
+  /**
+   * Extrae el identificador de la colección almacenado en el token JWT.
+   *
+   * @param token el token JWT del cual extraer el claim
+   * @return identificador de la colección
+   */
   public String getColeccionId(String token) {
     return obtenerAtributos(token)
         .get("colId", String.class);
   }
 
+  /**
+   * Extrae el identificador de usuario almacenado en el token JWT.
+   *
+   * @param token el token JWT del cual extraer el claim
+   * @return identificador del usuario
+   */
   public String getUsuarioId(String token) {
     return obtenerAtributos(token)
         .get("usuarioId", String.class);
   }
 
+  /**
+   * Extrae el rol de usuario almacenado en el token JWT.
+   *
+   * @param token el token JWT del cual extraer el claim
+   * @return rol del usuario (ej. "ADMINISTRADOR", "USUARIO")
+   */
   public String getRol(String token) {
     return obtenerAtributos(token)
         .get("rol", String.class);
   }
 
+  /**
+   * Extrae el identificador de perfil almacenado en el token JWT.
+   *
+   * @param token el token JWT del cual extraer el claim
+   * @return identificador del perfil
+   */
   public String getPerfilId(String token) {
     return obtenerAtributos(token)
         .get("perfilId", String.class);

@@ -32,6 +32,17 @@ services:
         catch(e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongodb:27017'}]}) }
     restart: "no"
 
+  mongo-express:
+    image: mongo-express:1
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      mongo-init:
+        condition: service_completed_successfully
+
   backend:
     build:
       context: ./backend
@@ -50,9 +61,12 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       target: dev
+    env_file: .env
     ports:
       - "5173:5173"
     command: npm run dev -- --host
+    environment:
+      - VITE_BACKEND_URI=http://localhost:8080
     depends_on:
       - backend
     develop:
@@ -69,6 +83,5 @@ services:
           path: ./frontend/public
           target: /app/public
           initial_sync: true
-
 volumes:
   mongodb_data_dev:

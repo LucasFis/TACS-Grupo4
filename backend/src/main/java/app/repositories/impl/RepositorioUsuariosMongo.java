@@ -36,4 +36,10 @@ public class RepositorioUsuariosMongo implements RepositorioUsuarios {
     return usuario;
   }
 
+  public boolean existePorNombre(String nombre) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("nombre").is(nombre));
+    return mongoTemplate.exists(query, Usuario.class);
+  }
+
 }

@@ -17,9 +17,21 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Manejador global de excepciones de la API. Captura las excepciones lanzadas
+ * por los controladores y las convierte en respuestas HTTP estructuradas
+ * como {@link ErrorResponse}, con el código de estado, mensaje y timestamp
+ * correspondientes.
+ */
 @RestControllerAdvice
 public class ErrorHandler {
 
+  /**
+   * Maneja errores de recurso no encontrado (404).
+   *
+   * @param ex excepción lanzada
+   * @return respuesta 404 con el mensaje de error
+   */
   @ExceptionHandler(NotFoundException.class)
   public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException ex) {
     ErrorResponse errorResponse = new ErrorResponse(
@@ -33,6 +45,12 @@ public class ErrorHandler {
         .body(errorResponse);
   }
 
+  /**
+   * Maneja errores de solicitud incorrecta (400).
+   *
+   * @param ex excepción lanzada
+   * @return respuesta 400 con el mensaje de error
+   */
   @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<ErrorResponse> handleBadRequest(
       BadRequestException ex
@@ -50,6 +68,12 @@ public class ErrorHandler {
         .body(error);
   }
 
+  /**
+   * Maneja errores de autenticación (401).
+   *
+   * @param ex excepción lanzada
+   * @return respuesta 401 con el mensaje de error
+   */
   @ExceptionHandler(UnauthorizedException.class)
   public ResponseEntity<ErrorResponse> handleUnathorized(
       UnauthorizedException ex
@@ -67,6 +91,12 @@ public class ErrorHandler {
         .body(error);
   }
 
+  /**
+   * Maneja errores de acceso prohibido (403).
+   *
+   * @param ex excepción lanzada
+   * @return respuesta 403 con el mensaje de error
+   */
   @ExceptionHandler(ForbiddenException.class)
   public ResponseEntity<ErrorResponse> handleForbidden(
       ForbiddenException ex
@@ -84,6 +114,13 @@ public class ErrorHandler {
         .body(error);
   }
 
+  /**
+   * Maneja errores de validación de argumentos en los controladores.
+   * Devuelve los errores de campo individuales en el mapa {@code errors}.
+   *
+   * @param ex excepción lanzada por validación fallida
+   * @return respuesta 400 con los errores de validación por campo
+   */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
     Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
@@ -101,6 +138,12 @@ public class ErrorHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
 
+  /**
+   * Maneja errores de tipo inválido en parámetros de ruta o query.
+   *
+   * @param ex excepción lanzada
+   * @return respuesta 400 indicando el parámetro y valor inválido
+   */
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
     ErrorResponse error = new ErrorResponse(
@@ -112,6 +155,12 @@ public class ErrorHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
 
+  /**
+   * Maneja errores de argumento ilegal (400).
+   *
+   * @param ex excepción lanzada
+   * @return respuesta 400 con el mensaje de error
+   */
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
     ErrorResponse error = new ErrorResponse(
@@ -123,6 +172,12 @@ public class ErrorHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
 
+  /**
+   * Maneja errores por cookie faltante en la petición (400).
+   *
+   * @param ex excepción lanzada
+   * @return respuesta 400 indicando la cookie faltante
+   */
   @ExceptionHandler(MissingRequestCookieException.class)
   public ResponseEntity<ErrorResponse> handleMissingCookie(MissingRequestCookieException ex) {
     ErrorResponse error = new ErrorResponse(
@@ -134,6 +189,13 @@ public class ErrorHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
 
+  /**
+   * Maneja cualquier excepción no capturada por los handlers específicos.
+   * Retorna un error 500 genérico.
+   *
+   * @param ex excepción no esperada
+   * @return respuesta 500 con mensaje genérico
+   */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleInternalServerError(
       Exception ex

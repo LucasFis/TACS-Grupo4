@@ -19,6 +19,14 @@ public class ControladorPropuesta {
     private final ServicioPropuesta propuestaService;
     private final ServicioJwt servicioJwt;
 
+    /**
+     * Crea una nueva propuesta de intercambio. Valida que la figurita buscada esté
+     * en los faltantes del autor y que las figuritas ofrecidas existan.
+     *
+     * @param token   token JWT del que se extrae el identificador del perfil autor
+     * @param request datos de la propuesta (destinatario, figurita buscada, figuritas ofrecidas)
+     * @return 201 Created con los datos de la propuesta creada
+     */
     @PostMapping
     public ResponseEntity<PropuestaDto> crearPropuesta(
         @CookieValue("token") String token,
@@ -28,6 +36,13 @@ public class ControladorPropuesta {
         return ResponseEntity.status(201).body(propuestaService.crearPropuesta(autorId, request));
     }
 
+    /**
+     * Obtiene una propuesta de intercambio por su identificador.
+     *
+     * @param token  token JWT del que se extrae el identificador del perfil
+     * @param prop_id identificador de la propuesta
+     * @return 200 OK con los datos de la propuesta (clasificada como ENVIADA o RECIBIDA)
+     */
     @GetMapping("/{prop_id}")
     public ResponseEntity<PropuestaDto> obtenerPropuesta(
             @CookieValue String token,
@@ -37,6 +52,14 @@ public class ControladorPropuesta {
         return ResponseEntity.ok(this.propuestaService.obtenerPorId(prop_id, perfilId));
     }
 
+    /**
+     * Acepta una propuesta de intercambio. Ejecuta el intercambio de figuritas
+     * entre el autor y el destinatario.
+     *
+     * @param token   token JWT del que se extrae el identificador del perfil que acepta
+     * @param prop_id identificador de la propuesta a aceptar
+     * @return 204 No Content si la operación se realizó correctamente
+     */
     @PatchMapping("/{prop_id}/aceptar")
     public ResponseEntity<?> aceptar(
         @CookieValue String token,
@@ -47,6 +70,14 @@ public class ControladorPropuesta {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Rechaza una propuesta de intercambio. Libera las figuritas ofrecidas
+     * que estaban reservadas.
+     *
+     * @param token   token JWT del que se extrae el identificador del perfil que rechaza
+     * @param prop_id identificador de la propuesta a rechazar
+     * @return 204 No Content si la operación se realizó correctamente
+     */
     @PatchMapping("/{prop_id}/rechazar")
     public ResponseEntity<?> rechazar(
         @CookieValue String token,
@@ -57,6 +88,14 @@ public class ControladorPropuesta {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Cancela una propuesta de intercambio. Solo el autor puede cancelarla.
+     * Libera las figuritas ofrecidas que estaban reservadas.
+     *
+     * @param token   token JWT del que se extrae el identificador del perfil autor
+     * @param prop_id identificador de la propuesta a cancelar
+     * @return 204 No Content si la operación se realizó correctamente
+     */
     @PatchMapping("/{prop_id}/cancelar")
     public ResponseEntity<?> cancelar(
         @CookieValue String token,
@@ -67,6 +106,14 @@ public class ControladorPropuesta {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Obtiene las propuestas de intercambio del perfil autenticado, de forma paginada
+     * y filtradas por tipo (ENVIADAS o RECIBIDAS).
+     *
+     * @param token   token JWT del que se extrae el identificador del perfil
+     * @param filtros criterios de filtrado (tipo, paginación)
+     * @return 200 OK con la página de intercambios encontrados
+     */
     @GetMapping()
     public ResponseEntity<PaginaResultado<IntercambioDto>> obtenerPropuestas(
         @CookieValue String token,

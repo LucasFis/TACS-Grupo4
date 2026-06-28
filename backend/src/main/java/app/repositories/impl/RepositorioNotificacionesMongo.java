@@ -26,7 +26,6 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
 
   @Override
   public void guardar(List<Notificacion> notificaciones) {
-
     BulkOperations bulk = mongoTemplate.bulkOps(
         BulkOperations.BulkMode.UNORDERED,
         Notificacion.class
@@ -48,19 +47,18 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
     bulk.execute();
   }
 
-  @Override
-  public List<Notificacion> buscarPorPerfil(Perfil perfil) {
-    Query query = new Query();
-    query.addCriteria(
-        Criteria.where("perfil").is(perfil.getId())
-    );
+    @Override
+    public List<Notificacion> buscarPorPerfil(Perfil perfil) {
+      Query query = new Query();
+      query.addCriteria(
+          Criteria.where("perfil").is(perfil.getId())
+      );
 
-    return this.mongoTemplate.find(query, Notificacion.class);
-  }
+      return this.mongoTemplate.find(query, Notificacion.class);
+    }
 
   @Override
   public List<Notificacion> buscarPorPerfilFechaDesc(String perfilId) {
-
     Query query = new Query();
     query.addCriteria(
         Criteria.where("perfil").is(perfilId)

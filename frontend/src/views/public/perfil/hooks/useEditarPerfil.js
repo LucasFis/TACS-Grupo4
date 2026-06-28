@@ -4,7 +4,7 @@ import { editarContrasenia } from '@/services/usuarioService.js'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 
-export const useEditarPerfil = (perfil) => {
+export const useEditarPerfil = (perfil, columnaContraseniaRef) => {
   const [nombreEditando, setNombreEditando] = useState(perfil.nombre ?? '')
   const [nombreUsuarioEditando, setNombreUsuarioEditando] = useState(perfil.nombre_usuario ?? '')
   const [contraseniaActual, setContraseniaActual] = useState('')
@@ -13,9 +13,17 @@ export const useEditarPerfil = (perfil) => {
   const [guardado, setGuardado] = useState(null)
 
   const { showToast } = useToast()
-  const {handleError} = useError()
+  const { handleError } = useError()
 
   const guardarCambios = async () => {
+    const errores = columnaContraseniaRef.current?.obtenerErrores()
+
+    if (errores?.nombreUsuario || errores?.contraseniaNueva || errores?.contraseniaActual) {
+      columnaContraseniaRef.current?.forzarTocado()
+      showToast('Revisá los campos marcados en rojo', 'error')
+      return
+    }
+
     try {
       await editarPerfil({
         nombre: nombreEditando,

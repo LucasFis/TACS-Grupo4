@@ -15,6 +15,8 @@ class FiguritasFiltroTest {
         10,
         "ARGENTINA",
         "Messi",
+        null,
+        null,
         null
     );
 
@@ -26,7 +28,7 @@ class FiguritasFiltroTest {
 
   @Test
   void deberiaAceptarValoresNull() {
-    FiguritasFiltro filtro = new FiguritasFiltro(null, null, null, null, null);
+    FiguritasFiltro filtro = new FiguritasFiltro(null, null, null, null, null, null, null);
 
     assertNull(filtro.id());
     assertNull(filtro.numero());
@@ -36,8 +38,8 @@ class FiguritasFiltroTest {
 
   @Test
   void deberiaSerIgualSiLosValoresSonIguales() {
-    FiguritasFiltro a = new FiguritasFiltro("1", 10, "ARGENTINA", "Messi", null);
-    FiguritasFiltro b = new FiguritasFiltro("1", 10, "ARGENTINA", "Messi", null);
+    FiguritasFiltro a = new FiguritasFiltro("1", 10, "ARGENTINA", "Messi", null, null, null);
+    FiguritasFiltro b = new FiguritasFiltro("1", 10, "ARGENTINA", "Messi", null, null, null);
 
     assertEquals(a, b);
   }

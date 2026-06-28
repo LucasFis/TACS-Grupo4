@@ -40,6 +40,18 @@ public class ServicioSubasta {
   private final ServicioNotificacion notificacionService;
   private final MeterRegistry meterRegistry;
 
+  /**
+   * Crea una nueva subasta para una figurita repetida del perfil, con una duración
+   * determinada, una lista de figuritas deseadas y una calificación mínima requerida
+   * para participar. Notifica a los perfiles que tienen la figurita como faltante.
+   *
+   * @param perfilId            identificador del perfil que crea la subasta
+   * @param figuritaId          identificador de la figurita a subastar
+   * @param duracionEnHoras     duración de la subasta en horas
+   * @param figuritasDeseadasIds lista de identificadores de figuritas deseadas a cambio
+   * @param calificacionMinima  calificación mínima requerida para ofertar
+   * @throws app.exceptions.NotFoundException si no se encuentra el perfil o alguna figurita
+   */
   @Transactional
   public void crearSubasta(String perfilId, String figuritaId, Integer duracionEnHoras,
                            List<String> figuritasDeseadasIds, Integer calificacionMinima) {
@@ -75,6 +87,18 @@ public class ServicioSubasta {
         interesados, "Encontramos una subasta de una figurita que te falta!");
   }
 
+  /**
+   * Realiza una oferta en una subasta activa ofreciendo un conjunto de figuritas
+   * repetidas a cambio de la figurita subastada. Valida que la subasta esté activa,
+   * que la figurita subastada sea faltante del ofertante y que no haya figuritas repetidas.
+   *
+   * @param autorId        identificador del perfil que realiza la oferta
+   * @param subastaId      identificador de la subasta en la que se oferta
+   * @param rawFiguritasId lista de identificadores de figuritas ofrecidas
+   * @throws app.exceptions.BadRequestException si la subasta no está activa, la figurita
+   *         subastada no es faltante del ofertante, o hay figuritas ofrecidas repetidas
+   * @throws app.exceptions.NotFoundException  si no se encuentra la subasta o alguna figurita
+   */
   @Transactional
   public void ofertarEnSubasta(String autorId, String subastaId, List<String> rawFiguritasId) {
     CamposPerfil conColeccion = new CamposPerfil(true);
@@ -113,6 +137,16 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
+  /**
+   * Modifica las figuritas ofrecidas en una oferta existente dentro de una subasta activa.
+   *
+   * @param perfilId  identificador del perfil propietario de la oferta
+   * @param subastaId identificador de la subasta
+   * @param ofertaId  identificador de la oferta a modificar
+   * @param body      nuevas figuritas ofrecidas
+   * @throws app.exceptions.BadRequestException si la oferta no pertenece al perfil
+   * @throws app.exceptions.NotFoundException  si no se encuentra la subasta o la oferta
+   */
   @Transactional
   public void editarOfertaEnSubasta(String perfilId, String subastaId, String ofertaId, EditarOfertaRequest body) {
     CamposSubasta camposSubasta = new CamposSubasta(true, false);
@@ -138,6 +172,16 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
+  /**
+   * Cancela una oferta existente en una subasta activa, liberando las figuritas
+   * que habían sido reservadas.
+   *
+   * @param perfilId  identificador del perfil que cancela la oferta
+   * @param subastaId identificador de la subasta
+   * @param ofertaId  identificador de la oferta a cancelar
+   * @throws app.exceptions.BadRequestException si la subasta ya cerró
+   * @throws app.exceptions.NotFoundException  si no se encuentra la subasta o la oferta
+   */
   @Transactional
   public void cancelarOferta(String perfilId, String subastaId, String ofertaId) {
     CamposSubasta camposSubasta = new CamposSubasta(true, false);
@@ -156,6 +200,16 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
+  /**
+   * Selecciona una oferta como ganadora de la subasta. El autor de la subasta
+   * elige cuál oferta aceptar.
+   *
+   * @param perfilId  identificador del perfil que selecciona la oferta (autor de la subasta)
+   * @param subastaId identificador de la subasta
+   * @param ofertaId  identificador de la oferta seleccionada
+   * @throws app.exceptions.BadRequestException si la subasta ya cerró
+   * @throws app.exceptions.NotFoundException  si no se encuentra la subasta o la oferta
+   */
   @Transactional
   public void seleccionarOferta( String perfilId, String subastaId, String ofertaId) {
     CamposSubasta camposSubasta = new CamposSubasta(true, false);
@@ -172,6 +226,16 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
+  /**
+   * Rechaza una oferta en una subasta activa, liberando las figuritas que habían
+   * sido reservadas para dicha oferta.
+   *
+   * @param perfilId  identificador del perfil que rechaza la oferta (autor de la subasta)
+   * @param subastaId identificador de la subasta
+   * @param ofertaId  identificador de la oferta a rechazar
+   * @throws app.exceptions.BadRequestException si la subasta ya cerró
+   * @throws app.exceptions.NotFoundException  si no se encuentra la subasta o la oferta
+   */
   @Transactional
   public void rechazarOferta(String perfilId, String subastaId, String ofertaId) {
     CamposSubasta camposSubasta = new CamposSubasta(true, false);
@@ -190,6 +254,15 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
+  /**
+   * Cancela una subasta activa por completo. Libera las figuritas reservadas de
+   * todas las ofertas (excepto las ya canceladas) y las del autor de la subasta.
+   *
+   * @param perfilId  identificador del perfil que cancela la subasta (autor)
+   * @param subastaId identificador de la subasta a cancelar
+   * @throws app.exceptions.BadRequestException si la subasta ya cerró
+   * @throws app.exceptions.NotFoundException  si no se encuentra la subasta
+   */
   @Transactional
   public void cancelarSubasta(String perfilId, String subastaId) {
     CamposSubasta camposSubasta = new CamposSubasta(true, false, true);
@@ -213,6 +286,16 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
+  /**
+   * Cierra una subasta activa. Si hay una oferta seleccionada, ejecuta el intercambio
+   * entre el ganador y el autor. Las ofertas no seleccionadas se rechazan y se liberan
+   * sus figuritas reservadas.
+   *
+   * @param perfilId  identificador del perfil que cierra la subasta (autor)
+   * @param subastaId identificador de la subasta a cerrar
+   * @throws app.exceptions.BadRequestException si la subasta ya cerró
+   * @throws app.exceptions.NotFoundException  si no se encuentra la subasta
+   */
   @Transactional
   public void cerrarSubasta(String perfilId, String subastaId) {
     CamposSubasta camposSubasta = new CamposSubasta(true, false, true);
@@ -268,6 +351,22 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
+  /**
+   * Obtiene las subastas del sistema según los filtros aplicados. El tipo de DTO
+   * varía según el contexto:
+   * <ul>
+   *   <li>Si {@code filtros.participanteId()} no es {@code null}, devuelve subastas
+   *       en las que el perfil participó como {@link app.dto.subasta.SubastaParticipoDto}.</li>
+   *   <li>Si el estado es {@code ACTIVA}, devuelve las subastas activas del perfil
+   *       como {@link app.dto.subasta.MiSubastaActivaDto}.</li>
+   *   <li>En caso contrario, devuelve las subastas finalizadas del perfil como
+   *       {@link app.dto.subasta.MiSubastaFinalizadaDto}.</li>
+   * </ul>
+   *
+   * @param perfilId identificador del perfil que solicita las subastas
+   * @param filtros  criterios de filtrado (estado, participante, paginación)
+   * @return página de subastas según el tipo de vista solicitada
+   */
     public PaginaResultado<?> obtenerSubastas(String perfilId, SubastasFiltro filtros) {
       PaginaResultado<Subasta> resultado = this.repoSubasta.buscarTodos(filtros, new CamposSubasta(true, true));
 
@@ -305,6 +404,14 @@ public class ServicioSubasta {
       }
     }
 
+  /**
+   * Busca la oferta realizada por un perfil dentro de una subasta específica.
+   *
+   * @param perfilId identificador del perfil del cual se busca la oferta
+   * @param subasta  subasta en la cual buscar la oferta
+   * @return la oferta del perfil en la subasta
+   * @throws app.exceptions.NotFoundException si el perfil no tiene una oferta en la subasta
+   */
   private Propuesta obtenerOferta(String perfilId, Subasta subasta) {
     return subasta.getOfertas().stream()
         .filter(p -> p.getAutor().getId().equals(perfilId))
@@ -312,6 +419,13 @@ public class ServicioSubasta {
         .orElseThrow(() -> new NotFoundException("No se encontró oferta del perfil " + perfilId + " en la subasta " + subasta.getId()));
   }
 
+  /**
+   * Obtiene los datos completos de una subasta por su identificador.
+   *
+   * @param subastaId identificador de la subasta a obtener
+   * @return datos de la subasta como {@link SubastaDto}
+   * @throws app.exceptions.NotFoundException si no se encuentra la subasta
+   */
   public SubastaDto obtenerSubasta(String subastaId) {
     Subasta subasta = this.repoSubasta.buscarPorId(subastaId, new CamposSubasta(true, true));
 

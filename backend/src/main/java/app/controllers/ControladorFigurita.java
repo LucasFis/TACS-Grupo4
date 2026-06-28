@@ -19,6 +19,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class ControladorFigurita {
     private final ServicioFigurita figuritaService;
 
+    /**
+     * Obtiene figuritas intercambiables de forma paginada. Si se proporciona
+     * un término de búsqueda {@code q}, realiza una búsqueda por texto libre;
+     * en caso contrario, aplica los filtros individuales (número, selección,
+     * jugador, tipo de intercambio).
+     *
+     * @param q             término de búsqueda por texto libre (opcional)
+     * @param numero        número de la figurita (opcional)
+     * @param seleccion     selección o equipo de la figurita (opcional)
+     * @param jugador       nombre del jugador (opcional)
+     * @param tipo          lista de métodos de intercambio (opcional)
+     * @param pagina        número de página (default: 0)
+     * @param tamanioPagina tamaño de página, acotado a 40 como máximo (default: 12)
+     * @return 200 OK con la página de figuritas intercambiables encontradas
+     */
     @GetMapping("/figuritas/intercambiables")
     public ResponseEntity<PaginaResultado<FiguritaIntercambiableDto>> obtenerFiguritas(
         @RequestParam(required = false) String q,
@@ -40,6 +55,13 @@ public class ControladorFigurita {
         );
     }
 
+    /**
+     * Obtiene la lista de figuritas base (no intercambiables) aplicando los filtros
+     * proporcionados.
+     *
+     * @param filtros criterios de filtrado (número, selección, jugador, etc.)
+     * @return 200 OK con la lista de figuritas base encontradas
+     */
     @GetMapping("/figuritas")
     public ResponseEntity<List<FiguritaDto>> obtenerFiguritasBase(
         @ModelAttribute FiguritasFiltro filtros
