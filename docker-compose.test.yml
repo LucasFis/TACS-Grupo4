@@ -33,6 +33,7 @@ services:
     environment:
       MONGO_URI: mongodb://mongodb-test:27017/tacs-test
       SEED_DATA: "true"
+      SPRING_PROFILES_ACTIVE: test
     command: mvn spring-boot:run
     depends_on:
       mongo-init-test:
