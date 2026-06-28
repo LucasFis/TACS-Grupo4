@@ -10,6 +10,7 @@ import app.model.entities.Perfil;
 import app.model.entities.Rol;
 import app.model.entities.Usuario;
 import app.servicios.ServicioUsuario;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,7 +22,7 @@ class ServicioUsuarioTest extends MongoTestBase {
 
   @BeforeEach
   void setUp() {
-    service = new ServicioUsuario(repositorioUsuarios, repositorioPerfiles, repositorioColecciones);
+    service = new ServicioUsuario(repositorioUsuarios, repositorioPerfiles, repositorioColecciones, new SimpleMeterRegistry());
 
     String contraseniaEncriptada = new BCryptPasswordEncoder().encode("contrasenia123");
     Usuario user = new Usuario("u-1", Rol.USUARIO, "lucas", contraseniaEncriptada);

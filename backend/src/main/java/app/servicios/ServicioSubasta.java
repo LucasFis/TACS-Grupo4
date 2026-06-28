@@ -16,12 +16,16 @@ import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioSubastas;
 import app.repositories.impl.campos.CamposColeccion;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import app.repositories.impl.campos.CamposPerfil;
 import app.repositories.impl.campos.CamposSubasta;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +39,7 @@ public class ServicioSubasta {
   private final RepositorioCalificacion repoCalificacion;
   private final RepositorioColecciones repositorioColecciones;
   private final ServicioNotificacion notificacionService;
+  private final MeterRegistry meterRegistry;
 
   /**
    * Crea una nueva subasta para una figurita repetida del perfil, con una duración
@@ -72,6 +77,7 @@ public class ServicioSubasta {
     nuevaSubasta.reservarFiguritaSubastada();
 
     this.repoSubasta.guardar(nuevaSubasta);
+    meterRegistry.counter("subastas_creadas_total").increment();
     this.repositorioColecciones.guardar(perfil.getColeccion(), new CamposColeccion(true, false));
 
     CamposPerfil conMedio = new CamposPerfil(true);
@@ -127,6 +133,7 @@ public class ServicioSubasta {
         .build();
 
     subasta.agregarOferta(nuevaPropuesta);
+    meterRegistry.counter("propuestas_creadas_total", "metodo", "subasta").increment();
 
     this.repositorioColecciones.guardar(autor.getColeccion(), new CamposColeccion(true, false));
     this.repoSubasta.guardar(subasta, camposSubasta);
@@ -161,6 +168,7 @@ public class ServicioSubasta {
 
     List<Figurita> nuevasFiguritas = this.repoFigurita.buscarPorIds(body.getFiguritasOfrecidasId());
     subasta.modificarFiguritasDeOferta(ofertaId, perfilId, nuevasFiguritas);
+    contarTransicion("pendiente");
 
     this.repositorioColecciones.guardar(coleccion, camposColeccion);
     this.repoSubasta.guardar(subasta, camposSubasta);
@@ -186,6 +194,7 @@ public class ServicioSubasta {
     }
 
     Propuesta oferta = subasta.cancelarOferta(ofertaId, perfilId);
+    contarTransicion("cancelado");
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     this.repositorioColecciones.guardar(oferta.getAutor().getColeccion(), camposColeccion);
@@ -212,7 +221,9 @@ public class ServicioSubasta {
       throw new BadRequestException("La subasta ya cerro");
     }
 
+    Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.seleccionarOferta(ofertaId, perfilId);
+    registrarTransiciones(subasta, estadosAntes);
 
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
@@ -237,6 +248,7 @@ public class ServicioSubasta {
     }
 
     Propuesta oferta = subasta.rechazarOferta(ofertaId, perfilId);
+    contarTransicion("rechazado");
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     this.repositorioColecciones.guardar(oferta.getAutor().getColeccion(), camposColeccion);
@@ -260,7 +272,10 @@ public class ServicioSubasta {
     if (!subasta.estaActivo()) {
       throw new BadRequestException("La subasta ya cerro");
     }
+    Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cancelar(perfilId);
+    registrarTransiciones(subasta, estadosAntes);
+    registrarCierreSubasta(subasta, "cancelada");
 
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     subasta.getOfertas().stream()
@@ -318,7 +333,10 @@ public class ServicioSubasta {
           o.getAutor().setColeccion(col);
         });
 
+    Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cerrar(perfilId);
+    registrarTransiciones(subasta, estadosAntes);
+    registrarCierreSubasta(subasta, seleccionada != null ? "adjudicada" : "sin_oferta");
 
     subasta.getOfertas().stream()
         .filter(o -> seleccionada == null || !o.getId().equals(seleccionada.getId()))
@@ -414,6 +432,43 @@ public class ServicioSubasta {
     Subasta subasta = this.repoSubasta.buscarPorId(subastaId, new CamposSubasta(true, true));
 
     return new SubastaDto(subasta);
+  }
+
+  /**
+   * Única fuente del contador de transiciones de ofertas de subasta: centraliza nombre de
+   * métrica y tags ({@code origen=subasta}) para que las series no diverjan entre los
+   * caminos manuales (editar/cancelar/rechazar oferta) y los por snapshot (cerrar/cancelar/
+   * seleccionar subasta). Ningún camino usa los dos, así que no hay doble conteo.
+   */
+  private void contarTransicion(String estado) {
+    meterRegistry.counter("propuestas_transiciones_total", "estado", estado, "origen", "subasta").increment();
+  }
+
+  private void registrarTransicion(EstadoProceso antes, EstadoProceso despues) {
+    if (antes != despues) {
+      contarTransicion(despues.name().toLowerCase());
+    }
+  }
+
+  private Map<String, EstadoProceso> snapshotEstados(Subasta subasta) {
+    return subasta.getOfertas().stream()
+        .collect(Collectors.toMap(Propuesta::getId, o -> o.getEstadoActual().getValor()));
+  }
+
+  private void registrarTransiciones(Subasta subasta, Map<String, EstadoProceso> antes) {
+    subasta.getOfertas().forEach(o ->
+        registrarTransicion(antes.get(o.getId()), o.getEstadoActual().getValor()));
+  }
+
+  /**
+   * Registra el cierre de una subasta: el contador de resultado, la duración (inicio→cierre)
+   * y cuántas ofertas recibió. Engagement + "¿cumplió su propósito?". Tags de conjunto cerrado.
+   */
+  private void registrarCierreSubasta(Subasta subasta, String resultado) {
+    meterRegistry.counter("subastas_finalizadas_total", "resultado", resultado).increment();
+    meterRegistry.timer("subastas_duracion_segundos", "resultado", resultado)
+        .record(Duration.between(subasta.getFechaInicio(), subasta.getFechaCierre()));
+    meterRegistry.summary("subastas_ofertas_recibidas").record(subasta.getOfertas().size());
   }
 }
 

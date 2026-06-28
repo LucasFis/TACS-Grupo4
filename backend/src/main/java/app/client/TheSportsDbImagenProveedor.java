@@ -3,10 +3,17 @@ package app.client;
 import app.client.dto.TheSportsDbPlayerDto;
 import app.client.dto.TheSportsDbResponse;
 import app.exceptions.RateLimitException;
+import io.github.resilience4j.micrometer.tagged.TaggedRateLimiterMetrics;
+import io.github.resilience4j.micrometer.tagged.TaggedRetryMetrics;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.text.Normalizer;
 import java.time.Duration;
 import java.util.List;
@@ -32,10 +39,14 @@ public class TheSportsDbImagenProveedor implements ImagenJugadorProveedor {
   private final Retry retry;
   private final String baseUrl;
   private final String apiKey;
+  private final MeterRegistry meterRegistry;
 
   @Autowired
   public TheSportsDbImagenProveedor(
       RestTemplateBuilder builder,
+      RateLimiterRegistry rateLimiterRegistry,
+      RetryRegistry retryRegistry,
+      MeterRegistry meterRegistry,
       @Value("${thesportsdb.base-url}") String baseUrl,
       @Value("${thesportsdb.api-key}") String apiKey,
       @Value("${thesportsdb.rpm:30}") int rpm,
@@ -44,12 +55,16 @@ public class TheSportsDbImagenProveedor implements ImagenJugadorProveedor {
 
     this.baseUrl = baseUrl;
     this.apiKey = apiKey;
-    this.rateLimiter = crearRateLimiter(rpm);
-    this.retry = crearRetry(maxAttempts, waitSeconds);
+    this.meterRegistry = meterRegistry;
+    this.rateLimiter = crearRateLimiter(rateLimiterRegistry, rpm);
+    this.retry = crearRetry(retryRegistry, maxAttempts, waitSeconds);
     this.restTemplate = builder
         .setConnectTimeout(Duration.ofSeconds(3))
         .setReadTimeout(Duration.ofSeconds(3))
         .build();
+
+    TaggedRateLimiterMetrics.ofRateLimiterRegistry(rateLimiterRegistry).bindTo(meterRegistry);
+    TaggedRetryMetrics.ofRetryRegistry(retryRegistry).bindTo(meterRegistry);
   }
 
   /**
@@ -59,8 +74,9 @@ public class TheSportsDbImagenProveedor implements ImagenJugadorProveedor {
     this.restTemplate = restTemplate;
     this.baseUrl = baseUrl;
     this.apiKey = apiKey;
-    this.rateLimiter = crearRateLimiter(Integer.MAX_VALUE);
-    this.retry = crearRetry(1, 0);
+    this.meterRegistry = new SimpleMeterRegistry();
+    this.rateLimiter = crearRateLimiter(RateLimiterRegistry.ofDefaults(), Integer.MAX_VALUE);
+    this.retry = crearRetry(RetryRegistry.ofDefaults(), 1, 0);
   }
 
   @Override
@@ -83,25 +99,39 @@ public class TheSportsDbImagenProveedor implements ImagenJugadorProveedor {
   private Optional<String> buscarImagenInterna(String nombreJugador) {
     String url = String.format("%s/%s/searchplayers.php?p=%s", baseUrl, apiKey, normalizarNombre(nombreJugador));
 
+    Timer.Sample sample = Timer.start(meterRegistry);
     try {
       TheSportsDbResponse response = restTemplate.getForObject(url, TheSportsDbResponse.class);
       Optional<String> thumb = extraerThumb(response);
       if (thumb.isPresent()) {
-        //log.info("200 OK - imagen encontrada: {}", nombreJugador);
+        log.info("200 OK - imagen encontrada: {}", nombreJugador);
+        registrarTiempo(sample, "encontrada");
       } else {
-        //log.warn("200 OK - sin imagen: {}", nombreJugador);
+        log.warn("200 OK - sin imagen: {}", nombreJugador);
+        registrarTiempo(sample, "no_encontrada");
       }
       return thumb;
     } catch (HttpClientErrorException e) {
       log.error("{} - {}", e.getStatusCode().value(), nombreJugador);
       if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+        registrarTiempo(sample, "rate_limited");
         throw new RateLimitException("Rate limit alcanzado para TheSportsDB (HTTP 429)");
       }
+      registrarTiempo(sample, "error");
       return Optional.empty();
     } catch (Exception e) {
       log.error("Error inesperado buscando imagen de {}: {}", nombreJugador, e.getMessage());
+      registrarTiempo(sample, "error");
       return Optional.empty();
     }
+  }
+
+  /**
+   * Registra la duración de la búsqueda con el desenlace de negocio como tag, sin exponer
+   * el nombre del jugador ni la URL con la API key (cardinalidad cerrada en {@code resultado}).
+   */
+  private void registrarTiempo(Timer.Sample sample, String resultado) {
+    sample.stop(meterRegistry.timer("thesportsdb_busqueda_imagen_seconds", "resultado", resultado));
   }
 
   /**
@@ -134,19 +164,19 @@ public class TheSportsDbImagenProveedor implements ImagenJugadorProveedor {
         : Optional.empty();
   }
 
-  private static RateLimiter crearRateLimiter(int rpm) {
+  private static RateLimiter crearRateLimiter(RateLimiterRegistry registry, int rpm) {
     // 1 permiso cada (60/rpm) segundos — emite permisos de a uno, espaciados uniformemente.
     // Ej: 30rpm → 1 permiso cada 2s. Evita consumir todos los permisos de golpe.
     long segundosEntreRequests = Math.max(1L, 60L / rpm);
-    return RateLimiter.of("thesportsdb", RateLimiterConfig.custom()
+    return registry.rateLimiter("thesportsdb", RateLimiterConfig.custom()
         .limitForPeriod(1)
         .limitRefreshPeriod(Duration.ofSeconds(segundosEntreRequests))
         .timeoutDuration(Duration.ofSeconds(segundosEntreRequests + 1))
         .build());
   }
 
-  private static Retry crearRetry(int maxAttempts, long waitSeconds) {
-    return Retry.of("thesportsdb", RetryConfig.custom()
+  private static Retry crearRetry(RetryRegistry registry, int maxAttempts, long waitSeconds) {
+    return registry.retry("thesportsdb", RetryConfig.custom()
         .maxAttempts(maxAttempts)
         .waitDuration(Duration.ofSeconds(waitSeconds))
         .retryOnException(e -> e instanceof RateLimitException)

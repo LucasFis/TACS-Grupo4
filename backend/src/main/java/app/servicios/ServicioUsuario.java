@@ -11,6 +11,7 @@ import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioUsuarios;
 import app.repositories.impl.campos.CamposPerfil;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,7 @@ public class ServicioUsuario {
   private final RepositorioUsuarios repositorioUsuarios;
   private final RepositorioPerfiles repositorioPerfiles;
   private final RepositorioColecciones repositorioColecciones;
+  private final MeterRegistry meterRegistry;
 
   /**
    * Registra un nuevo usuario con rol {@link Rol#USUARIO}. Crea la cuenta de usuario,
@@ -101,6 +103,7 @@ public class ServicioUsuario {
     }
 
     this.repositorioUsuarios.guardar(usuarioNuevo);
+    meterRegistry.counter("usuarios_registrados_total", "rol", usuarioNuevo.getRol().name().toLowerCase()).increment();
 
     Coleccion coleccion = new Coleccion();
 
