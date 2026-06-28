@@ -18,7 +18,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          CONFIG.MODEL: groq/llama-3.3-70b-versatile
-          CONFIG.MODEL_TURBO: groq/llama-3.3-70b-versatile
+          CONFIG.MODEL: groq/llama-3.1-8b-instant
+          CONFIG.MODEL_TURBO: groq/llama-3.1-8b-instant
           CONFIG.FALLBACK_MODELS: "[]"
           github_action_config.auto_review: "true"
