@@ -8,6 +8,7 @@ import app.servicios.ServicioEstadisticas;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioSesion;
 import jakarta.servlet.http.HttpServletResponse;
+import app.dto.request.FiltroFechasRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -37,18 +38,13 @@ public class ControladorSesion {
     @GetMapping("/administrador/estadisticas")
     public ResponseEntity<EstadisticasDto> obtenerEstadisticas(
         @CookieValue("token") String token,
-        @RequestParam(required = false) String desde,
-        @RequestParam(required = false) String hasta
+        @ModelAttribute @jakarta.validation.Valid FiltroFechasRequest filtro
     ) {
-        if (desde == null || hasta == null) {
-            throw new BadRequestException("Los parámetros 'desde' y 'hasta' son requeridos");
-        }
-
         LocalDate fechaDesde;
         LocalDate fechaHasta;
         try {
-            fechaDesde = LocalDate.parse(desde);
-            fechaHasta = LocalDate.parse(hasta);
+            fechaDesde = LocalDate.parse(filtro.desde());
+            fechaHasta = LocalDate.parse(filtro.hasta());
         } catch (DateTimeParseException e) {
             throw new BadRequestException("Formato de fecha inválido. Use YYYY-MM-DD");
         }

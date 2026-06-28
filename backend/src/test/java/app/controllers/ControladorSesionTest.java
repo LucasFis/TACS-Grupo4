@@ -56,12 +56,36 @@ class ControladorSesionTest {
   }
 
   @Test
-  void obtenerEstadisticas_sinParams_retorna400() throws Exception {
+  void obtenerEstadisticas_sinDesde_retorna400ConMensaje() throws Exception {
+    mockMvc.perform(
+            get("/administrador/estadisticas")
+                .param("hasta", "2025-06-15")
+                .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors.desde").value("el parámetro 'desde' es requerido"));
+  }
+
+  @Test
+  void obtenerEstadisticas_sinHasta_retorna400ConMensaje() throws Exception {
+    mockMvc.perform(
+            get("/administrador/estadisticas")
+                .param("desde", "2025-06-01")
+                .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors.hasta").value("el parámetro 'hasta' es requerido"));
+  }
+
+  @Test
+  void obtenerEstadisticas_sinParams_retorna400ConAmbosErrores() throws Exception {
     mockMvc.perform(
             get("/administrador/estadisticas")
                 .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
         )
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors.desde").value("el parámetro 'desde' es requerido"))
+        .andExpect(jsonPath("$.errors.hasta").value("el parámetro 'hasta' es requerido"));
   }
 
   @Test
