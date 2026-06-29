@@ -134,7 +134,7 @@ class RepositorioSubastasTest extends MongoTestBase {
         );
 
         SubastasFiltro filtros =
-            new SubastasFiltro(1,10,null,null,null);
+            new SubastasFiltro(1,10,null,null,null, null, null);
 
         PaginaResultado<Subasta> resultado =
             repositorioSubastas.buscarTodos(filtros, new CamposSubasta(true, true));
@@ -169,6 +169,8 @@ class RepositorioSubastasTest extends MongoTestBase {
                 1,
                 10,
                 p1.getId(),
+                null,
+                null,
                 null,
                 null
             );
@@ -210,7 +212,9 @@ class RepositorioSubastasTest extends MongoTestBase {
                 10,
                 null,
                 null,
-                "ACTIVA"
+                "ACTIVA",
+                null,
+                null
             );
 
         PaginaResultado<Subasta> resultado =
@@ -250,7 +254,9 @@ class RepositorioSubastasTest extends MongoTestBase {
                 10,
                 null,
                 null,
-                "FINALIZADA"
+                "FINALIZADA",
+                null,
+                null
             );
 
         PaginaResultado<Subasta> resultado =
@@ -297,6 +303,8 @@ class RepositorioSubastasTest extends MongoTestBase {
                 10,
                 null,
                 participante.getId(),
+                null,
+                null,
                 null
             );
 
@@ -344,6 +352,8 @@ class RepositorioSubastasTest extends MongoTestBase {
             new SubastasFiltro(
                 2,
                 2,
+                null,
+                null,
                 null,
                 null,
                 null
