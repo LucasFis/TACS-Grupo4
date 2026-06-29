@@ -2,7 +2,7 @@ package app.servicios;
 
 import app.dto.request.UsuarioRequest;
 import app.exceptions.BadRequestException;
-import app.exceptions.UnauthorizedException;
+import app.exceptions.ForbiddenException;
 import app.model.entities.Coleccion;
 import app.model.entities.Perfil;
 import app.model.entities.Rol;
@@ -41,22 +41,22 @@ public class ServicioUsuario {
     this.registrar(request);
   }
 
-  /**
-   * Registra un nuevo administrador. Solo puede ser invocada por otro administrador.
-   *
-   * @param request datos del usuario administrador a registrar
-   * @param rol     rol que debe ser {@link Rol#ADMINISTRADOR} para autorizar el registro
-   * @throws app.exceptions.UnauthorizedException si el rol proporcionado no es ADMINISTRADOR
-   * @throws app.exceptions.BadRequestException   si el nombre de usuario ya está en uso
-   */
-  public void registrarAdministrador(UsuarioRequest request, Rol rol) {
+    /**
+     * Registra un nuevo administrador. Solo puede ser invocada por otro administrador.
+     *
+     * @param request datos del usuario administrador a registrar
+     * @param rol     rol que debe ser {@link Rol#ADMINISTRADOR} para autorizar el registro
+     * @throws app.exceptions.ForbiddenException si el rol proporcionado no es ADMINISTRADOR
+     * @throws app.exceptions.BadRequestException   si el nombre de usuario ya está en uso
+     */
+    public void registrarAdministrador(UsuarioRequest request, Rol rol) {
 
-    if(rol == Rol.ADMINISTRADOR) {
-      this.registrar(request);
-    } else {
-      throw new UnauthorizedException("Acceso denegado por rol invalido");
+        if(rol == Rol.ADMINISTRADOR) {
+            this.registrar(request);
+        } else {
+            throw new ForbiddenException("Acceso denegado por rol invalido");
+        }
     }
-  }
 
   /**
    * Cambia la contraseña de un usuario. Valida que la contraseña actual sea correcta
