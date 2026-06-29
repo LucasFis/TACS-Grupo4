@@ -5,7 +5,7 @@ import ColumnaDatosPerfil from './ColumnaDatosPerfil.jsx'
 import ColumnaContrasenia from './ColumnaContrasenia.jsx'
 import styles from './ModalEditarPerfil.module.css'
 
-const ModalEditarPerfil = ({ perfil, reviews, promedio, onGuardar, onCerrar }) => {
+const ModalEditarPerfil = ({ perfil, reviews, promedio, esAdmin, onGuardar, onCerrar }) => {
   const columnaContraseniaRef = useRef(null)
 
   const {
@@ -42,12 +42,14 @@ const ModalEditarPerfil = ({ perfil, reviews, promedio, onGuardar, onCerrar }) =
             <div>
               <div className={styles['preview-nombre']}>{perfil.nombre}</div>
               <div className={styles['preview-usuario']}>@{perfil.nombre_usuario}</div>
-              <div className={styles['preview-rating']}>
-                <Estrellas calificacion={perfil.calificacion_media} />
-                <span className={styles['preview-rating-count']}>
-                  {promedio} ({reviews.cantidad_de_elementos ?? 0})
-                </span>
-              </div>
+              {!esAdmin && (
+                <div className={styles['preview-rating']}>
+                  <Estrellas calificacion={perfil.calificacion_media} />
+                  <span className={styles['preview-rating-count']}>
+                    {promedio} ({reviews.cantidad_de_elementos ?? 0})
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

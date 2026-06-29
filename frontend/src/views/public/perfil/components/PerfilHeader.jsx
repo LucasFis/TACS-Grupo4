@@ -7,6 +7,7 @@ const PerfilHeader = ({
   promedio,
   reviews,
   perfilId,
+  esAdmin,
   onEditarClick,
   onCerrarSesionClick,
 }) => {
@@ -33,10 +34,12 @@ const PerfilHeader = ({
             ) : (
               <>
                 <h2 className={`mb-0 fw-bold ${styles.nombre}`}>{perfil?.nombre}</h2>
-                <div className="d-flex align-items-center gap-1">
-                  <Estrellas calificacion={promedio} mostrarNumero={true} varianteNumero="blanco"/>
-                  <span>({reviews.cantidad_de_elementos})</span>
-                </div>
+                {!esAdmin && (
+                  <div className="d-flex align-items-center gap-1">
+                    <Estrellas calificacion={promedio} mostrarNumero={true} varianteNumero="blanco"/>
+                    <span>({reviews.cantidad_de_elementos})</span>
+                  </div>
+                )}
               </>
             )}
           </div>
