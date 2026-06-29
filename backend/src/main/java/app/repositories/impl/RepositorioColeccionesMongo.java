@@ -474,18 +474,14 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     operaciones.addAll(ops);
     operaciones.add(Aggregation.skip((long) (pagina - 1) * limite));
     operaciones.add(Aggregation.limit(limite));
-    operaciones.add(Aggregation.lookup(
-        "perfiles",
-        "repetidas.perfilId",
-        "_id",
-        "perfil"
-    ));
-    operaciones.add(Aggregation.unwind("perfil", true));
-    operaciones.add(Aggregation.project()
-        .and("repetidas").as("figurita")
-        .and("perfil._id").as("perfilId")
-        .and("perfil.nombre").as("perfilNombre")
-        .and("perfil.calificacionMedia").as("perfilCalificacionMedia"));
+
+    operaciones.addAll(obtenerLookupPerfilCompatible());
+
+      operaciones.add(Aggregation.project()
+              .and("repetidas").as("figurita")
+              .and("perfil._id").as("perfilId")
+              .and("perfil.nombre").as("perfilNombre")
+              .and("perfil.calificacionMedia").as("perfilCalificacionMedia"));
 
     return mongoTemplate.aggregate(
         Aggregation.newAggregation(operaciones),
@@ -542,6 +538,79 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
         .map(doc -> converter.read(FiguritaIntercambiable.class, doc))
         .toList();
   }
+
+    /**
+     * Construye las etapas de agregación necesarias para obtener el perfil
+     * asociado a una figurita intercambiable soportando ambos formatos
+     * históricos de almacenamiento del identificador.
+     *
+     * <p>La aplicación convivió con dos representaciones distintas del
+     * {@code perfilId} dentro de {@code repetidas}:
+     *
+     * <ul>
+     *   <li>Como {@link org.bson.types.ObjectId} almacenado en la colección
+     *       {@code perfiles}.</li>
+     *   <li>Como {@link String} dentro del documento embebido
+     *       {@code repetidas.perfilId}.</li>
+     * </ul>
+     *
+     * <p>Para mantener compatibilidad con ambas versiones se realizan dos
+     * {@code $lookup}: uno utilizando el valor original y otro convirtiéndolo
+     * previamente a {@code ObjectId}. Luego se selecciona automáticamente el
+     * resultado que haya producido coincidencias.
+     *
+     * @return etapas de agregación para incorporar el perfil asociado al
+     *         documento actual.
+     */
+    private List<AggregationOperation> obtenerLookupPerfilCompatible() {
+        List<AggregationOperation> operaciones = new ArrayList<>();
+
+        operaciones.add(context ->
+                new Document("$addFields",
+                        new Document("perfilObjectId",
+                                new Document("$convert",
+                                        new Document("input", "$repetidas.perfilId")
+                                                .append("to", "objectId")
+                                                .append("onError", null)
+                                                .append("onNull", null)
+                                )
+                        )
+                )
+        );
+
+        operaciones.add(Aggregation.lookup(
+                "perfiles",
+                "repetidas.perfilId",
+                "_id",
+                "perfilString"
+        ));
+
+        operaciones.add(Aggregation.lookup(
+                "perfiles",
+                "perfilObjectId",
+                "_id",
+                "perfilObject"
+        ));
+
+        operaciones.add(context ->
+                new Document("$addFields",
+                        new Document("perfil",
+                                new Document("$cond", List.of(
+                                        new Document("$gt", List.of(
+                                                new Document("$size", "$perfilObject"),
+                                                0
+                                        )),
+                                        "$perfilObject",
+                                        "$perfilString"
+                                ))
+                        )
+                )
+        );
+
+        operaciones.add(Aggregation.unwind("perfil", true));
+
+        return operaciones;
+    }
 
   /**
    * Convierte documentos de agregación en proyecciones {@link FiguritaIntercambiableConPerfil},

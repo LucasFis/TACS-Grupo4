@@ -37,4 +37,9 @@ public interface RepositorioSubastas {
      * @return lista de subastas activas que coinciden con las figuritas indicadas
      */
     List<Subasta> buscarActivasPorFiguritasSubastadas(List<String> figuritaIds);
+
+    /**
+     * Devuelve todas las subastas que actualmente se encuentran activas.
+     */
+    List<Subasta> buscarActivas();
 }

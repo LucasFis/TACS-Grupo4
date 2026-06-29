@@ -12,6 +12,12 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import app.model.entities.Propuesta;
+import app.model.entities.Subasta;
+import app.servicios.ServicioNotificacion;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import app.repositories.RepositorioSubastas;
 
 import java.util.List;
 
@@ -22,6 +28,8 @@ public class Cronjobs implements ApplicationRunner {
 
   private final RepositorioPerfiles repositorioPerfiles;
   private final RepositorioSugerencias repositorioSugerencias;
+  private final RepositorioSubastas repoSubasta;
+  private final ServicioNotificacion notificacionService;
 
   // Corre al inicio
   @Override
@@ -40,5 +48,37 @@ public class Cronjobs implements ApplicationRunner {
       List<Sugerencia> sugerencias = this.repositorioSugerencias.generarSugerencias(perfil);
       this.repositorioSugerencias.guardar(sugerencias);
     });
+  }
+
+  // Corre cada 10 minutos. Se avisan todas las subastas que terminan en <1hora.
+  @Scheduled(cron = "0 */10 * * * *")
+  public void avisarSubastasPorFinalizar() {
+
+      List<Subasta> subastas = repoSubasta.buscarActivas();
+
+      for(Subasta subasta : subastas){
+
+          if(subasta.isAvisoFinalEnviado())
+              continue;
+
+          if (subasta.necesitaAvisoFinal()) {
+
+              List<Perfil> interesados = subasta.getOfertas()
+                              .stream()
+                              .map(Propuesta::getAutor)
+                              .toList();
+
+              notificacionService.notificarInteresados(
+                      interesados,
+                      "La subasta de la figurita #" +
+                              subasta.getFiguritaSubastada().getNumero() +
+                              " finaliza en menos de una hora.",
+                      "/subastas/" + subasta.getId()
+              );
+
+              subasta.setAvisoFinalEnviado(true);
+              repoSubasta.guardar(subasta);
+          }
+      }
   }
 }

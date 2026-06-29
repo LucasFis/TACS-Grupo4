@@ -335,6 +335,14 @@ public class ServicioSubasta {
 
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cerrar(perfilId);
+      if (seleccionada != null) {
+          notificacionService.notificarInteresados(
+                  List.of(seleccionada.getAutor()),
+                  "¡Felicitaciones! Ganaste la subasta de la figurita #" +
+                          subasta.getFiguritaSubastada().getNumero(),
+                  "/subastas/" + subasta.getId()
+          );
+      }
     registrarTransiciones(subasta, estadosAntes);
     registrarCierreSubasta(subasta, seleccionada != null ? "adjudicada" : "sin_oferta");
 
