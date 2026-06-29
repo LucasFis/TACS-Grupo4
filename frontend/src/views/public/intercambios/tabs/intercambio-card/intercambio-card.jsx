@@ -14,6 +14,7 @@ import { useState } from 'react'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { construirAdvertenciaConflictos } from '@/utils/conflictos.js'
 
 const ChipFigurita = ({ figurita }) => (
   <div className="border rounded p-2 mb-1 d-flex align-items-center gap-2">
@@ -48,9 +49,7 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
   const puedeAceptar = esRecibida && estado === 'PENDIENTE'
   const puedeCalificar = estado === 'ACEPTADO' && !intercambio.ya_calificado
 
-  const advertencia = conflictosData?.tieneConflictos
-    ? conflictosData.figuritasEnConflicto.map(f => f.jugador).join(', ') + ' también está' + (conflictosData.figuritasEnConflicto.length > 1 ? 'n' : '') + ' involucrada' + (conflictosData.figuritasEnConflicto.length > 1 ? 's' : '') + ' en otras transacciones pendientes.'
-    : null
+  const advertencia = construirAdvertenciaConflictos(conflictosData)
 
   const ejecutarCancelar = async () => {
     try {

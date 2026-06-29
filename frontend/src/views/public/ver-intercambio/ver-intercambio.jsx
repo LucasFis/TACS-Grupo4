@@ -20,6 +20,7 @@ import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { construirAdvertenciaConflictos } from '@/utils/conflictos.js'
 
 const VerIntercambio = () => {
   const { intercambioId } = useParams()
@@ -207,10 +208,7 @@ const VerIntercambio = () => {
         labelConfirmar="Aceptar"
         onConfirmar={ejecutarAceptar}
         onCancelar={() => { setShowConfirmAceptar(false); setConflictosData(null) }}
-        advertencia={conflictosData?.tieneConflictos
-          ? conflictosData.figuritasEnConflicto.map(f => f.jugador).join(', ') + ' también está' + (conflictosData.figuritasEnConflicto.length > 1 ? 'n' : '') + ' involucrada' + (conflictosData.figuritasEnConflicto.length > 1 ? 's' : '') + ' en otras transacciones pendientes.'
-          : null
-        }
+        advertencia={construirAdvertenciaConflictos(conflictosData)}
       />
     </div>
   )
