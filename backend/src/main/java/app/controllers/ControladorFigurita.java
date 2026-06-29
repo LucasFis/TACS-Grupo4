@@ -50,6 +50,7 @@ public class ControladorFigurita {
                 figuritaService.buscarPorQuery(q, tipo, pagina, tamanioDePaginaAcotado)
             );
         }
+
         return ResponseEntity.ok(
             figuritaService.buscarFiguritas(numero, seleccion, jugador, tipo, pagina, tamanioDePaginaAcotado)
         );

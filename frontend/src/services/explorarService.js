@@ -38,6 +38,7 @@ export const explorarFiguritas = async ({
       totalElements: data.cantidad_de_elementos,
       totalPages: data.cantidad_de_paginas,
     }
+
   } catch (error) {
     handleAxiosError(error)
   }
