@@ -9,7 +9,7 @@ const RutaProtegida = () => {
     if (!user) return <Navigate to="/acceso-denegado" replace />;
 
     if (user.rol === "ADMINISTRADOR" && !location.pathname.startsWith("/perfil"))
-        return <Navigate to="/acceso-denegado" replace />;
+        return <Navigate to="/estadisticas" replace />;
 
     return <Outlet />;
 }
