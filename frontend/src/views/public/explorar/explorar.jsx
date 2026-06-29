@@ -9,7 +9,6 @@ import styles from './explorar.module.css'
 const FILTROS_INICIAL = { q: '', tipos: [], jugador: '', seleccion: '', numero: '' }
 
 const Explorar = () => {
-  throw new Error('test')
   const resultadosRef = useRef(null)
   const heroInputRef = useRef(null)
   const [filtros, setFiltros] = useState(FILTROS_INICIAL)
