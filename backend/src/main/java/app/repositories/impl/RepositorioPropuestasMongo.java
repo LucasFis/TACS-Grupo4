@@ -89,4 +89,18 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
     public int contar() {
         return (int) this.mongoTemplate.count(new Query(), Propuesta.class);
     }
+
+    @Override
+    public int contarConflictos(String figuritaId, String perfilId, String excluirPropuestaId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").ne(excluirPropuestaId));
+        query.addCriteria(Criteria.where("estadoActual.valor").is("PENDIENTE"));
+        query.addCriteria(new Criteria().orOperator(
+            Criteria.where("figuritaBuscada.$id").is(figuritaId)
+                .and("autor.id").is(perfilId),
+            Criteria.where("figuritasOfrecidas.$id").is(figuritaId)
+                .and("destinatario.id").is(perfilId)
+        ));
+        return (int) this.mongoTemplate.count(query, Propuesta.class);
+    }
 }

@@ -16,9 +16,13 @@ import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioPropuestas;
+import app.repositories.RepositorioSubastas;
 import app.exceptions.NotFoundException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.repositories.impl.campos.CamposPerfil;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -34,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioPropuesta {
 
   private final RepositorioPropuestas repositorioPropuestas;
+  private final RepositorioSubastas repositorioSubastas;
   private final RepositorioPerfiles repositorioPerfiles;
   private final RepositorioFiguritas repositorioFiguritas;
   private final RepositorioColecciones repositorioColecciones;
@@ -199,6 +204,39 @@ public class ServicioPropuesta {
     repositorioColecciones.guardar(autor.getColeccion());
 
     this.repositorioPropuestas.guardar(propuesta);
+  }
+
+  /**
+   * Verifica si las figuritas que el destinatario va a recibir en una propuesta
+   * también están involucradas en otras transacciones pendientes del mismo perfil
+   * (propuestas como autor/destinatario y subastas activas con oferta pendiente).
+   *
+   * @param propuestaId identificador de la propuesta a verificar
+   * @param perfilId    identificador del perfil que va a aceptar (destinatario)
+   * @return mapa con "tieneConflictos" (boolean) y "figuritasEnConflicto" (lista con id y jugador)
+   */
+  public Map<String, Object> verificarConflictos(String propuestaId, String perfilId) {
+    Propuesta propuesta = repositorioPropuestas.buscarPorId(propuestaId);
+    List<Figurita> recibidas = propuesta.getFiguritasOfrecidas();
+
+    List<Map<String, String>> figuritasEnConflicto = new ArrayList<>();
+
+    for (Figurita figurita : recibidas) {
+      int total = repositorioPropuestas.contarConflictos(figurita.getId(), perfilId, propuestaId)
+          + repositorioSubastas.contarActivasConOfertaPendiente(figurita.getId(), perfilId);
+
+      if (total > 0) {
+        Map<String, String> entry = new HashMap<>();
+        entry.put("id", figurita.getId());
+        entry.put("jugador", figurita.getJugador());
+        figuritasEnConflicto.add(entry);
+      }
+    }
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("tieneConflictos", !figuritasEnConflicto.isEmpty());
+    result.put("figuritasEnConflicto", figuritasEnConflicto);
+    return result;
   }
 
   /**

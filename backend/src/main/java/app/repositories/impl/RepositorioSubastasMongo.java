@@ -201,6 +201,29 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
     }
   }
 
+  @Override
+  public int contarActivasConOfertaPendiente(String figuritaId, String perfilId) {
+    Date ahora = new Date();
+    DBRef autorRef = new DBRef("perfiles", perfilId);
+
+    Query query = new Query();
+    query.addCriteria(new Criteria().andOperator(
+        Criteria.where("figuritaSubastada.$id").is(figuritaId),
+        Criteria.where("fechaInicio").lte(ahora),
+        Criteria.where("fechaCierre").gt(ahora),
+        Criteria.where("ofertas").elemMatch(
+            new Criteria().andOperator(
+                Criteria.where("autor").is(autorRef),
+                new Criteria().orOperator(
+                    Criteria.where("estadoActual.valor").is("PENDIENTE"),
+                    Criteria.where("estadoActual.valor").is("SELECCIONADO")
+                )
+            )
+        )
+    ));
+    return (int) mongoTemplate.count(query, Subasta.class);
+  }
+
   private Subasta normalizar(Subasta subasta) {
     if(subasta.getOfertas() == null) {
       subasta.setOfertas(new ArrayList<>());
