@@ -14,9 +14,10 @@
     border-radius: 100%;
 }
 
-.ofertaCard:first-child, .ofertaCard:first-child .position {
-    background-color: rgba(144, 238, 144, 0.2);
-    border: 3px rgba(144, 238, 144, 0.5) solid;
+.ofertaSeleccionada,
+.ofertaSeleccionada .position {
+    background-color: rgba(144,238,144,.2);
+    border: 3px rgba(144,238,144,.5) solid;
 }
 
 .ofertaCard:first-child {

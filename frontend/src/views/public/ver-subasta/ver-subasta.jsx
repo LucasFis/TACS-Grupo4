@@ -1,7 +1,7 @@
 import styles from './ver-subasta.module.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
-import { buscarSubasta } from '@/services/subastasService.js'
+import { buscarSubasta, seleccionarOferta } from '@/services/subastasService.js'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import SectionTitle from '@/components/ui/section-title/section-title.jsx'
@@ -79,7 +79,7 @@ const VerSubasta = () => {
       setCargando(true)
       const payload = await buscarSubasta({ subId })
       setSubasta(payload)
-      setSubastaAbierta(new Date(payload.cierre) > new Date())
+      setSubastaAbierta(payload.tiempo_restante > 0)
       setTiempo(payload.tiempo_restante)
     } catch (err) {
       showToast(handleError(err, setError),'error')
@@ -88,21 +88,47 @@ const VerSubasta = () => {
     }
   }
 
+    const adjudicarOferta = async (ofertaId) => {
+      try {
+        await seleccionarOferta(subId, ofertaId)
+        await cargarSubasta()
+      } catch (err) {
+        showToast(handleError(err), 'error')
+      }
+    }
+
   useEffect(() => {
     cargarSubasta()
   }, [])
 
   useEffect(() => {
-    if (!tiempo) return
+    if (tiempo <= 0) {
+      setSubastaAbierta(false)
+      return
+    }
 
     const interval = setInterval(() => {
-      setTiempo((prev) => Math.max(prev - 1, 0))
+      setTiempo((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval)
+          setSubastaAbierta(false)
+          return 0
+        }
+
+        return prev - 1
+      })
     }, 1000)
 
     return () => clearInterval(interval)
   }, [tiempo])
 
   const mostrarSubasta = () => {
+
+    const ofertasOrdenadas = [...(subasta?.ofertas ?? [])].sort((a, b) => {
+      if (a.seleccionada === b.seleccionada) return 0
+      return a.seleccionada ? -1 : 1
+    })
+
     return (
       <>
         <div
@@ -111,7 +137,11 @@ const VerSubasta = () => {
             ' p-2 d-flex flex-column justify-content-center align-items-center gap-2 w-100 rounded-2 mb-3'
           }
         >
-          <div className={styles.figuritaImagen + ' bg-white rounded-3 '}></div>
+          <img
+            className={styles.figuritaImagen + ' bg-white rounded-3'}
+            src={subasta.figurita.imagen_url || '/jugador-placeholder.png'}
+            alt={subasta.figurita.jugador}
+          />
 
           <h4 className={'text-white'}>{subasta.figurita.jugador}</h4>
           <h6 className={'text-white'}>{subasta.figurita.seleccion}</h6>
@@ -273,9 +303,18 @@ const VerSubasta = () => {
           </SectionTitle>
           <SectionCard.Section>
             <div className="d-flex flex-column gap-2">
-              {subasta.ofertas.length > 0 ? (
-                subasta.ofertas.map((oferta, index) => (
-                  <OfertaCard key={index} position={index + 1} propuesta={oferta} />
+              {ofertasOrdenadas.length > 0 ? (
+                ofertasOrdenadas.map((oferta, index) => (
+                  <OfertaCard
+                    key={oferta.id}
+                    position={index + 1}
+                    propuesta={oferta}
+                    puedeAdjudicar={
+                      subasta.perfil.id === user.perfil_id &&
+                      subastaAbierta
+                    }
+                    onAdjudicar={adjudicarOferta}
+                  />
                 ))
               ) : (
                 <h4>Aún no hay ofertas!</h4>
