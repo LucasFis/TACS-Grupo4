@@ -24,7 +24,7 @@ const FiltroSubasta = ({ estado, onChangeEstado, onAplicarFigurita }) => {
     onAplicarFigurita(params)
   }
 
-  const handleQuitar = (campo, valor) => {
+  const handleQuitar = () => {
     resetFigurita()
     onAplicarFigurita({})
   }
@@ -51,23 +51,18 @@ const FiltroSubasta = ({ estado, onChangeEstado, onAplicarFigurita }) => {
 
       <hr className={styles.divider} />
 
-      <div className="d-flex flex-column gap-3">
-        <div className={styles.filtrosRow}>
-          <button
-            className={`${styles.chip} ${tipoFigurita === 'SUBASTADA' ? styles.chipActive : ''}`}
-            onClick={() => toggleTipo('SUBASTADA')}
-          >
-            Subastada
-          </button>
-          <button
-            className={`${styles.chip} ${tipoFigurita === 'OFERTADA' ? styles.chipActive : ''}`}
-            onClick={() => toggleTipo('OFERTADA')}
-          >
-            Ofertada
-          </button>
-        </div>
-
-        <div className={styles.filtrosInputRow}>
+      <div className={styles.filtrosInputRow}>
+        <FilterChip
+          label="Subastada"
+          selected={tipoFigurita === 'SUBASTADA'}
+          onClick={() => toggleTipo('SUBASTADA')}
+        />
+        <FilterChip
+          label="Ofertada"
+          selected={tipoFigurita === 'OFERTADA'}
+          onClick={() => toggleTipo('OFERTADA')}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
           <AutocompleteInput
             value={jugadorQuery}
             onChange={setJugadorQuery}
@@ -77,15 +72,16 @@ const FiltroSubasta = ({ estado, onChangeEstado, onAplicarFigurita }) => {
             placeholder="Buscar por nombre del jugador"
             disabled={!tipoFigurita}
           />
-          <Button
-            label="Aplicar"
-            onClick={handleAplicar}
-            disabled={!tipoFigurita || !tieneFiltroFigurita}
-          />
         </div>
-
-        <FiltrosActivos chips={chipsActivos()} onQuitar={handleQuitar} />
+        <Button
+          label="Aplicar"
+          onClick={handleAplicar}
+          disabled={!tipoFigurita || !tieneFiltroFigurita}
+        />
       </div>
+
+      <FiltrosActivos chips={chipsActivos()} onQuitar={handleQuitar} />
+
     </div>
   )
 }
