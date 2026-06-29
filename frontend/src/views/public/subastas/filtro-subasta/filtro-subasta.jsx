@@ -24,9 +24,11 @@ const FiltroSubasta = ({ estado, onChangeEstado, onAplicarFigurita }) => {
     onAplicarFigurita(params)
   }
 
-  const handleQuitar = () => {
-    resetFigurita()
-    onAplicarFigurita({})
+  const handleQuitar = (campo, valor) => {
+    if (campo === 'tipoFigurita') {
+      resetFigurita()
+      onAplicarFigurita({})
+    }
   }
 
   return (
