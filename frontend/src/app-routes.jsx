@@ -26,6 +26,7 @@ import VerIntercambio from './views/public/ver-intercambio/ver-intercambio.jsx'
 
 import Administrador from './views/public/administrador/administrador.jsx'
 import RutaPrivilegiada from '@/components/autenticacion/ruta-privilegiada.jsx'
+import VistaNoEncontrada from '@/views/public/vista-no-encontrada/vista-no-encontrada.jsx'
 
 const publicas = [
   {
@@ -142,8 +143,10 @@ const AppRoutes = () => {
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
               </Route>
-            </Route>
 
+              <Route path="*" element={<VistaNoEncontrada />} />
+
+            </Route>
           </Routes>
         </AuthProvider>
       </ToastProvider>
