@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ConfirmModal from '../../../../../../components/ui/confirm-modal/confirm-modal.jsx'
 import CalificarModal from '../../../../../../components/ui/calificar-modal/calificar-modal.jsx'
 import CabeceraFigurita from '../../../../../../components/ui/cabecera-figurita/cabecera-figurita.jsx'
@@ -47,7 +47,7 @@ const MODAL_CONFIG = {
   },
 }
 
-const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
+const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const {
     id: subastaId,
     figurita_subastada,
@@ -57,11 +57,13 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
     ya_calificado,
   } = subasta
 
-  const { tiempoRestante, finalizadaHace, finalizaPronto } = derivarTiempo({ fecha_cierre })
+  const [tiempoRestante, setTiempoRestante] = useState(subasta.tiempo_restante)
   const navigate = useNavigate()
   const [modal, setModal] = useState(null)
   const [loadingModal, setLoadingModal] = useState(false)
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
+
+  const finalizaPronto = tiempoRestante > 0 && tiempoRestante <= 3600;
 
   const estadoKey = finalizada ? 'adjudicada' : finalizaPronto ? 'finaliza_pronto' : 'activa'
   const badge = BADGE_ESTADO[estadoKey]
@@ -96,6 +98,24 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
     onRefresh()
   }
 
+    useEffect(() => {
+      if (tiempoRestante <= 0) return
+
+      const interval = setInterval(() => {
+        setTiempoRestante((prev) => Math.max(prev - 1, 0))
+      }, 1000)
+
+      return () => clearInterval(interval)
+    }, [tiempoRestante])
+
+    const formatearTiempo = (segundos) => {
+        if (segundos <= 0) return '00:00:00'
+        const horas = Math.floor(segundos / 3600)
+        const minutos = Math.floor((segundos % 3600) / 60)
+        const segs = segundos % 60
+        return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`
+    }
+
   return (
     <>
       <div className="border rounded-3 overflow-hidden bg-white">
@@ -103,7 +123,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
 
         <BarraTiempo
           finalizada={finalizada}
-          tiempoRestante={tiempoRestante}
+          tiempoRestante={formatearTiempo(tiempoRestante)}
           finalizadaHace={finalizadaHace}
           derecha={
             !finalizada && (
