@@ -15,8 +15,6 @@ const Perfil = () => {
   const { perfil, setPerfil, loading, stats, promedio, perfilId, manejarCierreDeSesion } = usePerfil()
   const { reviews, loading: loadingCalificaciones, pagina, setPagina } = useCalificaciones()
   const { user } = useAuth()
-  const esAdmin = user?.rol === 'ADMINISTRADOR'
-
   return (
     <div className="d-flex flex-column">
       <PerfilHeader
@@ -25,17 +23,16 @@ const Perfil = () => {
         promedio={promedio}
         reviews={reviews}
         perfilId={perfilId}
-        esAdmin={esAdmin}
         onEditarClick={() => setShowModal(true)}
         onCerrarSesionClick={() => setShowConfirmModal(true)}
       />
 
-      {!esAdmin && (
+      {user?.rol !== 'ADMINISTRADOR' && (
           <PerfilStats stats={stats}/>
         )
       }
 
-      {!esAdmin && (
+      {user?.rol !== 'ADMINISTRADOR' && (
         <PerfilCalificaciones
           reviews={reviews}
           loadingNotificaciones={loadingCalificaciones}
@@ -49,7 +46,6 @@ const Perfil = () => {
           perfil={perfil}
           reviews={reviews}
           promedio={promedio}
-          esAdmin={esAdmin}
           onGuardar={(datosActualizados) => {
             setPerfil((prev) => ({ ...prev, ...datosActualizados }))
             setShowModal(false)

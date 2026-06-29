@@ -1,4 +1,5 @@
 import Estrellas from '@/components/ui/estrellas/estrellas.jsx'
+import { useAuth } from '@/contexts/userContext.jsx'
 import styles from './PerfilHeader.module.css'
 
 const PerfilHeader = ({
@@ -7,10 +8,11 @@ const PerfilHeader = ({
   promedio,
   reviews,
   perfilId,
-  esAdmin,
   onEditarClick,
   onCerrarSesionClick,
 }) => {
+  const { user } = useAuth()
+  const esAdmin = user?.rol === 'ADMINISTRADOR'
   return (
     <div className={styles.wrapper}>
       <div
