@@ -432,7 +432,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
         repositorio.guardar(propuesta);
 
         int count = repositorio.contarConflictos("F2", u1.getId(), "otro-id");
-        assertEquals(0, count);}
+        assertEquals(0, count);
+    }
     @Test
     void buscarTodos_filtraPorFiguritaBuscada() {
         EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
