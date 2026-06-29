@@ -20,6 +20,9 @@ class RepositorioSubastasTest extends MongoTestBase {
     private Perfil p2;
     private Perfil participante;
 
+    private Figurita messi;
+    private Figurita diMaria;
+
     private List<MedioDeContacto> telegram(String numero) {
         return List.of(new MedioDeContacto(MedioComunicacion.TELEGRAM, numero));
     }
@@ -74,6 +77,22 @@ class RepositorioSubastasTest extends MongoTestBase {
             .build();
 
         repositorioPerfiles.guardar(participante);
+
+        messi = Figurita.builder()
+            .id("ARG-10")
+            .numero(10)
+            .jugador("Messi")
+            .seleccion(Seleccion.ARGENTINA)
+            .build();
+        repositorioFiguritas.guardar(messi);
+
+        diMaria = Figurita.builder()
+            .id("ARG-11")
+            .numero(11)
+            .jugador("Di María")
+            .seleccion(Seleccion.ARGENTINA)
+            .build();
+        repositorioFiguritas.guardar(diMaria);
     }
 
     @Test
@@ -134,7 +153,7 @@ class RepositorioSubastasTest extends MongoTestBase {
         );
 
         SubastasFiltro filtros =
-            new SubastasFiltro(1,10,null,null,null);
+            new SubastasFiltro(1,10,null,null,null, null, null);
 
         PaginaResultado<Subasta> resultado =
             repositorioSubastas.buscarTodos(filtros, new CamposSubasta(true, true));
@@ -169,6 +188,8 @@ class RepositorioSubastasTest extends MongoTestBase {
                 1,
                 10,
                 p1.getId(),
+                null,
+                null,
                 null,
                 null
             );
@@ -210,7 +231,9 @@ class RepositorioSubastasTest extends MongoTestBase {
                 10,
                 null,
                 null,
-                "ACTIVA"
+                "ACTIVA",
+                null,
+                null
             );
 
         PaginaResultado<Subasta> resultado =
@@ -250,7 +273,9 @@ class RepositorioSubastasTest extends MongoTestBase {
                 10,
                 null,
                 null,
-                "FINALIZADA"
+                "FINALIZADA",
+                null,
+                null
             );
 
         PaginaResultado<Subasta> resultado =
@@ -297,6 +322,8 @@ class RepositorioSubastasTest extends MongoTestBase {
                 10,
                 null,
                 participante.getId(),
+                null,
+                null,
                 null
             );
 
@@ -346,6 +373,8 @@ class RepositorioSubastasTest extends MongoTestBase {
                 2,
                 null,
                 null,
+                null,
+                null,
                 null
             );
 
@@ -356,6 +385,126 @@ class RepositorioSubastasTest extends MongoTestBase {
         assertEquals(2, resultado.cantidadDePaginas());
         assertEquals(2, resultado.numero());
         assertEquals(1, resultado.contenido().size());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaSubastada() {
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-1")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(diMaria)
+                .build()
+        );
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-2")
+                .autor(p2)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(messi)
+                .build()
+        );
+
+        SubastasFiltro filtros =
+            new SubastasFiltro(1, 10, null, null, null, "ARG-10", null);
+
+        PaginaResultado<Subasta> resultado =
+            repositorioSubastas.buscarTodos(filtros, new CamposSubasta(true, true));
+
+        assertEquals(1, resultado.contenido().size());
+        assertEquals("s-2", resultado.contenido().get(0).getId());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaSubastada_sinResultados_retornaVacio() {
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-1")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(messi)
+                .build()
+        );
+
+        SubastasFiltro filtros =
+            new SubastasFiltro(1, 10, null, null, null, "INEXISTENTE", null);
+
+        PaginaResultado<Subasta> resultado =
+            repositorioSubastas.buscarTodos(filtros, new CamposSubasta(true, true));
+
+        assertTrue(resultado.contenido().isEmpty());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaOfertada() {
+        Propuesta ofertaConMessi = Propuesta.builder()
+            .id("o-1")
+            .autor(participante)
+            .figuritasOfrecidas(List.of(messi))
+            .build();
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-1")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(diMaria)
+                .ofertas(List.of(ofertaConMessi))
+                .build()
+        );
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-2")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(messi)
+                .build()
+        );
+
+        SubastasFiltro filtros =
+            new SubastasFiltro(1, 10, null, null, null, null, "ARG-10");
+
+        PaginaResultado<Subasta> resultado =
+            repositorioSubastas.buscarTodos(filtros, new CamposSubasta(true, true));
+
+        assertEquals(1, resultado.contenido().size());
+        assertEquals("s-1", resultado.contenido().get(0).getId());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaOfertada_sinResultados_retornaVacio() {
+        Propuesta ofertaConMessi = Propuesta.builder()
+            .id("o-1")
+            .autor(participante)
+            .figuritasOfrecidas(List.of(messi))
+            .build();
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-1")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(messi)
+                .ofertas(List.of(ofertaConMessi))
+                .build()
+        );
+
+        SubastasFiltro filtros =
+            new SubastasFiltro(1, 10, null, null, null, null, "INEXISTENTE");
+
+        PaginaResultado<Subasta> resultado =
+            repositorioSubastas.buscarTodos(filtros, new CamposSubasta(true, true));
+
+        assertTrue(resultado.contenido().isEmpty());
     }
 
     private Subasta crearSubasta(

@@ -5,7 +5,9 @@ public record SubastasFiltro(
   Integer limite,
   String autorId,
   String participanteId,
-  String estado
+  String estado,
+  String idFiguritaSubastada,
+  String idFiguritaOfertada
 ) {
   public SubastasFiltro {
     if(limite == null){
