@@ -26,6 +26,9 @@ class RepositorioPropuestasTest extends MongoTestBase {
     private Perfil u2;
     private Perfil u3;
 
+    private Figurita messi;
+    private Figurita diMaria;
+
     private List<MedioDeContacto> telegram(String usuario) {
         return List.of(
             new MedioDeContacto(
@@ -60,6 +63,22 @@ class RepositorioPropuestasTest extends MongoTestBase {
             .nombre("Matias")
             .mediosDeContacto(telegram("@mati"))
             .build();
+
+        messi = Figurita.builder()
+            .id("ARG-10")
+            .numero(10)
+            .jugador("Messi")
+            .seleccion(Seleccion.ARGENTINA)
+            .build();
+        repositorioFiguritas.guardar(messi);
+
+        diMaria = Figurita.builder()
+            .id("ARG-11")
+            .numero(11)
+            .jugador("Di María")
+            .seleccion(Seleccion.ARGENTINA)
+            .build();
+        repositorioFiguritas.guardar(diMaria);
     }
 
     private Propuesta propuesta(
@@ -179,6 +198,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "RECIBIDAS",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 
@@ -210,6 +231,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "ENVIADAS",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 
@@ -250,7 +273,9 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "",
                 0,
                 10,
-                EstadoProceso.RECHAZADO
+                EstadoProceso.RECHAZADO,
+                null,
+                null
             );
 
         PaginaResultado<Propuesta> resultado =
@@ -310,6 +335,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 
@@ -322,5 +349,128 @@ class RepositorioPropuestasTest extends MongoTestBase {
         assertTrue(
             resultado.contenido().isEmpty()
         );
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaBuscada() {
+        EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-1")
+                .autor(u1)
+                .destinatario(u2)
+                .figuritaBuscada(diMaria)
+                .figuritasOfrecidas(List.of())
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-2")
+                .autor(u1)
+                .destinatario(u3)
+                .figuritaBuscada(messi)
+                .figuritasOfrecidas(List.of())
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        PropuestasFiltro filtros =
+            new PropuestasFiltro("", 0, 10, null, "ARG-10", null);
+
+        PaginaResultado<Propuesta> resultado =
+            repositorio.buscarTodos(u1.getId(), filtros);
+
+        assertEquals(1, resultado.contenido().size());
+        assertEquals("p-2", resultado.contenido().get(0).getId());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaBuscada_sinResultados_retornaVacio() {
+        EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-1")
+                .autor(u1)
+                .destinatario(u2)
+                .figuritaBuscada(messi)
+                .figuritasOfrecidas(List.of())
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        PropuestasFiltro filtros =
+            new PropuestasFiltro("", 0, 10, null, "INEXISTENTE", null);
+
+        PaginaResultado<Propuesta> resultado =
+            repositorio.buscarTodos(u1.getId(), filtros);
+
+        assertTrue(resultado.contenido().isEmpty());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaPropuesta() {
+        EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-1")
+                .autor(u1)
+                .destinatario(u2)
+                .figuritasOfrecidas(List.of(messi))
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-2")
+                .autor(u1)
+                .destinatario(u3)
+                .figuritasOfrecidas(List.of(diMaria))
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        PropuestasFiltro filtros =
+            new PropuestasFiltro("", 0, 10, null, null, "ARG-10");
+
+        PaginaResultado<Propuesta> resultado =
+            repositorio.buscarTodos(u1.getId(), filtros);
+
+        assertEquals(1, resultado.contenido().size());
+        assertEquals("p-1", resultado.contenido().get(0).getId());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaPropuesta_sinResultados_retornaVacio() {
+        EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-1")
+                .autor(u1)
+                .destinatario(u2)
+                .figuritasOfrecidas(List.of(messi))
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        PropuestasFiltro filtros =
+            new PropuestasFiltro("", 0, 10, null, null, "INEXISTENTE");
+
+        PaginaResultado<Propuesta> resultado =
+            repositorio.buscarTodos(u1.getId(), filtros);
+
+        assertTrue(resultado.contenido().isEmpty());
     }
 }

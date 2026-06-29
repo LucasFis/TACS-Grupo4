@@ -402,7 +402,7 @@ public class ServicioSubastaTest extends MongoTestBase {
 
     repositorioSubastas.guardar(subasta);
 
-    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "ACTIVA");
+    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "ACTIVA", null, null);
 
     PaginaResultado<?> resultado = service.obtenerSubastas(sofia.getId(), filtros);
 
@@ -423,7 +423,7 @@ public class ServicioSubastaTest extends MongoTestBase {
 
     repositorioSubastas.guardar(subasta);
 
-    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "FINALIZADA");
+    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "FINALIZADA", null, null);
 
     PaginaResultado<?> resultado = service.obtenerSubastas(sofia.getId(), filtros);
 
@@ -453,7 +453,7 @@ public class ServicioSubastaTest extends MongoTestBase {
 
     repositorioSubastas.guardar(subasta);
 
-    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "FINALIZADA");
+    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "FINALIZADA", null, null);
 
     PaginaResultado<?> resultado = service.obtenerSubastas(sofia.getId(), filtros);
 
@@ -474,7 +474,7 @@ public class ServicioSubastaTest extends MongoTestBase {
 
     repositorioSubastas.guardar(subasta);
 
-    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "FINALIZADA");
+    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "FINALIZADA", null, null);
 
     PaginaResultado<?> resultado = service.obtenerSubastas(sofia.getId(), filtros);
 
@@ -503,7 +503,7 @@ public class ServicioSubastaTest extends MongoTestBase {
     repositorioSubastas.guardar(activa);
     repositorioSubastas.guardar(finalizada);
 
-    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "ACTIVA");
+    SubastasFiltro filtros = new SubastasFiltro(1, 10, sofia.getId(), null, "ACTIVA", null, null);
 
     PaginaResultado<?> resultado = service.obtenerSubastas(sofia.getId(), filtros);
 
@@ -532,7 +532,7 @@ public class ServicioSubastaTest extends MongoTestBase {
 
     repositorioSubastas.guardar(subasta);
 
-    SubastasFiltro filtros = new SubastasFiltro(1, 10, null, lucas.getId(), "ACTIVA");
+    SubastasFiltro filtros = new SubastasFiltro(1, 10, null, lucas.getId(), "ACTIVA", null, null);
 
     PaginaResultado<?> resultado = service.obtenerSubastas(lucas.getId(), filtros);
 
@@ -565,7 +565,7 @@ public class ServicioSubastaTest extends MongoTestBase {
 
     repositorioSubastas.guardar(subasta);
 
-    SubastasFiltro filtros = new SubastasFiltro(1, 10, null, lucas.getId(), "ACTIVA");
+    SubastasFiltro filtros = new SubastasFiltro(1, 10, null, lucas.getId(), "ACTIVA", null, null);
 
     PaginaResultado<?> resultado = service.obtenerSubastas(lucas.getId(), filtros);
 
@@ -584,7 +584,7 @@ public class ServicioSubastaTest extends MongoTestBase {
 
     repositorioSubastas.guardar(subasta);
 
-    SubastasFiltro filtros = new SubastasFiltro(1, 10, null, lucas.getId(), "ACTIVA");
+    SubastasFiltro filtros = new SubastasFiltro(1, 10, null, lucas.getId(), "ACTIVA", null, null);
 
     PaginaResultado<?> resultado = service.obtenerSubastas(lucas.getId(), filtros);
 

@@ -737,42 +737,46 @@ class ServicioPropuestaTest extends MongoTestBase {
         )
     );
 
-    PropuestasFiltro filtro =
-        new PropuestasFiltro(
-            "RECIBIDAS",
-            0,
-            10,
-            null
+        PropuestasFiltro filtro =
+            new PropuestasFiltro(
+                "RECIBIDAS",
+                0,
+                10,
+                null,
+                null,
+                null
+            );
+
+        PaginaResultado<IntercambioDto> resultado =
+            propuestaService.buscarPropuestas(
+                "1001",
+                filtro
+            );
+
+        assertEquals(1,
+            resultado.cantidadDeElementos());
+
+        assertEquals(
+            "1000",
+            resultado.contenido()
+                .get(0)
+                .getAutor()
+                .getId()
         );
+    }
 
-    PaginaResultado<IntercambioDto> resultado =
-        propuestaService.buscarPropuestas(
-            "1001",
-            filtro
-        );
+    @Test
+    void buscarPropuestasConTipoInvalidoDevuelvePaginaVacia() {
 
-    assertEquals(1,
-        resultado.cantidadDeElementos());
-
-    assertEquals(
-        "1000",
-        resultado.contenido()
-            .get(0)
-            .getAutor()
-            .getId()
-    );
-  }
-
-  @Test
-  void buscarPropuestasConTipoInvalidoDevuelvePaginaVacia() {
-
-    PropuestasFiltro filtro =
-        new PropuestasFiltro(
-            "INVALIDO",
-            0,
-            10,
-            null
-        );
+        PropuestasFiltro filtro =
+            new PropuestasFiltro(
+                "INVALIDO",
+                0,
+                10,
+                null,
+                null,
+                null
+            );
 
     PaginaResultado<IntercambioDto> resultado =
         propuestaService.buscarPropuestas(
@@ -802,19 +806,21 @@ class ServicioPropuestaTest extends MongoTestBase {
         )
     );
 
-    PropuestasFiltro filtro =
-        new PropuestasFiltro(
-            "ENVIADAS",
-            0,
-            10,
-            null
-        );
+        PropuestasFiltro filtro =
+            new PropuestasFiltro(
+                "ENVIADAS",
+                0,
+                10,
+                null,
+                null,
+                null
+            );
 
-    PaginaResultado<IntercambioDto> resultado =
-        propuestaService.buscarPropuestas(
-            "1000",
-            filtro
-        );
+        PaginaResultado<IntercambioDto> resultado =
+            propuestaService.buscarPropuestas(
+                "1000",
+                filtro
+            );
 
     assertEquals(
         1,
@@ -863,43 +869,47 @@ class ServicioPropuestaTest extends MongoTestBase {
         "1001"
     );
 
-    PropuestasFiltro filtro =
-        new PropuestasFiltro(
-            "RECIBIDAS",
-            0,
-            10,
-            EstadoProceso.RECHAZADO
+        PropuestasFiltro filtro =
+            new PropuestasFiltro(
+                "RECIBIDAS",
+                0,
+                10,
+                EstadoProceso.RECHAZADO,
+                null,
+                null
+            );
+
+        PaginaResultado<IntercambioDto> resultado =
+            propuestaService.buscarPropuestas(
+                "1001",
+                filtro
+            );
+
+        assertEquals(
+            1,
+            resultado.contenido().size()
         );
 
-    PaginaResultado<IntercambioDto> resultado =
-        propuestaService.buscarPropuestas(
-            "1001",
-            filtro
+        assertEquals(
+            EstadoProceso.RECHAZADO,
+            resultado.contenido()
+                .get(0)
+                .getEstado()
         );
+    }
 
-    assertEquals(
-        1,
-        resultado.contenido().size()
-    );
+    @Test
+    void buscarPropuestasSinResultadosDevuelvePaginaVacia() {
 
-    assertEquals(
-        EstadoProceso.RECHAZADO,
-        resultado.contenido()
-            .get(0)
-            .getEstado()
-    );
-  }
-
-  @Test
-  void buscarPropuestasSinResultadosDevuelvePaginaVacia() {
-
-    PropuestasFiltro filtro =
-        new PropuestasFiltro(
-            "RECIBIDAS",
-            0,
-            10,
-            EstadoProceso.ACEPTADO
-        );
+        PropuestasFiltro filtro =
+            new PropuestasFiltro(
+                "RECIBIDAS",
+                0,
+                10,
+                EstadoProceso.ACEPTADO,
+                null,
+                null
+            );
 
     PaginaResultado<IntercambioDto> resultado =
         propuestaService.buscarPropuestas(

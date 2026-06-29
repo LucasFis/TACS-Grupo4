@@ -618,7 +618,7 @@ public class SubastaHandler implements BotHandler {
       String perfilId = servicioJwt.getPerfilId(token);
 
       String estado = "activas".equals(tipo) ? "ACTIVA" : "FINALIZADA";
-      SubastasFiltro filtro = new SubastasFiltro(pagina + 1, 5, perfilId, null, estado);
+      SubastasFiltro filtro = new SubastasFiltro(pagina + 1, 5, perfilId, null, estado, null, null);
 
       PaginaResultado<?> resultado = subastaService.obtenerSubastas(perfilId, filtro);
 
@@ -659,7 +659,7 @@ public class SubastaHandler implements BotHandler {
       String token = sessionManager.getToken(chatId);
       String perfilId = servicioJwt.getPerfilId(token);
 
-      SubastasFiltro filtro = new SubastasFiltro(pagina + 1, 5, null, perfilId, null);
+      SubastasFiltro filtro = new SubastasFiltro(pagina + 1, 5, null, perfilId, null, null, null);
 
       PaginaResultado<?> resultado = subastaService.obtenerSubastas(perfilId, filtro);
 

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { buscarSubastas } from '../../../../../services/subastasService.js'
 import SubastaParticipo from './subasta-participo/subasta-participo.jsx'
-import FilterChip from '../../../../../components/ui/filter-chip/filter-chip.jsx'
 import Paginacion from '../../../../../components/ui/paginacion/paginacion.jsx'
+import FiltroSubasta from '../../filtro-subasta/filtro-subasta.jsx'
 import { useNavigate } from 'react-router'
 import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
@@ -13,6 +13,8 @@ const Participo = () => {
   const [loading, setLoading] = useState(true)
   const [estado, setEstado] = useState('ACTIVA')
   const [pagina, setPagina] = useState(1)
+  const [refresh, setRefresh] = useState(0)
+  const [paramsFigurita, setParamsFigurita] = useState({})
 
   const navigate = useNavigate()
   const { handleError } = useError()
@@ -28,6 +30,7 @@ const Participo = () => {
           estado,
           pagina,
           limite: 5,
+          ...paramsFigurita,
         })
         setData(res)
       } catch (error) {
@@ -37,7 +40,7 @@ const Participo = () => {
       }
     }
     cargar()
-  }, [estado, pagina])
+  }, [estado, pagina, refresh, paramsFigurita])
 
   const cambiarEstado = (nuevoEstado) => {
     if (estado === nuevoEstado) return
@@ -47,18 +50,11 @@ const Participo = () => {
 
   return (
     <div className="container-fluid px-0 d-flex flex-column gap-4">
-      <div className="d-flex gap-2">
-        <FilterChip
-          label="Activas"
-          selected={estado === 'ACTIVA'}
-          onClick={() => cambiarEstado('ACTIVA')}
-        />
-        <FilterChip
-          label="Finalizadas"
-          selected={estado === 'FINALIZADA'}
-          onClick={() => cambiarEstado('FINALIZADA')}
-        />
-      </div>
+      <FiltroSubasta
+        estado={estado}
+        onChangeEstado={cambiarEstado}
+        onAplicarFigurita={(p) => { setParamsFigurita(p); setPagina(1) }}
+      />
 
       {loading ? (
         <div className="d-flex flex-column gap-3">
