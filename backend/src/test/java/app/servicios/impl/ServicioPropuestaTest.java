@@ -1051,7 +1051,7 @@ class ServicioPropuestaTest extends MongoTestBase {
         assertTrue((Boolean) resultado.get("tieneConflictos"));
 
         Map<String, Object> resultadoMisma = propuestaService.verificarConflictos(
-            mismaFigurita.getId(), "1001");
+            mismaFigurita.getId(), "1000");
 
         assertFalse((Boolean) resultadoMisma.get("tieneConflictos"));
     }
