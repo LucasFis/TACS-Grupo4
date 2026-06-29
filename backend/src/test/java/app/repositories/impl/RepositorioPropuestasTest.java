@@ -179,6 +179,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "RECIBIDAS",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 
@@ -210,6 +212,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "ENVIADAS",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 
@@ -250,7 +254,9 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "",
                 0,
                 10,
-                EstadoProceso.RECHAZADO
+                EstadoProceso.RECHAZADO,
+                null,
+                null
             );
 
         PaginaResultado<Propuesta> resultado =
@@ -310,6 +316,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 

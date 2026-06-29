@@ -6,7 +6,9 @@ public record PropuestasFiltro(
     String tipo,
     Integer pagina,
     Integer limite,
-    EstadoProceso estado
+    EstadoProceso estado,
+    String idFiguritaBuscada,
+    String idFiguritaPropuesta
 ) {
   public PropuestasFiltro {
     if(limite == null){
