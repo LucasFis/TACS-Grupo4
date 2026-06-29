@@ -6,6 +6,7 @@ import {
   cancelarPropuesta,
   aceptarPropuesta,
   rechazarPropuesta,
+  verificarConflictos,
 } from '@/services/propuestasService.js'
 import { calificarPerfil } from '@/services/perfilService.js'
 import CalificarModal from '@/components/ui/calificar-modal/calificar-modal.jsx'
@@ -13,6 +14,7 @@ import { useState } from 'react'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { construirAdvertenciaConflictos } from '@/utils/conflictos.js'
 
 const ChipFigurita = ({ figurita }) => (
   <div className="border rounded p-2 mb-1 d-flex align-items-center gap-2">
@@ -25,6 +27,7 @@ const ChipFigurita = ({ figurita }) => (
 const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => {
   const [showCalificacion, setShowCalificacion] = useState(false)
   const [confirmAction, setConfirmAction] = useState(null)
+  const [conflictosData, setConflictosData] = useState(null)
 
   const { handleError } = useError()
   const { showToast } = useToast()
@@ -46,6 +49,8 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
   const puedeAceptar = esRecibida && estado === 'PENDIENTE'
   const puedeCalificar = estado === 'ACEPTADO' && !intercambio.ya_calificado
 
+  const advertencia = construirAdvertenciaConflictos(conflictosData)
+
   const ejecutarCancelar = async () => {
     try {
       await cancelarPropuesta(intercambio.id)
@@ -61,6 +66,7 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
     try {
       await aceptarPropuesta(intercambio.id)
       setConfirmAction(null)
+      setConflictosData(null)
       showToast('Propuesta aceptada correctamente', 'success')
       onActualizado?.()
     } catch (error) {
@@ -79,6 +85,16 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
     }
   }
 
+  const handleClickAceptar = async () => {
+    try {
+      const data = await verificarConflictos(intercambio.id)
+      setConflictosData(data)
+      setConfirmAction('ACEPTAR')
+    } catch (error) {
+      showToast(handleError(error, (m) => {}),'error')
+    }
+  }
+
   const confirmConfig = {
     CANCELAR: {
       titulo: 'Cancelar propuesta',
@@ -91,6 +107,7 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
       mensaje: '¿Querés aceptar este intercambio?',
       labelConfirmar: 'Aceptar',
       onConfirmar: ejecutarAceptar,
+      advertencia,
     },
     RECHAZAR: {
       titulo: 'Rechazar intercambio',
@@ -179,7 +196,7 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
                 className="flex-fill"
                 label="Aceptar"
                 variante="exitoBorde"
-                onClick={() => setConfirmAction('ACEPTAR')}
+                onClick={handleClickAceptar}
               />
             )}
           </div>
@@ -199,7 +216,8 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
         mensaje={confirmConfig[confirmAction]?.mensaje}
         labelConfirmar={confirmConfig[confirmAction]?.labelConfirmar}
         onConfirmar={confirmConfig[confirmAction]?.onConfirmar}
-        onCancelar={() => setConfirmAction(null)}
+        onCancelar={() => { setConfirmAction(null); setConflictosData(null) }}
+        advertencia={confirmConfig[confirmAction]?.advertencia}
       />
     </>
   )

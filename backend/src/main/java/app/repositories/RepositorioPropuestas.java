@@ -19,4 +19,5 @@ public interface RepositorioPropuestas {
     int contar();
     void guardar(Propuesta propuesta);
     PaginaResultado<Propuesta> buscarTodos(String perfilId, PropuestasFiltro filtros);
+    int contarConflictos(String figuritaId, String perfilId, String excluirPropuestaId);
 }

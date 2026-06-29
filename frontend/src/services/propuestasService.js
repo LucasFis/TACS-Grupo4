@@ -35,6 +35,15 @@ export const cancelarPropuesta = async (prop_id) => {
     }
 }
 
+export const verificarConflictos = async (prop_id) => {
+    try {
+        const { data } = await api.get(`${PROPUESTAS_URL}/${prop_id}/conflictos`);
+        return data;
+    } catch (error) {
+        handleAxiosError(error);
+    }
+};
+
 export const aceptarPropuesta = async (prop_id) => {
     try {
         const {data} = await api.patch(PROPUESTAS_URL + `/${prop_id}/aceptar`);
