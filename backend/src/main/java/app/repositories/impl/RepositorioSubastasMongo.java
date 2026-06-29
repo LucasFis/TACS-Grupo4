@@ -215,8 +215,8 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
             new Criteria().andOperator(
                 Criteria.where("autor").is(autorRef),
                 new Criteria().orOperator(
-                    Criteria.where("estadoActual.valor").is("PENDIENTE"),
-                    Criteria.where("estadoActual.valor").is("SELECCIONADO")
+                    Criteria.where("estadoActual.valor").is(EstadoProceso.PENDIENTE),
+                    Criteria.where("estadoActual.valor").is(EstadoProceso.SELECCIONADO)
                 )
             )
         )

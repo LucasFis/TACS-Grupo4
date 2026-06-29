@@ -6,6 +6,7 @@ import app.dto.filtros.PropuestasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.dto.request.CrearPropuestaRequest;
 import app.exceptions.BadRequestException;
+import app.exceptions.ForbiddenException;
 import app.model.entities.Coleccion;
 import app.model.entities.Figurita;
 import app.model.entities.MetodoIntercambio;
@@ -217,7 +218,13 @@ public class ServicioPropuesta {
    */
   public Map<String, Object> verificarConflictos(String propuestaId, String perfilId) {
     Propuesta propuesta = repositorioPropuestas.buscarPorId(propuestaId);
+    if (!propuesta.getDestinatario().getId().equals(perfilId)) {
+      throw new ForbiddenException("No sos el destinatario de esta propuesta");
+    }
     List<Figurita> recibidas = propuesta.getFiguritasOfrecidas();
+    if (recibidas == null) {
+      recibidas = List.of();
+    }
 
     List<Map<String, String>> figuritasEnConflicto = new ArrayList<>();
 
