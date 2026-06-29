@@ -194,6 +194,7 @@ const Navbar = () => {
           <ul className="navbar-nav mx-auto gap-2">
             {NAV_LINKS.map(({ to, label, privilege }) => {
               if (privilege && user?.rol !== privilege) return null
+              if (user?.rol === 'ADMINISTRADOR' && !privilege) return null
 
               return (
                 <li className="nav-item" key={to}>

@@ -26,6 +26,7 @@ import VerIntercambio from './views/public/ver-intercambio/ver-intercambio.jsx'
 
 import Administrador from './views/public/administrador/administrador.jsx'
 import RutaPrivilegiada from '@/components/autenticacion/ruta-privilegiada.jsx'
+import RutaNoAdministrador from '@/components/autenticacion/ruta-no-administrador.jsx'
 
 const publicas = [
   {
@@ -127,7 +128,12 @@ const AppRoutes = () => {
         <AuthProvider>
           <Routes>
             <Route element={<Layout />}>
-              {publicas.map((route) => (
+              <Route element={<RutaNoAdministrador />}>
+                <Route path="/" element={<Navigate to="/explorar" replace />} />
+                <Route path="/explorar" element={<Explorar />} />
+              </Route>
+
+              {publicas.slice(2).map((route) => (
                 <Route key={route.path} path={route.path} element={route.element} />
               ))}
 
