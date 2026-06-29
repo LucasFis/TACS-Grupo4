@@ -109,13 +109,11 @@ class ColeccionTest {
   }
 
   @Test
-  void eliminarFaltante_inexistente_lanzaExcepcion() {
+  void eliminarFaltante_inexistente_noHaceNada() {
     Coleccion coleccion = new Coleccion("10");
 
-    assertThrows(
-        BadRequestException.class,
-        () -> coleccion.eliminarFaltante(messi)
-    );
+    assertDoesNotThrow(() -> coleccion.eliminarFaltante(messi));
+    assertTrue(coleccion.getFaltantes().isEmpty());
   }
 
   @Test
