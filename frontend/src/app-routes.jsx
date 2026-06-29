@@ -25,8 +25,7 @@ import EditarOferta from './views/public/editar-oferta/editar-oferta.jsx'
 import VerIntercambio from './views/public/ver-intercambio/ver-intercambio.jsx'
 
 import Administrador from './views/public/administrador/administrador.jsx'
-import RutaPrivilegiada from '@/components/autenticacion/ruta-privilegiada.jsx'
-import RutaNoAdministrador from '@/components/autenticacion/ruta-no-administrador.jsx'
+import RutaConRol from '@/components/autenticacion/ruta-con-rol.jsx'
 
 const publicas = [
   {
@@ -131,7 +130,7 @@ const AppRoutes = () => {
         <AuthProvider>
           <Routes>
             <Route element={<Layout />}>
-              <Route element={<RutaNoAdministrador />}>
+              <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/estadisticas" invertir />}>
                 {rutasSinAdmin.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
@@ -147,7 +146,7 @@ const AppRoutes = () => {
                 ))}
               </Route>
 
-              <Route element={<RutaPrivilegiada />}>
+              <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/acceso-denegado" />}>
                 {privilegiadas.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
