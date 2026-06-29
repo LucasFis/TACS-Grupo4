@@ -23,10 +23,9 @@ import ErrorInterno from '@/views/public/errores/error-interno/error-interno.jsx
 import CrearOferta from './views/public/crear-oferta/crear-oferta.jsx'
 import EditarOferta from './views/public/editar-oferta/editar-oferta.jsx'
 import VerIntercambio from './views/public/ver-intercambio/ver-intercambio.jsx'
-
 import Administrador from './views/public/administrador/administrador.jsx'
 import RutaPrivilegiada from '@/components/autenticacion/ruta-privilegiada.jsx'
-import VistaNoEncontrada from '@/views/public/vista-no-encontrada/vista-no-encontrada.jsx'
+import VistaNoEncontrada from '@/views/public/errores/vista-no-encontrada/vista-no-encontrada.jsx'
 import ErrorBoundary from '@/contexts/errorBoundary.jsx'
 
 const publicas = [
