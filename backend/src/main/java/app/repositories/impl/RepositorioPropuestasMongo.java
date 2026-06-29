@@ -46,9 +46,21 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
             );
         }
 
+        if (filtros.idFiguritaBuscada() != null) {
+            query.addCriteria(
+                Criteria.where("figuritaBuscada.$id").is(filtros.idFiguritaBuscada())
+            );
+        }
+
+        if (filtros.idFiguritaPropuesta() != null) {
+            query.addCriteria(
+                Criteria.where("figuritasOfrecidas.$id").is(filtros.idFiguritaPropuesta())
+            );
+        }
+
         long count = mongoTemplate.count(query, Propuesta.class);
 
-        query.skip((long) filtros.pagina() - 1 * filtros.limite());
+        query.skip((long) (filtros.pagina() - 1) * filtros.limite());
         query.limit(filtros.limite());
 
         List<Propuesta> contenido =

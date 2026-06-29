@@ -191,7 +191,7 @@ public class PropuestaHandler implements BotHandler {
       String token = sessionManager.getToken(chatId);
       String perfilId = servicioJwt.getPerfilId(token);
 
-      PropuestasFiltro filtros = new PropuestasFiltro(tipo, pagina + 1, 5, estado);
+      PropuestasFiltro filtros = new PropuestasFiltro(tipo, pagina + 1, 5, estado, null, null);
 
       PaginaResultado<IntercambioDto> resultado = propuestaService.buscarPropuestas(perfilId, filtros);
 

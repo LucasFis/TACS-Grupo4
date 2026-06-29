@@ -3,7 +3,7 @@ import IntercambioCard from './intercambio-card/intercambio-card.jsx'
 import { buscarPropuestas } from '@/services/propuestasService.js'
 import Paginacion from '@/components/ui/paginacion/paginacion.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
-import FilterChip from '@/components/ui/filter-chip/filter-chip.jsx'
+import FiltroIntercambio from '../filtro-intercambio/filtro-intercambio.jsx'
 
 const TEXTOS_ESTADO = {
   '': 'Todas las propuestas',
@@ -18,12 +18,13 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
   const [pagina, setPagina] = useState(1)
   const [propuestas, setPropuestas] = useState([])
   const [filtros, setFiltros] = useState({ estado: estadoInicial, tipo })
+  const [paramsFigurita, setParamsFigurita] = useState({})
   const { handleError } = useError()
 
   const cargarPropuestas = async () => {
     try {
       setLoading(true)
-      const res = await buscarPropuestas({ pagina, limite: 10, ...filtros })
+      const res = await buscarPropuestas({ pagina, limite: 10, ...filtros, ...paramsFigurita })
       setPropuestas(res)
     } catch (error) {
       handleError(error, () => {})
@@ -34,10 +35,11 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
 
   useEffect(() => {
     cargarPropuestas()
-  }, [pagina, filtros])
+  }, [pagina, filtros, paramsFigurita])
 
   useEffect(() => {
     setFiltros({ estado: estadoInicial, tipo })
+    setParamsFigurita({})
   }, [tipo])
 
   const cambiarFiltro = (nuevoEstado) => {
@@ -45,35 +47,18 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
     setPagina(1)
   }
 
+  const handleAplicarFigurita = (params) => {
+    setParamsFigurita(params)
+    setPagina(1)
+  }
+
   return (
     <div className="container-fluid px-0 d-flex flex-column gap-4">
-      <div className="d-flex flex-wrap gap-2">
-        <FilterChip
-          label="Todas"
-          selected={filtros.estado === ''}
-          onClick={() => cambiarFiltro('')}
-        />
-        <FilterChip
-          label="Pendientes"
-          selected={filtros.estado === 'PENDIENTE'}
-          onClick={() => cambiarFiltro('PENDIENTE')}
-        />
-        <FilterChip
-          label="Aceptadas"
-          selected={filtros.estado === 'ACEPTADO'}
-          onClick={() => cambiarFiltro('ACEPTADO')}
-        />
-        <FilterChip
-          label="Rechazadas"
-          selected={filtros.estado === 'RECHAZADO'}
-          onClick={() => cambiarFiltro('RECHAZADO')}
-        />
-        <FilterChip
-          label="Canceladas"
-          selected={filtros.estado === 'CANCELADO'}
-          onClick={() => cambiarFiltro('CANCELADO')}
-        />
-      </div>
+      <FiltroIntercambio
+        estado={filtros.estado}
+        onChangeEstado={cambiarFiltro}
+        onAplicarFigurita={handleAplicarFigurita}
+      />
 
       {loading ? (
         <div className="d-flex flex-column gap-3">
