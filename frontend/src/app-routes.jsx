@@ -121,6 +121,9 @@ const privilegiadas = [
   }
 ]
 
+const rutasSinAdmin = publicas.filter(r => r.path === '/' || r.path === '/explorar')
+const rutasRestantes = publicas.filter(r => r.path !== '/' && r.path !== '/explorar')
+
 const AppRoutes = () => {
   return (
     <ErrorProvider>
@@ -129,11 +132,12 @@ const AppRoutes = () => {
           <Routes>
             <Route element={<Layout />}>
               <Route element={<RutaNoAdministrador />}>
-                <Route path="/" element={<Navigate to="/explorar" replace />} />
-                <Route path="/explorar" element={<Explorar />} />
+                {rutasSinAdmin.map((route) => (
+                  <Route key={route.path} path={route.path} element={route.element} />
+                ))}
               </Route>
 
-              {publicas.slice(2).map((route) => (
+              {rutasRestantes.map((route) => (
                 <Route key={route.path} path={route.path} element={route.element} />
               ))}
 
