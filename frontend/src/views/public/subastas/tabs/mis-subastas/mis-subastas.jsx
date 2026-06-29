@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { buscarSubastas } from '../../../../../services/subastasService.js'
 import MiSubasta from './mi-subasta/mi-subasta.jsx'
-import Button from '../../../../../components/ui/button/button.jsx'
 import Paginacion from '../../../../../components/ui/paginacion/paginacion.jsx'
 import FiltroSubasta from '../../filtro-subasta/filtro-subasta.jsx'
-import { useNavigate } from 'react-router'
 import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
@@ -17,7 +15,6 @@ const MisSubastas = () => {
   const [refresh, setRefresh] = useState(0)
   const [paramsFigurita, setParamsFigurita] = useState({})
 
-  const navigate = useNavigate()
   const { user } = useAuth()
   const { handleError } = useError()
   const { showToast } = useToast()
@@ -45,10 +42,6 @@ const MisSubastas = () => {
 
   return (
     <div className="container-fluid px-0 d-flex flex-column gap-4">
-      <div className="d-flex justify-content-end">
-        <Button label="Crear subasta ↗" onClick={() => navigate('/subastas/crear')} />
-      </div>
-
       <FiltroSubasta
         estado={estado}
         onChangeEstado={cambiarEstado}

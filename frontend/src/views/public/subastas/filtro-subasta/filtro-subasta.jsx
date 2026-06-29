@@ -29,10 +29,6 @@ const FiltroSubasta = ({ estado, onChangeEstado, onAplicarFigurita }) => {
     onAplicarFigurita({})
   }
 
-  const handleSelect = (fig) => {
-    seleccionarFigurita(fig)
-  }
-
   return (
     <div className={styles.filtrosCard}>
       <div className={styles.filtrosRow}>
@@ -51,7 +47,7 @@ const FiltroSubasta = ({ estado, onChangeEstado, onAplicarFigurita }) => {
 
       <hr className={styles.divider} />
 
-      <div className={styles.filtrosInputRow}>
+      <div className={styles.seccionBusqueda}>
         <FilterChip
           label="Subastada"
           selected={tipoFigurita === 'SUBASTADA'}
@@ -62,12 +58,12 @@ const FiltroSubasta = ({ estado, onChangeEstado, onAplicarFigurita }) => {
           selected={tipoFigurita === 'OFERTADA'}
           onClick={() => toggleTipo('OFERTADA')}
         />
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: '220px' }}>
           <AutocompleteInput
             value={jugadorQuery}
             onChange={setJugadorQuery}
             onSearch={async (texto) => await buscarFiguritas({ jugador: texto })}
-            onSelect={handleSelect}
+            onSelect={seleccionarFigurita}
             getLabel={(fig) => `${fig.jugador} - ${fig.seleccion} #${fig.numero}`}
             placeholder="Buscar por nombre del jugador"
             disabled={!tipoFigurita}
@@ -77,11 +73,11 @@ const FiltroSubasta = ({ estado, onChangeEstado, onAplicarFigurita }) => {
           label="Aplicar"
           onClick={handleAplicar}
           disabled={!tipoFigurita || !tieneFiltroFigurita}
+          variante="exito"
         />
       </div>
 
       <FiltrosActivos chips={chipsActivos()} onQuitar={handleQuitar} />
-
     </div>
   )
 }

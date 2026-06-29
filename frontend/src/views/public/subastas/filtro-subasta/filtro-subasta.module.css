@@ -1,5 +1,5 @@
 .filtrosCard {
-    background: #ffffff;
+    background: var(--color-primary);
     border: 1.5px solid var(--border-color-light);
     border-radius: 10px;
     padding: 16px 20px;
@@ -18,13 +18,37 @@
 .filtrosLabel {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--color-text);
 }
 
-.filtrosInputRow {
+.seccionBusqueda {
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.seccionBusqueda > div:first-child {
+    flex: 1;
+    min-width: 220px;
+}
+
+@media (max-width: 768px) {
+    .seccionBusqueda {
+        align-items: stretch;
+    }
+
+    .seccionBusqueda > :nth-child(3) {
+        order: 1;
+    }
+
+    .seccionBusqueda > :nth-child(4) {
+        order: 2;
+    }
+
+    .seccionBusqueda > * {
+        width: 100%;
+    }
 }
 
 .filtroInput {
@@ -32,9 +56,9 @@
     padding: 10px 14px;
     border: 1.5px solid var(--border-color-light);
     border-radius: 8px;
-    font-size: 0.9rem;
-    color: #374151;
-    background: #ffffff;
+    font-size: var(--font-size-p);
+    color: var(--color-text);
+    background: var(--color-primary);
     outline: none;
     font-family: var(--font-family);
     transition: border-color 0.15s;
@@ -42,7 +66,7 @@
 }
 
 .filtroInput::placeholder {
-    color: #9ca3af;
+    color: var(--color-placeholder);
 }
 
 .filtroInput:focus {
@@ -61,19 +85,18 @@
     gap: 5px;
     padding: 4px 12px;
     border-radius: 999px;
-    border: 1.5px solid #374151;
-    background: #374151;
-    color: #ffffff;
+    border: 1.5px solid var(--color-subtitle);
+    background: var(--color-subtitle);
+    color: var(--color-primary);
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     font-family: var(--font-family);
-    transition: background 0.15s, border-color 0.15s;
+    transition: opacity 0.15s;
 }
 
 .chipActivo:hover {
-    background: #1f2937;
-    border-color: #1f2937;
+    opacity: 0.85;
 }
 
 .chipX {
@@ -84,22 +107,7 @@
 
 .divider {
     border: none;
-    border-top: 1px solid var(--color-placeholder);
+    border-top: 1px solid var(--color-subtitle);
     margin: 0;
 }
 
-@media (max-width: 768px) {
-    .filtrosRow {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .filtrosLabel {
-        display: none;
-    }
-
-    .filtrosInputRow {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
