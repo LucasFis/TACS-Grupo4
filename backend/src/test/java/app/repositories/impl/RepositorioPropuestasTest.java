@@ -323,4 +323,88 @@ class RepositorioPropuestasTest extends MongoTestBase {
             resultado.contenido().isEmpty()
         );
     }
+
+    @Test
+    void contarConflictos_cuandoEsFiguritaBuscadaYPerfilEsAutor_cuenta() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u1).destinatario(u2)
+            .figuritaBuscada(f1).figuritasOfrecidas(List.of())
+            .build();
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F1", u1.getId(), "otro-id");
+        assertEquals(1, count);
+    }
+
+    @Test
+    void contarConflictos_cuandoEsFiguritaOfrecidaYPerfilEsDestinatario_cuenta() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u2).destinatario(u1)
+            .figuritasOfrecidas(List.of(f1))
+            .build();
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F1", u1.getId(), "otro-id");
+        assertEquals(1, count);
+    }
+
+    @Test
+    void contarConflictos_excluyePropuestaActual() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u1).destinatario(u2)
+            .figuritaBuscada(f1).figuritasOfrecidas(List.of())
+            .build();
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F1", u1.getId(), propuesta.getId());
+        assertEquals(0, count);
+    }
+
+    @Test
+    void contarConflictos_noCuentaPropuestasNoPendientes() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u1).destinatario(u2)
+            .figuritaBuscada(f1).figuritasOfrecidas(List.of())
+            .build();
+
+        EstadoPropuesta aceptado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.ACEPTADO);
+        propuesta.setEstado(new ArrayList<>(List.of(aceptado)));
+        propuesta.setEstadoActual(aceptado);
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F1", u1.getId(), "otro-id");
+        assertEquals(0, count);
+    }
+
+    @Test
+    void contarConflictos_sinConflictos_devuelveCero() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u1).destinatario(u2)
+            .figuritaBuscada(f1).figuritasOfrecidas(List.of())
+            .build();
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F2", u1.getId(), "otro-id");
+        assertEquals(0, count);
+    }
 }

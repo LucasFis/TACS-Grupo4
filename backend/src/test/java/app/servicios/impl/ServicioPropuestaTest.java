@@ -14,7 +14,9 @@ import app.exceptions.NotFoundException;
 import app.model.entities.*;
 import app.repositories.impl.campos.CamposPerfil;
 import app.servicios.ServicioPropuesta;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -890,36 +892,158 @@ class ServicioPropuestaTest extends MongoTestBase {
     );
   }
 
-  @Test
-  void buscarPropuestasSinResultadosDevuelvePaginaVacia() {
+    @Test
+    void buscarPropuestasSinResultadosDevuelvePaginaVacia() {
 
-    PropuestasFiltro filtro =
-        new PropuestasFiltro(
-            "RECIBIDAS",
+        PropuestasFiltro filtro =
+            new PropuestasFiltro(
+                "RECIBIDAS",
+                0,
+                10,
+                EstadoProceso.ACEPTADO
+            );
+
+        PaginaResultado<IntercambioDto> resultado =
+            propuestaService.buscarPropuestas(
+                "1001",
+                filtro
+            );
+
+        assertTrue(
+            resultado.contenido().isEmpty()
+        );
+
+        assertEquals(
             0,
-            10,
-            EstadoProceso.ACEPTADO
+            resultado.cantidadDeElementos()
         );
 
-    PaginaResultado<IntercambioDto> resultado =
-        propuestaService.buscarPropuestas(
-            "1001",
-            filtro
+        assertEquals(
+            0,
+            resultado.cantidadDePaginas()
+        );
+    }
+
+    @Test
+    void verificarConflictos_detectaConflictoEnPropuestaComoAutor() {
+        Propuesta propuesta = Propuesta.builder()
+            .autor(lucas).destinatario(sofia)
+            .figuritaBuscada(messi).figuritasOfrecidas(List.of(mbappe))
+            .build();
+        repositorioPropuestas.guardar(propuesta);
+
+        Propuesta conflicto = Propuesta.builder()
+            .autor(sofia).destinatario(lucas)
+            .figuritaBuscada(mbappe).figuritasOfrecidas(List.of(messi))
+            .build();
+        repositorioPropuestas.guardar(conflicto);
+
+        Map<String, Object> resultado = propuestaService.verificarConflictos(
+            propuesta.getId(), "1001");
+
+        assertTrue((Boolean) resultado.get("tieneConflictos"));
+        List<Map<String, String>> figuras = (List<Map<String, String>>) resultado.get("figuritasEnConflicto");
+        assertEquals(1, figuras.size());
+        assertEquals("FRA-10", figuras.get(0).get("id"));
+        assertEquals("Mbappe", figuras.get(0).get("jugador"));
+    }
+
+    @Test
+    void verificarConflictos_detectaConflictoEnPropuestaComoDestinatario() {
+        Propuesta propuesta = Propuesta.builder()
+            .autor(lucas).destinatario(sofia)
+            .figuritaBuscada(messi).figuritasOfrecidas(List.of(mbappe))
+            .build();
+        repositorioPropuestas.guardar(propuesta);
+
+        Propuesta conflicto = Propuesta.builder()
+            .autor(lucas).destinatario(sofia)
+            .figuritaBuscada(messi).figuritasOfrecidas(List.of(mbappe))
+            .build();
+        repositorioPropuestas.guardar(conflicto);
+
+        Map<String, Object> resultado = propuestaService.verificarConflictos(
+            propuesta.getId(), "1001");
+
+        assertTrue((Boolean) resultado.get("tieneConflictos"));
+    }
+
+    @Test
+    void verificarConflictos_detectaConflictoEnSubasta() {
+        Propuesta propuesta = Propuesta.builder()
+            .autor(lucas).destinatario(sofia)
+            .figuritaBuscada(messi).figuritasOfrecidas(List.of(mbappe))
+            .build();
+        repositorioPropuestas.guardar(propuesta);
+
+        Propuesta oferta = Propuesta.builder()
+            .autor(sofia)
+            .figuritasOfrecidas(List.of())
+            .build();
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .autor(lucas)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(mbappe)
+                .ofertas(List.of(oferta))
+                .build()
         );
 
-    assertTrue(
-        resultado.contenido().isEmpty()
-    );
+        Map<String, Object> resultado = propuestaService.verificarConflictos(
+            propuesta.getId(), "1001");
 
-    assertEquals(
-        0,
-        resultado.cantidadDeElementos()
-    );
+        assertTrue((Boolean) resultado.get("tieneConflictos"));
+    }
 
-    assertEquals(
-        0,
-        resultado.cantidadDePaginas()
-    );
-  }
+    @Test
+    void verificarConflictos_sinConflictos_devuelveFalso() {
+        Propuesta propuesta = Propuesta.builder()
+            .autor(lucas).destinatario(sofia)
+            .figuritaBuscada(messi).figuritasOfrecidas(List.of(mbappe))
+            .build();
+        repositorioPropuestas.guardar(propuesta);
+
+        Map<String, Object> resultado = propuestaService.verificarConflictos(
+            propuesta.getId(), "1001");
+
+        assertFalse((Boolean) resultado.get("tieneConflictos"));
+        assertTrue(((List<?>) resultado.get("figuritasEnConflicto")).isEmpty());
+    }
+
+    @Test
+    void verificarConflictos_excluyePropuestaActual() {
+        Figurita ronaldo = Figurita.builder()
+            .id("POR-7")
+            .numero(7)
+            .jugador("Ronaldo")
+            .seleccion(Seleccion.PORTUGAL)
+            .build();
+        repositorioFiguritas.guardar(ronaldo);
+
+        Propuesta propuesta = Propuesta.builder()
+            .id("prop-excluir")
+            .autor(lucas).destinatario(sofia)
+            .figuritaBuscada(messi).figuritasOfrecidas(List.of(ronaldo))
+            .build();
+        repositorioPropuestas.guardar(propuesta);
+
+        Propuesta mismaFigurita = Propuesta.builder()
+            .autor(sofia).destinatario(lucas)
+            .figuritaBuscada(ronaldo).figuritasOfrecidas(List.of(mbappe))
+            .build();
+        repositorioPropuestas.guardar(mismaFigurita);
+
+        Map<String, Object> resultado = propuestaService.verificarConflictos(
+            propuesta.getId(), "1001");
+
+        assertTrue((Boolean) resultado.get("tieneConflictos"));
+
+        Map<String, Object> resultadoMisma = propuestaService.verificarConflictos(
+            mismaFigurita.getId(), "1001");
+
+        assertFalse((Boolean) resultadoMisma.get("tieneConflictos"));
+    }
 
 }
