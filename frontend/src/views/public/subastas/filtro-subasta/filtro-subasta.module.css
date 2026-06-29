@@ -1,0 +1,147 @@
+.filtrosCard {
+    background: #ffffff;
+    border: 1.5px solid var(--border-color-light);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filtrosRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filtrosLabel {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border-color-dark);
+    background: #ffffff;
+    color: #374151;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font-family);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.chip:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+.chipActive {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.chipActive:hover {
+    background: #1a6e38;
+    border-color: #1a6e38;
+}
+
+.filtrosInputRow {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.filtroInput {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border-color-light);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #374151;
+    background: #ffffff;
+    outline: none;
+    font-family: var(--font-family);
+    transition: border-color 0.15s;
+    min-width: 0;
+}
+
+.filtroInput::placeholder {
+    color: #9ca3af;
+}
+
+.filtroInput:focus {
+    border-color: var(--color-secondary);
+}
+
+.chipsActivos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chipActivo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-secondary);
+  background: var(--color-secondary);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.chipActivo:hover {
+  background: #1a6e38;
+  border-color: #1a6e38;
+}
+
+.chipX {
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.divider {
+  border: none;
+  border-top: 1.5px solid var(--border-color-light);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+    .filtrosRow {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filtrosLabel {
+        display: none;
+    }
+
+    .filtrosRow .chip {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .filtrosInputRow {
+        flex-direction: column;
+    }
+
+    .filtroInput {
+        flex: unset;
+        width: 100%;
+    }
+}
