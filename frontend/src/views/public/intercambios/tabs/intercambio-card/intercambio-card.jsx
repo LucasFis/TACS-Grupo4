@@ -2,7 +2,6 @@ import Button from '@/components/ui/button/button.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import HeaderUsuarioEstado from './header-usuario-estado.jsx'
 import { useNavigate } from 'react-router'
-import styles from './intercambio-card.module.css'
 import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import {
   cancelarPropuesta,
@@ -139,17 +138,21 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
         <SectionCard.Section>
           <div className="row mt-2">
             <div className="col">
-              <div className={styles.columnLabel}>Vos recibís</div>
-              {izq.map((f) => (
-                <FiguritaChip key={f.id} fig={f} variante="neutro" />
-              ))}
+              <div className="label-seccion">Vos recibís</div>
+              <div className="d-flex flex-column gap-1">
+                {izq.map((f) => (
+                  <FiguritaChip key={f.id} fig={f} variante="neutro" />
+                ))}
+              </div>
             </div>
             <div className="col-auto d-flex align-items-center">⇄</div>
             <div className="col">
-              <div className={styles.columnLabel}>Vos entregás</div>
-              {der.map((f) => (
-                <FiguritaChip key={f.id} fig={f} variante="neutro" />
-              ))}
+              <div className="label-seccion">Vos entregás</div>
+              <div className="d-flex flex-column gap-1">
+                {der.map((f) => (
+                  <FiguritaChip key={f.id} fig={f} variante="neutro" />
+                ))}
+              </div>
             </div>
           </div>
         </SectionCard.Section>
