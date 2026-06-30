@@ -113,7 +113,7 @@ const VerSubasta = () => {
             {/* Tiempo restante */}
             <SectionCard>
               <SectionCard.Section>
-                <p className={styles.sectionLabel}>Tiempo restante</p>
+                <p className="label-seccion">Tiempo restante</p>
                 <div className="d-flex align-items-end gap-2">
                   <h2 className="mb-0">{procesarDuracion()}</h2>
                   <p className="mb-1 text-muted">HH:MM:SS</p>
@@ -124,7 +124,7 @@ const VerSubasta = () => {
             {/* Detalles */}
             <SectionCard>
               <SectionCard.Section>
-                <p className={styles.sectionLabel}>Detalles de la subasta</p>
+                <p className="label-seccion">Detalles de la subasta</p>
                 <div className="d-flex flex-column gap-3 mt-2">
                   <div className="d-flex">
                     <div className="w-50">
@@ -153,7 +153,7 @@ const VerSubasta = () => {
             {/* Publicado por */}
             <SectionCard>
               <SectionCard.Section>
-                <p className={styles.sectionLabel}>Publicado por</p>
+                <p className="label-seccion">Publicado por</p>
                 <div className="mt-2">
                   <PerfilSimple perfil={subasta.perfil} />
                 </div>
@@ -163,12 +163,12 @@ const VerSubasta = () => {
             {/* Condiciones */}
             <SectionCard>
               <SectionCard.Section>
-                <p className={styles.sectionLabel}>Condiciones para ofertar</p>
+                <p className="label-seccion">Condiciones para ofertar</p>
 
                 <div className="d-flex flex-column gap-3 mt-2">
                   {/* Figuritas requeridas */}
                   <div className="d-flex flex-column gap-2">
-                    <p className={styles.sectionLabel}>Figuritas requeridas</p>
+                    <p className="label-seccion">Figuritas requeridas</p>
                     {subasta.figuritas_solicitadas.length > 0 ? (
                       <>
                         {subasta.figuritas_solicitadas.map((fig, i) => (
@@ -188,7 +188,7 @@ const VerSubasta = () => {
                   {/* Calificación mínima */}
                   <div className={`${styles.condicionesDivisor} d-flex align-items-center justify-content-between pt-2`}>
                     <div>
-                      <p className={styles.sectionLabel}>Calificación mínima</p>
+                      <p className="label-seccion">Calificación mínima</p>
                       <p className="mb-0 text-muted" style={{ fontSize: '0.72rem' }}>
                         {subasta.calificacion_minima_solicitada <= 1
                           ? 'Cualquier usuario puede ofertar'
@@ -213,7 +213,7 @@ const VerSubasta = () => {
             {/* Ofertas */}
             <SectionCard>
               <SectionCard.Section>
-                <p className={styles.sectionLabel}>
+                <p className="label-seccion">
                   Ofertas {subastaAbierta ? 'actuales' : 'históricas'} ({subasta.ofertas.length})
                 </p>
                 <div className="d-flex flex-column gap-2 mt-2">
@@ -229,7 +229,7 @@ const VerSubasta = () => {
 
               {!esAutor && subastaAbierta && (
                 <SectionCard.Section>
-                  <p className={styles.sectionLabel}>Tu oferta</p>
+                  <p className="label-seccion">Tu oferta</p>
                   <div className="mt-2">
                     {ofertaPropia ? (
                       <TuOfertaCard oferta={ofertaPropia} subasta={subasta} subastaAbierta={subastaAbierta} />

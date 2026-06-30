@@ -3,9 +3,11 @@
   --color-primary-acent: #e6e6e6;
 
   --color-secondary: #175a2d;
+  --color-secondary-dark: #0f3d1e;
   --color-secondary-acent: #b1f5c7;
 
   --color-terciary: #d49a2c;
+  --color-terciary-dark: #a87820;
 
   --color-background: #faf9f5;
   --color-text: #212529;
@@ -66,4 +68,13 @@ p {
 input::placeholder {
   color: var(--color-placeholder)  !important;
   opacity: 1  !important;
+}
+
+.label-seccion {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6c757d;
+  margin-bottom: 4px;
 }

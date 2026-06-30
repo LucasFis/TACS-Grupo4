@@ -42,14 +42,6 @@
     letter-spacing: 0.04em;
 }
 
-.sectionLabel {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #6c757d;
-    margin-bottom: 4px;
-}
 
 .condicionesDivisor {
     border-top: 1px solid #9FE1CB;
