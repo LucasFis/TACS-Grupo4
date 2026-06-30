@@ -91,13 +91,13 @@ const CrearOferta = () => {
         }
       >
         <img
-                    className={`${styles.figuritaImagen} bg-white rounded-3`}
-                    src={figurita?.imagen_url || '/jugador-placeholder.png'}
-                    alt={figurita?.jugador}
-                  />
+          className={`${styles.figuritaImagen} bg-white rounded-3`}
+          src={subasta.figurita?.imagen_url || '/jugador-placeholder.png'}
+          alt={subasta.figurita?.jugador}
+        />
 
-        <h4 className={'text-white'}>{subasta.figurita.jugador}</h4>
-        <h6 className={'text-white'}>{subasta.figurita.seleccion}</h6>
+        <h4 className="text-white">{subasta.figurita.jugador}</h4>
+        <h6 className="text-white">{subasta.figurita.seleccion}</h6>
       </div>
 
       <SectionCard>
