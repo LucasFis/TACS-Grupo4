@@ -177,6 +177,7 @@ const Repetidas = () => {
                         onClick={() =>
                             navigate("/mis-figuritas/nueva-repetida")
                         }
+                        variante="primario"
                     />
                 </div>
             </div>
