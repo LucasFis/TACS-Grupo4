@@ -335,6 +335,10 @@ public class ServicioSubasta {
 
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cerrar(perfilId);
+
+    registrarTransiciones(subasta, estadosAntes);
+    registrarCierreSubasta(subasta, seleccionada != null ? "adjudicada" : "sin_oferta");
+
       if (seleccionada != null) {
           notificacionService.notificarInteresados(
                   List.of(seleccionada.getAutor()),
@@ -343,8 +347,6 @@ public class ServicioSubasta {
                   "/subastas/" + subasta.getId()
           );
       }
-    registrarTransiciones(subasta, estadosAntes);
-    registrarCierreSubasta(subasta, seleccionada != null ? "adjudicada" : "sin_oferta");
 
     subasta.getOfertas().stream()
         .filter(o -> seleccionada == null || !o.getId().equals(seleccionada.getId()))

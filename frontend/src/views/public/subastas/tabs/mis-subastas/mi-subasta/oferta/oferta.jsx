@@ -30,11 +30,11 @@ const Oferta = ({ oferta, onAdjudicar, onRechazar }) => (
       </button>
     )}
 
-    {/*
+    {
     <button className="btn btn-outline-secondary btn-sm px-2" onClick={onRechazar}>
       ✕
     </button>
-     */}
+     }
 
   </div>
 )

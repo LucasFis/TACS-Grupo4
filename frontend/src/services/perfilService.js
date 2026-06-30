@@ -24,21 +24,26 @@ export const calificarPerfil = async (
 }
 
 export const buscarPerfil = async (perfilId) => {
+  try {
 
     const url = perfilId
-        ? `/perfil/${perfilId}`
-        : '/perfil'
+      ? `/perfil/${perfilId}`
+      : '/perfil'
 
     const { data } = await api.get(url)
 
     return data
+
+  } catch (error) {
+    handleAxiosError(error)
+  }
 }
 
 export const buscarCalificaciones = async (
     perfilId,
     filtros
 ) => {
-
+    try{
     const url = perfilId
         ? `/perfil/${perfilId}/calificaciones`
         : '/perfil/calificaciones'
@@ -48,6 +53,10 @@ export const buscarCalificaciones = async (
     })
 
     return data
+    } catch (error){
+        handleAxiosError(error)
+    }
+
 }
 
 export const buscarContadores = async (perfilId) => {
