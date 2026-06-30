@@ -7,6 +7,7 @@ const PerfilHeader = ({
   promedio,
   reviews,
   perfilId,
+  esMiPerfil,
   onEditarClick,
   onCerrarSesionClick,
 }) => {
@@ -42,20 +43,23 @@ const PerfilHeader = ({
           </div>
         </div>
 
-        <div className="d-flex align-items-center gap-3">
-          <button className={`btn btn-warning ${styles['btn-editar']}`} onClick={onEditarClick}>
-            Editar perfil
-          </button>
+        {esMiPerfil && (
+          <div className="d-flex align-items-center gap-3">
+            <button
+              className={`btn btn-warning ${styles['btn-editar']}`}
+              onClick={onEditarClick}
+            >
+              Editar perfil
+            </button>
 
-          {perfilId != null && (
             <button
               className={`btn btn-outline-light ${styles['btn-editar']}`}
               onClick={onCerrarSesionClick}
             >
               Cerrar sesion
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -3,7 +3,7 @@ import { buscarCalificaciones } from '@/services/perfilService.js'
 import { useError } from '@/contexts/errorContext.jsx'
 import usePaginacion from '@/hooks/usePaginacion.js'
 
-export const useCalificaciones = () => {
+export const useCalificaciones = (perfilId) => {
   const [reviews, setReviews] = useState({})
   const [loading, setLoading] = useState(false)
   const [filtros] = useState({})
@@ -15,7 +15,7 @@ export const useCalificaciones = () => {
     const cargar = async () => {
       try {
         setLoading(true)
-        const data = await buscarCalificaciones({ ...filtros, pagina, limite: 10 })
+        const data = await buscarCalificaciones(perfilId, { ...filtros, pagina, limite: 10 })
         setReviews(data)
       } catch (error) {
         handleError(error, () => {})
@@ -24,7 +24,7 @@ export const useCalificaciones = () => {
       }
     }
     cargar()
-  }, [filtros, handleError, pagina])
+  }, [perfilId ,filtros, handleError, pagina])
 
   return { reviews, loading, pagina, setPagina }
 }

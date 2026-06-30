@@ -5,7 +5,7 @@ import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { truncarADosDecimales } from '@/utils/estandarizar.js'
 
-export const usePerfil = () => {
+export const usePerfil = (perfilId) => {
   const [perfil, setPerfil] = useState({})
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState([])
@@ -27,8 +27,8 @@ export const usePerfil = () => {
     const cargar = async () => {
       try {
         setLoading(true)
-        const perfilData = await buscarPerfil()
-        const statsData = await buscarContadores()
+        const perfilData = await buscarPerfil(perfilId)
+        const statsData = await buscarContadores(perfilId)
         setPerfil(perfilData)
         setStats(statsData)
       } catch (error) {
@@ -38,7 +38,7 @@ export const usePerfil = () => {
       }
     }
     cargar()
-  }, [])
+  }, [perfilId])
 
   return {
     perfil,

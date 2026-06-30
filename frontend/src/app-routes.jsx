@@ -110,6 +110,10 @@ const privadas = [
   {
     path: '/subastas/:subId/ofertas/:ofertaId/editar',
     element: <EditarOferta />,
+  },
+  {
+    path: '/perfil/:perfilId',
+    element: <Perfil />,
   }
 ]
 
