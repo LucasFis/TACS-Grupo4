@@ -44,7 +44,7 @@ class ControladorAdministradorTest {
     }
 
     @Test
-    void getEstadisticas_conUsuarioComun_retorna401() throws Exception {
+    void getEstadisticas_conUsuarioComun_retorna403() throws Exception {
 
         when(servicioJwt.obtenerSesion(any()))
             .thenReturn(new SesionDto("u1", "USUARIO", "p1", "c1"));
@@ -55,7 +55,7 @@ class ControladorAdministradorTest {
                     .param("hasta", "2025-06-15")
                     .cookie(new Cookie("token", "token-usuario"))
             )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isForbidden());
     }
 
 }
