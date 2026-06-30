@@ -1,5 +1,5 @@
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
-import FiguritaRecomendadaCard from '@/views/public/sugerencias/figurita-recomendada-card.jsx'
+import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import styles from '@/views/public/sugerencias/sugerencia-card.module.css'
 import { useState } from 'react'
 import { alternarFavorito } from '@/services/sugerenciasService.js'
@@ -44,7 +44,7 @@ const SugerenciaResumen = ({id, figuritasNecesarias, figuritasRecomendadas, perf
         <div className="d-flex flex-row align-items-center gap-2">
           <div className="flex-grow-1">
             {figuritasNecesarias.map((fig) => (
-              <FiguritaRecomendadaCard fig={fig} key={fig.id} />
+              <FiguritaChip fig={fig} key={fig.id} />
             ))}
           </div>
 
@@ -52,7 +52,7 @@ const SugerenciaResumen = ({id, figuritasNecesarias, figuritasRecomendadas, perf
 
           <div className="flex-grow-1 text-end">
             {figuritasRecomendadas.map((fig) => (
-              <FiguritaRecomendadaCard fig={fig} key={fig.id} verde={false} />
+              <FiguritaChip fig={fig} key={fig.id} variante="azul" />
             ))}
           </div>
         </div>
