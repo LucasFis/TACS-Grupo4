@@ -2,39 +2,68 @@ import { useState } from 'react'
 import Button from '../../../components/ui/button/button.jsx'
 import styles from './sugerencia-card.module.css'
 import ProponerIntercambioModal from '@/views/public/sugerencias/proponer-intercambio-modal.jsx'
-import SugerenciaResumen from '@/views/public/sugerencias/sugerencia-resumen.jsx'
+import FiguritaRecomendadaCard from '@/views/public/sugerencias/figurita-recomendada-card.jsx'
+import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
 import { crearPropuesta } from '@/services/propuestasService.js'
+import { alternarFavorito } from '@/services/sugerenciasService.js'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 
-const SugerenciaCard = ({id, perfil, figuritasRecomendadas, figuritasNecesarias, favorito}) => {
+const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias, favorito }) => {
   const [modalAbierto, setModalAbierto] = useState(false)
-  const {showToast} = useToast()
-  const {handleError, errorTemplate} = useError()
-  const [error, setErrorState] = useState(errorTemplate())
+  const [esFavorito, setEsFavorito] = useState(favorito)
+  const { showToast } = useToast()
+  const { handleError } = useError()
+
+  const handleToggleFavorito = async () => {
+    try {
+      setEsFavorito(!esFavorito)
+      await alternarFavorito({ sugerenciaId: id })
+    } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
+    }
+  }
 
   const handleProponer = async ({ repetidas, faltantes } = {}) => {
     try {
-      await crearPropuesta(perfil.id,  faltantes[0].id, repetidas.map(re => re.figurita_id))
-      showToast(`Propuesta enviada correctamente`, "success")
+      await crearPropuesta(perfil.id, faltantes[0].id, repetidas.map(re => re.figurita_id))
+      showToast('Propuesta enviada correctamente', 'success')
     } catch (error) {
-      showToast(handleError(error, setErrorState), "error")
+      showToast(handleError(error, () => {}), 'error')
     }
   }
 
   return (
     <>
-      <div className={`p-3 ${styles.card}`}>
+      <div className={styles.card}>
 
-        {/* HEADER */}
-        <SugerenciaResumen id={id} perfil={perfil} figuritasNecesarias={figuritasNecesarias} figuritasRecomendadas={figuritasRecomendadas} favorito={favorito} />
+        <div className={styles.cardHeader}>
+          <PerfilSimple perfil={perfil} />
+          <button
+            onClick={handleToggleFavorito}
+            className={styles.botonFavorito}
+            aria-label={esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+          >
+            {esFavorito ? '★' : '☆'}
+          </button>
+        </div>
 
-        <hr className="my-3" />
-
-        <div className="d-flex justify-content-end align-items-center">
-          <div className="d-flex gap-2">
-            <Button onClick={() => setModalAbierto(true)}>Proponer intercambio</Button>
+        <div className={styles.cardBody}>
+          <div className={styles.columns}>
+            <div className={styles.column}>
+              <p className={styles.columnLabel}>Le interesa</p>
+              {figuritasNecesarias.map(fig => <FiguritaRecomendadaCard fig={fig} key={fig.id} />)}
+            </div>
+            <div className={styles.swapIcon}>⇄</div>
+            <div className={styles.column}>
+              <p className={styles.columnLabel}>Él/ella tiene</p>
+              {figuritasRecomendadas.map(fig => <FiguritaRecomendadaCard fig={fig} key={fig.id} verde={false} />)}
+            </div>
           </div>
+        </div>
+
+        <div className={styles.cardFooter}>
+          <Button onClick={() => setModalAbierto(true)} variante="terciario" className="btn-sm">Proponer intercambio</Button>
         </div>
       </div>
 
@@ -42,7 +71,8 @@ const SugerenciaCard = ({id, perfil, figuritasRecomendadas, figuritasNecesarias,
         abierto={modalAbierto}
         onCerrar={() => setModalAbierto(false)}
         perfil={perfil}
-        id={id} favorito={favorito}
+        id={id}
+        favorito={favorito}
         figuritasNecesarias={figuritasNecesarias}
         figuritasRecomendadas={figuritasRecomendadas}
         onProponer={handleProponer}
