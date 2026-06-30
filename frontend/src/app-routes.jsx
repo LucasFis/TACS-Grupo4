@@ -25,129 +25,57 @@ import EditarOferta from './views/public/editar-oferta/editar-oferta.jsx'
 import VerIntercambio from './views/public/ver-intercambio/ver-intercambio.jsx'
 import Administrador from './views/public/administrador/administrador.jsx'
 import RutaConRol from '@/components/autenticacion/ruta-con-rol.jsx'
-import RutaPrivilegiada from '@/components/autenticacion/ruta-privilegiada.jsx'
 import VistaNoEncontrada from '@/views/public/errores/vista-no-encontrada/vista-no-encontrada.jsx'
 import ErrorBoundary from '@/contexts/errorBoundary.jsx'
 
-const publicas = [
-  {
-    path: '/',
-    element: <Navigate to="/explorar" replace />,
-  },
-  {
-    path: '/explorar',
-    element: <Explorar />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/registrar',
-    element: <Registrar />,
-  },
-  {
-    path: '/acceso-denegado',
-    element: <AccesoDenegado />,
-  },
-  {
-    path: '/servidor-caido',
-    element: <ServidorCaido />,
-  },
-  {
-    path: '/error-interno',
-    element: <ErrorInterno />,
-  },
+const rutasSinAdmin = [
+  { path: '/', element: <Navigate to="/explorar" replace /> },
+  { path: '/explorar', element: <Explorar /> },
+]
+
+const rutasPublicas = [
+  { path: '/login', element: <Login /> },
+  { path: '/registrar', element: <Registrar /> },
+  { path: '/acceso-denegado', element: <AccesoDenegado /> },
+  { path: '/servidor-caido', element: <ServidorCaido /> },
+  { path: '/error-interno', element: <ErrorInterno /> },
 ]
 
 const privadas = [
-  {
-    path: '/mis-figuritas',
-    element: <MisFiguritas />,
-  },
-  {
-    path: '/mis-figuritas/nueva-faltante',
-    element: <NuevaFaltante />,
-  },
-  {
-    path: '/mis-figuritas/nueva-repetida',
-    element: <NuevaRepetida />,
-  },
-  {
-    path: '/subastas/crear',
-    element: <CrearSubasta />,
-  },
-  {
-    path: '/sugerencias',
-    element: <Sugerencias />,
-  },
-  {
-    path: '/perfil',
-    element: <Perfil />,
-  },
-  {
-    path: '/intercambios',
-    element: <Intercambios />,
-  },
-  {
-    path: '/intercambios/crear',
-    element: <CrearPropuestaIntercambio />,
-  },
-  {
-    path: '/intercambios/:intercambioId',
-    element: <VerIntercambio />,
-  },
-  {
-    path: '/subastas/:subId',
-    element: <VerSubasta />,
-  },
-  {
-    path: '/subastas',
-    element: <Subastas />,
-  },
-  {
-    path: '/subastas/:subId/crear-oferta',
-    element: <CrearOferta />,
-  },
-  {
-    path: '/subastas/:subId/ofertas/:ofertaId/editar',
-    element: <EditarOferta />,
-  }
+  { path: '/mis-figuritas', element: <MisFiguritas /> },
+  { path: '/mis-figuritas/nueva-faltante', element: <NuevaFaltante /> },
+  { path: '/mis-figuritas/nueva-repetida', element: <NuevaRepetida /> },
+  { path: '/subastas/crear', element: <CrearSubasta /> },
+  { path: '/sugerencias', element: <Sugerencias /> },
+  { path: '/perfil', element: <Perfil /> },
+  { path: '/intercambios', element: <Intercambios /> },
+  { path: '/intercambios/crear', element: <CrearPropuestaIntercambio /> },
+  { path: '/intercambios/:intercambioId', element: <VerIntercambio /> },
+  { path: '/subastas/:subId', element: <VerSubasta /> },
+  { path: '/subastas', element: <Subastas /> },
+  { path: '/subastas/:subId/crear-oferta', element: <CrearOferta /> },
+  { path: '/subastas/:subId/ofertas/:ofertaId/editar', element: <EditarOferta /> },
 ]
 
 const privilegiadas = [
-  {
-    path: '/estadisticas',
-    element: <Administrador />,
-  }
+  { path: '/estadisticas', element: <Administrador /> },
 ]
-
-const rutasSinAdmin = publicas.filter(r => r.path === '/' || r.path === '/explorar')
-const rutasRestantes = publicas.filter(r => r.path !== '/' && r.path !== '/explorar')
 
 const AppRoutes = () => {
   return (
-    <ErrorProvider>
-      <ToastProvider>
-        <AuthProvider>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/estadisticas" invertir />}>
-                {rutasSinAdmin.map((route) => (
-                  <Route key={route.path} path={route.path} element={route.element} />
-                ))}
-              </Route>
-
-              {rutasRestantes.map((route) => (
-                <Route key={route.path} path={route.path} element={route.element} />
-              ))}
     <ErrorBoundary>
       <ErrorProvider>
         <ToastProvider>
           <AuthProvider>
             <Routes>
               <Route element={<Layout />}>
-                {publicas.map((route) => (
+                <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/estadisticas" invertir />}>
+                  {rutasSinAdmin.map((route) => (
+                    <Route key={route.path} path={route.path} element={route.element} />
+                  ))}
+                </Route>
+
+                {rutasPublicas.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
 
@@ -157,31 +85,19 @@ const AppRoutes = () => {
                   ))}
                 </Route>
 
-                <Route element={<RutaPrivilegiada />}>
+                <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/acceso-denegado" />}>
                   {privilegiadas.map((route) => (
                     <Route key={route.path} path={route.path} element={route.element} />
                   ))}
                 </Route>
 
                 <Route path="*" element={<VistaNoEncontrada />} />
-
               </Route>
             </Routes>
           </AuthProvider>
         </ToastProvider>
       </ErrorProvider>
     </ErrorBoundary>
-              <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/acceso-denegado" />}>
-                {privilegiadas.map((route) => (
-                  <Route key={route.path} path={route.path} element={route.element} />
-                ))}
-              </Route>
-            </Route>
-
-          </Routes>
-        </AuthProvider>
-      </ToastProvider>
-    </ErrorProvider>
   )
 }
 
