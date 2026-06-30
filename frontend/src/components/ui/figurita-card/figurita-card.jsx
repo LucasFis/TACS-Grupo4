@@ -66,7 +66,7 @@ const CardBody = ({
     {!esPropio && (tipo === 'intercambio' || tipo === 'ambos') && (
       <CardActionBtn to="/intercambios/crear" label="Proponer intercambio ↗" state={{ figurita }} />
     )}
-    {(tipo === 'subasta' || tipo === 'ambos') && figurita.subasta_id && (
+    {!esPropio && (tipo === 'subasta' || tipo === 'ambos') && figurita.subasta_id && (
       <CardActionBtn
         to={`/subastas/${figurita.subasta_id}`}
         label="Ver subasta ↗"
