@@ -14,14 +14,18 @@ export function calcularTiempoRestante(fechaCierre) {
 }
 
 export function calcularFinalizadaHace(fechaCierre) {
-  const diff = new Date() - new Date(fechaCierre);
-  const minutos = Math.floor(diff / 60000);
-  const horas = Math.floor(minutos / 60);
-  const dias = Math.floor(horas / 24);
+  const diff = new Date() - new Date(fechaCierre)
 
-  if (dias > 0) return `${dias}d`;
-  if (horas > 0) return `${horas}h`;
-  return `${minutos}m`;
+  const segundos = Math.floor(diff / 1000)
+  const minutos = Math.floor(segundos / 60)
+  const horas = Math.floor(minutos / 60)
+  const dias = Math.floor(horas / 24)
+
+  if (dias > 0) return `${dias}d`
+  if (horas > 0) return `${horas}h`
+  if (minutos > 0) return `${minutos}m`
+
+  return 'Ahora'
 }
 
 // umbral: finaliza en menos de 2 horas
