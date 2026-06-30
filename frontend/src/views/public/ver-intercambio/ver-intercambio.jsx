@@ -11,18 +11,23 @@ import {
   aceptarPropuesta,
   rechazarPropuesta,
   cancelarPropuesta,
+  verificarConflictos,
 } from '@/services/propuestasService.js'
 
 import FiguritaCard from './figurita-card.jsx'
 import OfertaCard from './oferta-card.jsx'
+import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { construirAdvertenciaConflictos } from '@/utils/conflictos.js'
 
 const VerIntercambio = () => {
   const { intercambioId } = useParams()
   const [cargando, setCargando] = useState(true)
   const [propuesta, setPropuesta] = useState(null)
+  const [showConfirmAceptar, setShowConfirmAceptar] = useState(false)
+  const [conflictosData, setConflictosData] = useState(null)
 
   const { handleError } = useError()
   const { showToast } = useToast()
@@ -46,9 +51,21 @@ const VerIntercambio = () => {
     cargarIntercambio()
   }, [intercambioId])
 
+  const handleClickAceptar = async () => {
+    try {
+      const data = await verificarConflictos(propuesta.id)
+      setConflictosData(data)
+      setShowConfirmAceptar(true)
+    } catch (error) {
+      showToast(handleError(error, (m) => {}),'error')
+    }
+  }
+
   const ejecutarAceptar = async () => {
     try {
       await aceptarPropuesta(propuesta.id)
+      setShowConfirmAceptar(false)
+      setConflictosData(null)
       setPropuesta((prev) => ({ ...prev, estado: 'ACEPTADO' }))
       showToast('Propuesta aceptada correctamente.')
     } catch (error) {
@@ -138,7 +155,7 @@ const VerIntercambio = () => {
             {estaPendiente && (
               <div className="d-flex gap-2">
                 <Button label="Rechazar" onClick={ejecutarRechazar} variante="peligroBorde" />
-                <Button label="Aceptar" onClick={ejecutarAceptar} variante="exitoBorde" />
+                <Button label="Aceptar" onClick={handleClickAceptar} variante="exitoBorde" />
               </div>
             )}
             {puedeCancelar && (
@@ -183,6 +200,16 @@ const VerIntercambio = () => {
           <OfertaCard propuesta={propuesta} tipo={propuesta.tipo} />
         </SectionCard.Section>
       </SectionCard>
+
+      <ConfirmModal
+        show={showConfirmAceptar}
+        titulo="Aceptar intercambio"
+        mensaje="¿Querés aceptar este intercambio?"
+        labelConfirmar="Aceptar"
+        onConfirmar={ejecutarAceptar}
+        onCancelar={() => { setShowConfirmAceptar(false); setConflictosData(null) }}
+        advertencia={construirAdvertenciaConflictos(conflictosData)}
+      />
     </div>
   )
 }

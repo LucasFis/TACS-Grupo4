@@ -26,7 +26,7 @@ const Subastas = () => {
             <SectionTitle>Subastas</SectionTitle>
             <Button
               label="Crear subasta ↗"
-              variante="exito"
+              variante="terciario"
               onClick={() => navigate('/subastas/crear')}
             />
           </div>

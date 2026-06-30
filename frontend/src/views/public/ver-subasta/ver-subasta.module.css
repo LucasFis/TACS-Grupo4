@@ -1,12 +1,73 @@
 .figuritaSubastada {
-
     background-color: var(--color-secondary);
+    border-radius: 12px;
 }
 
-.figuritaImagen{
-    min-height: 360px;
-    max-height: 480px;
+.figuritaImagen {
+    width: 280px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 12px;
+    flex-shrink: 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
 
-    min-width: 240px;
-    max-width: 360px;
+.figuritaNombre {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.figuritaSeleccion {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 6px 0 0;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.figuritaNumero {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-terciary);
+    background: rgba(212, 154, 44, 0.15);
+    border: 1px solid rgba(212, 154, 44, 0.35);
+    padding: 3px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+}
+
+
+.condicionesDivisor {
+    border-top: 1px solid #9FE1CB;
+}
+
+.calBadge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.calSinMinimo {
+    background-color: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    font-size: 0.82rem;
+    color: var(--bs-secondary-color);
+}
+
+.calConMinimo {
+    background-color: #E1F5EE;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #085041;
+}
+
+.calConMinimoStar {
+    font-size: 0.82rem;
+    color: #0F6E56;
 }

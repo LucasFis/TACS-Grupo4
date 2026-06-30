@@ -8,6 +8,7 @@ import app.dto.request.CrearPropuestaRequest;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioPropuesta;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,23 @@ public class ControladorPropuesta {
     ) {
         String perfilId = this.servicioJwt.getPerfilId(token);
         return ResponseEntity.ok(this.propuestaService.obtenerPorId(prop_id, perfilId));
+    }
+
+    /**
+     * Verifica si las figuritas que el destinatario va a recibir en esta propuesta
+     * también están involucradas en otras transacciones pendientes del mismo perfil.
+     *
+     * @param token   token JWT del que se extrae el identificador del perfil
+     * @param prop_id identificador de la propuesta a verificar
+     * @return 200 OK con { tieneConflictos: boolean, figuritasEnConflicto: [...] }
+     */
+    @GetMapping("/{prop_id}/conflictos")
+    public ResponseEntity<Map<String, Object>> verificarConflictos(
+        @CookieValue String token,
+        @PathVariable String prop_id
+    ) {
+        String perfilId = this.servicioJwt.getPerfilId(token);
+        return ResponseEntity.ok(propuestaService.verificarConflictos(prop_id, perfilId));
     }
 
     /**

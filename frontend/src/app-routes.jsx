@@ -23,9 +23,11 @@ import ErrorInterno from '@/views/public/errores/error-interno/error-interno.jsx
 import CrearOferta from './views/public/crear-oferta/crear-oferta.jsx'
 import EditarOferta from './views/public/editar-oferta/editar-oferta.jsx'
 import VerIntercambio from './views/public/ver-intercambio/ver-intercambio.jsx'
-
 import Administrador from './views/public/administrador/administrador.jsx'
 import RutaConRol from '@/components/autenticacion/ruta-con-rol.jsx'
+import RutaPrivilegiada from '@/components/autenticacion/ruta-privilegiada.jsx'
+import VistaNoEncontrada from '@/views/public/errores/vista-no-encontrada/vista-no-encontrada.jsx'
+import ErrorBoundary from '@/contexts/errorBoundary.jsx'
 
 const publicas = [
   {
@@ -139,13 +141,36 @@ const AppRoutes = () => {
               {rutasRestantes.map((route) => (
                 <Route key={route.path} path={route.path} element={route.element} />
               ))}
-
-              <Route element={<RutaProtegida />}>
-                {privadas.map((route) => (
+    <ErrorBoundary>
+      <ErrorProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <Routes>
+              <Route element={<Layout />}>
+                {publicas.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
-              </Route>
 
+                <Route element={<RutaProtegida />}>
+                  {privadas.map((route) => (
+                    <Route key={route.path} path={route.path} element={route.element} />
+                  ))}
+                </Route>
+
+                <Route element={<RutaPrivilegiada />}>
+                  {privilegiadas.map((route) => (
+                    <Route key={route.path} path={route.path} element={route.element} />
+                  ))}
+                </Route>
+
+                <Route path="*" element={<VistaNoEncontrada />} />
+
+              </Route>
+            </Routes>
+          </AuthProvider>
+        </ToastProvider>
+      </ErrorProvider>
+    </ErrorBoundary>
               <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/acceso-denegado" />}>
                 {privilegiadas.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />

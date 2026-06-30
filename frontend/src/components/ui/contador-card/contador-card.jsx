@@ -1,6 +1,8 @@
+import styles from './contador-card.module.css'
+
 const ContadorCard = ({ title, value, color }) => {
     return (
-        <div className="d-flex flex-column justify-content-between p-3 rounded-3 bg-body-secondary h-100">
+        <div className={`d-flex flex-column justify-content-between p-3 rounded-3 bg-body-secondary h-100 ${styles.card}`}>
             <div className="text-muted small fw-semibold">
                 {title}
             </div>

@@ -5,6 +5,7 @@ const ConfirmModal = ({
   labelConfirmar,
   onConfirmar,
   onCancelar,
+  advertencia,
 }) => {
   if (!show) return null;
 
@@ -19,6 +20,15 @@ const ConfirmModal = ({
             <h6 className="modal-title fw-bold">{titulo}</h6>
           </div>
           <div className="modal-body pt-2">
+            {advertencia && (
+              <div
+                className="alert alert-warning py-2 px-3 mb-3"
+                style={{ fontSize: "0.85rem" }}
+                role="alert"
+              >
+                {advertencia}
+              </div>
+            )}
             <p className="text-muted mb-0" style={{ fontSize: "0.9rem" }}>
               {mensaje}
             </p>

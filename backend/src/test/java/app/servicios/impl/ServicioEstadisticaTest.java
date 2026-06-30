@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import app.MongoTestBase;
 import app.dto.EstadisticasDto;
 import app.dto.SesionDto;
-import app.exceptions.UnauthorizedException;
+import app.exceptions.ForbiddenException;
 import app.model.entities.*;
 
 import java.time.LocalDate;
@@ -284,11 +284,11 @@ class ServicioEstadisticaTest extends MongoTestBase {
     }
 
     @Test
-    void obtenerEstadisticas_usuarioNoAdmin_lanzaUnauthorized() {
+    void obtenerEstadisticas_usuarioNoAdmin_lanzaForbidden() {
         SesionDto sesion = new SesionDto("u1", "USUARIO", "p-11", "c-10");
 
         assertThrows(
-            UnauthorizedException.class,
+            ForbiddenException.class,
             () -> service.obtenerEstadisticas(sesion, LocalDate.now().minusDays(7), LocalDate.now())
         );
     }

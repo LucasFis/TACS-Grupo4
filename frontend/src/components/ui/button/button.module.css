@@ -79,3 +79,25 @@
   background-color: #e2e3e5;
   color: var(--bs-secondary);
 }
+
+.primario {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: #fff;
+}
+
+.primario:hover:not(:disabled) {
+  background-color: var(--color-secondary-dark);
+  color: #fff;
+}
+
+.terciario {
+  background-color: var(--color-terciary);
+  border-color: var(--color-terciary);
+  color: #fff;
+}
+
+.terciario:hover:not(:disabled) {
+  background-color: var(--color-terciary-dark);
+  color: #fff;
+}

@@ -3,6 +3,7 @@ package app.repositories.impl;
 import app.dto.filtros.PropuestasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.exceptions.NotFoundException;
+import app.model.entities.EstadoProceso;
 import app.model.entities.Propuesta;
 import app.repositories.RepositorioPropuestas;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,5 +101,19 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
     @Override
     public int contar() {
         return (int) this.mongoTemplate.count(new Query(), Propuesta.class);
+    }
+
+    @Override
+    public int contarConflictos(String figuritaId, String perfilId, String excluirPropuestaId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").ne(excluirPropuestaId));
+        query.addCriteria(Criteria.where("estadoActual.valor").is(EstadoProceso.PENDIENTE));
+        query.addCriteria(new Criteria().orOperator(
+            Criteria.where("figuritaBuscada.$id").is(figuritaId)
+                .and("autor.id").is(perfilId),
+            Criteria.where("figuritasOfrecidas.$id").is(figuritaId)
+                .and("destinatario.id").is(perfilId)
+        ));
+        return (int) this.mongoTemplate.count(query, Propuesta.class);
     }
 }

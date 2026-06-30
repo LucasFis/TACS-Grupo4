@@ -3,7 +3,7 @@ package app.servicios;
 import app.dto.*;
 import app.dto.filtros.SubastasFiltro;
 import app.dto.paginacion.PaginaResultado;
-import app.exceptions.UnauthorizedException;
+import app.exceptions.ForbiddenException;
 import app.model.entities.EstadoProceso;
 import app.model.entities.MetodoIntercambio;
 import app.model.entities.Propuesta;
@@ -48,12 +48,12 @@ public class ServicioEstadisticas {
    * @param dto datos de la sesión del usuario que solicita las estadísticas, utilizados
    *            para validar que tenga rol de administrador
    * @return un {@link EstadisticasDto} con el resumen de las estadísticas del sistema
-   * @throws UnauthorizedException si el rol del usuario no es {@code ADMINISTRADOR}
+   * @throws ForbiddenException si el rol del usuario no es {@code ADMINISTRADOR}
    */
     public EstadisticasDto obtenerEstadisticas(SesionDto dto, LocalDate desde, LocalDate hasta) {
 
         if(!"ADMINISTRADOR".equals(dto.rol())) {
-            throw new UnauthorizedException("Solo el admin puede ver las estadisticas");
+            throw new ForbiddenException("Solo el admin puede ver las estadisticas");
         }
 
         LocalDateTime desdeDateTime = desde.atStartOfDay();
