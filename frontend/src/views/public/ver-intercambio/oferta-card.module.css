@@ -1,35 +1,6 @@
-.ofertaCard, .position {
-    background-color: rgba(211, 211, 211, 0.2);
-    border: 3px rgba(211, 211, 211, 0.5) solid;
-
-}
-
-.ofertaCard {
-    border-radius: 15px;
-}
-
-.position {
-    height: 44px;
-    width: 44px;
-    border-radius: 100%;
-}
-
-.ofertaCard:first-child, .ofertaCard:first-child .position {
-    background-color: rgba(144, 238, 144, 0.2);
-    border: 3px rgba(144, 238, 144, 0.5) solid;
-}
-
-.ofertaCard:first-child {
-    border-radius: 15px;
-}
-
-.ofertaCard:first-child .position {
-    height: 44px;
-    width: 44px;
-    border-radius: 100%;
-}
-
-.figuritaOfrecida {
-    font-size: 0.9rem;
-    margin-right: 4px;
+.card {
+  background: rgba(211, 211, 211, 0.15);
+  border: 1px solid rgba(211, 211, 211, 0.35);
+  border-radius: 12px;
+  padding: 1rem;
 }

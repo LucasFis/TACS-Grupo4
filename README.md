@@ -85,6 +85,11 @@ Copiar `.env.example` a `.env` y ajustar los valores según corresponda.
 | `JWT_EXPIRATION` | Tiempo de expiración del token | `12h` |
 | `VITE_BACKEND_URI` | URL base del backend para el frontend | `http://localhost:8080` |
 | `SEED_DATA` | Cargar datos de prueba al iniciar | `false` (dev). `true` si se quieren datos precargados |
+| `TELEGRAM_BOT_TOKEN` | Token para conectar el bot de telegram | (ej: dasdkajdudeauhasd:sjakdjskajdl) |
+| `TELEGRAM_BOT_USERNAME` | Nombre del bot | (ej: MiBotNuevo) |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Para exportar datos de telemetria | Es un secret |
+| `OTEL_EXPORTER_OTLP_HEADERS` | Para exportar datos de telemetria | Es un secret |
+| `OTEL_RESOURCE_ATTRIBUTES` |  | (ej: MiBotNuevo) |
 
 Los valores por defecto funcionan para desarrollo (`make dev`). Para producción (`make up`), configurar `MONGO_URI` con una instancia de MongoDB externa (ej: Atlas) y `CORS_ORIGIN` con el dominio real.
 
