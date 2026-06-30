@@ -19,8 +19,8 @@ const SubastaParticipo = ({ subasta, finalizada, onRefresh }) => {
   const badgeEstado = finalizada
     ? null
     : finalizaPronto
-      ? { label: '⏱ Finaliza pronto', className: 'text-warning bg-warning-subtle' }
-      : { label: 'Activa', className: 'text-success bg-success-subtle' }
+      ? { label: 'Finaliza pronto', variante: 'advertencia' }
+      : { label: 'Activa', variante: 'exito' }
 
   const handleCalificar = async ({ valor, descripcion }) => {
     await calificarPerfil({

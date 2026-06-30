@@ -1,4 +1,4 @@
-.PHONY: up build down logs logs-back logs-front dev dev-back dev-front dev-down test
+.PHONY: up build down logs logs-back logs-front dev dev-back dev-front dev-down test loadtest loadtest-script
 
 # --- Prod ---
 
@@ -41,8 +41,8 @@ logs-front:
 test:
 	docker compose -f docker-compose.dev.yml run --rm --build backend mvn test
 
-    #Todos los scripts
+loadtest:
 	docker compose -f docker-compose.test.yml run --rm --build loadtest
 
-    #Un solo script
-    docker compose -f docker-compose.test.yml run --rm --build loadtest sugerencias.js
+loadtest-script:
+	docker compose -f docker-compose.test.yml run --rm --build loadtest $(SCRIPT)

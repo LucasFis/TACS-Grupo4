@@ -14,7 +14,9 @@ import {
 import { calificarPerfil } from '../../../../../../services/perfilService.js'
 import { derivarTiempo } from '../../../../../../utils/subastasTiempo.js'
 import { useNavigate } from 'react-router'
-import './mi-subasta.css'
+import { useToast } from '@/contexts/toastContext.jsx'
+import { useError } from '@/contexts/errorContext.jsx'
+import styles from './mi-subasta.module.css'
 
 const BADGE_ESTADO = {
   activa: { label: 'Activa', variante: 'exito' },
@@ -59,6 +61,8 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
 
   const { tiempoRestante, finalizadaHace, finalizaPronto } = derivarTiempo({ fecha_cierre })
   const navigate = useNavigate()
+  const { showToast } = useToast()
+  const { handleError } = useError()
   const [modal, setModal] = useState(null)
   const [loadingModal, setLoadingModal] = useState(false)
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
@@ -77,8 +81,8 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
       else if (modal.tipo === 'cerrar') await cerrarSubasta(subastaId)
       setModal(null)
       onRefresh()
-    } catch {
-      // manejar error
+    } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
     } finally {
       setLoadingModal(false)
     }
@@ -118,7 +122,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
         {/* Activa: lista de ofertas */}
         {!finalizada && (
           <div className="px-3 py-2 d-flex flex-column gap-2 border-top">
-            <p className="texto-chico mb-0 text-muted">Ofertas recibidas</p>
+            <p className={`${styles.textoChico} mb-0 text-muted`}>Ofertas recibidas</p>
             {ofertas?.length > 0 ? (
               ofertas.map((oferta) => (
                 <Oferta
@@ -129,7 +133,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
                 />
               ))
             ) : (
-              <p className="texto-ganador mb-0 text-muted text-center py-2">
+              <p className={`${styles.textoGanador} mb-0 text-muted text-center py-2`}>
                 Todavía no recibiste ofertas para esta subasta.
               </p>
             )}
@@ -138,7 +142,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
 
         {/* Finalizada: ganador o sin ganador */}
         {finalizada && (
-          <div className="texto-ganador px-3 py-2 border-top">
+          <div className={`${styles.textoGanador} px-3 py-2 border-top`}>
             {oferta_ganadora ? (
               <>
                 <span className="text-muted">Ganador: </span>

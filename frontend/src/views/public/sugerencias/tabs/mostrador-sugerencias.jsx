@@ -51,7 +51,7 @@ const MostradorSugerencias = () => {
     }
 
     return (
-        <div className="d-flex flex-column gap-3 ms-2 me-2">
+        <div className="d-flex flex-column gap-3">
             {cargando ? <h2>Cargando sugerencias...</h2> : mostrarSugerencias()}
         </div>
     )

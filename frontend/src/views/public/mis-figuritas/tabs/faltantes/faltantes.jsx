@@ -71,19 +71,18 @@ const Faltantes = () => {
                     <Button
                         label="Agregar faltante ↗"
                         onClick={() => navigate("/mis-figuritas/nueva-faltante")}
+                        variante="terciario"
                     />
                 </div>
             </div>
 
             {loading ? (
-                <div className="row g-3 justify-content-center">
+                <div className="row g-4">
                     {[...Array(10)].map((_, i) => (
-                        <div key={i} className="col-6 col-md-4 col-lg-3">
+                        <div key={i} className="col-12 col-md-6 col-lg-4">
                             <div
                                 className="rounded-4 placeholder-glow border"
-                                style={{
-                                    height: "220px",
-                                }}
+                                style={{ height: "320px" }}
                             >
                                 <div className="placeholder w-100 h-100 rounded-4"></div>
                             </div>
@@ -92,12 +91,12 @@ const Faltantes = () => {
                 </div>
             ) : (
                 <>
-                    <div className="row g-3 justify-content-center">
+                    <div className="row g-4">
                         {faltantes?.contenido?.length > 0 ? (
                             faltantes.contenido.map((fig) => (
                                 <div
                                     key={fig.id}
-                                    className="col-6 col-md-4 col-lg-3 d-flex justify-content-center"
+                                    className="col-12 col-md-6 col-lg-4"
                                 >
                                     <FaltanteCard figurita={fig} />
                                 </div>

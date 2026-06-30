@@ -10,11 +10,13 @@ public class FiguritaDto {
   private int numero;
   private String jugador;
   private Seleccion seleccion;
+  private String imagenUrl;
 
   public FiguritaDto(Figurita figurita) {
     this.id = figurita.getId();
     this.numero = figurita.getNumero();
     this.jugador = figurita.getJugador();
     this.seleccion = figurita.getSeleccion();
+    this.imagenUrl = figurita.getImagenUrl();
   }
 }
