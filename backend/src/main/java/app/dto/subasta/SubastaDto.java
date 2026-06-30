@@ -40,7 +40,10 @@ public class SubastaDto {
     this.figurita = subasta.getFiguritaSubastada();
 
       this.ofertas = subasta.getOfertas().stream()
-              .filter(o -> o.getEstadoActual().getValor() != EstadoProceso.CANCELADO)
+              .filter(o ->
+                      o.getEstadoActual().getValor() != EstadoProceso.CANCELADO &&
+                              o.getEstadoActual().getValor() != EstadoProceso.RECHAZADO
+              )
               .map(OfertaSubastaDto::new)
               .toList();
 

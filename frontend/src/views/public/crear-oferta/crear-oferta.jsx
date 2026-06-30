@@ -90,7 +90,11 @@ const CrearOferta = () => {
           ' p-2 d-flex flex-column justify-content-center align-items-center gap-2 w-100 rounded-2 mb-3'
         }
       >
-        <div className={styles.figuritaImagen + ' bg-white rounded-3 '}></div>
+        <img
+                    className={`${styles.figuritaImagen} bg-white rounded-3`}
+                    src={figurita?.imagen_url || '/jugador-placeholder.png'}
+                    alt={figurita?.jugador}
+                  />
 
         <h4 className={'text-white'}>{subasta.figurita.jugador}</h4>
         <h6 className={'text-white'}>{subasta.figurita.seleccion}</h6>
