@@ -90,3 +90,14 @@
   background-color: #0f3d1e;
   color: #fff;
 }
+
+.terciario {
+  background-color: var(--color-terciary);
+  border-color: var(--color-terciary);
+  color: #fff;
+}
+
+.terciario:hover:not(:disabled) {
+  background-color: #a87820;
+  color: #fff;
+}

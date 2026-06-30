@@ -71,7 +71,7 @@ const Faltantes = () => {
                     <Button
                         label="Agregar faltante ↗"
                         onClick={() => navigate("/mis-figuritas/nueva-faltante")}
-                        variante="primario"
+                        variante="terciario"
                     />
                 </div>
             </div>
