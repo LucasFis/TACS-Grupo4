@@ -17,7 +17,8 @@ const Estrellas = ({
   decimales = 2,
   varianteNumero = 'gris',
 }) => {
-  const valor = Number(calificacion) || 0
+  const sinDatos = calificacion == null
+  const valor = sinDatos ? 0 : Number(calificacion) || 0
   const fullStars = Math.floor(valor)
   const emptyStars = 5 - fullStars
   const color = COLORES[variante] ?? COLORES.dorado
@@ -29,7 +30,11 @@ const Estrellas = ({
         {'★'.repeat(fullStars)}
         {'☆'.repeat(emptyStars)}
       </span>
-      {mostrarNumero && <span className={`fs-6 ${colorNumero}`}>{valor.toFixed(decimales)}</span>}
+      {mostrarNumero && (
+        <span className={`fs-6 ${colorNumero}`}>
+          {sinDatos ? '-' : valor.toFixed(decimales)}
+        </span>
+      )}
     </span>
   )
 }
