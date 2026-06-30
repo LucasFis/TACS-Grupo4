@@ -1,6 +1,7 @@
 import styles from './PerfilStats.module.css'
 
 const PerfilStats = ({ stats }) => {
+
   return (
     <div className={styles.wrapper}>
       <div className={`mx-auto d-flex text-white ${styles.inner}`}>
