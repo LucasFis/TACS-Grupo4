@@ -47,14 +47,12 @@ public class CommandHandler {
 
     // Flujos pendientes
     for (BotHandler handler : handlers) {
-      System.out.println(">>> chequeando pendiente: " + handler.getClass().getSimpleName() + " = " + handler.tienePendiente(chatId));
       if (handler.tienePendiente(chatId)) {
         if (text.startsWith("/")) {
           handler.cancelarPendiente(chatId);
           break;
         }
         BotResponse r = handler.handlePendiente(update);
-        System.out.println(">>> handlePendiente result: " + r);
         if (r != null) return r;
       }
     }
