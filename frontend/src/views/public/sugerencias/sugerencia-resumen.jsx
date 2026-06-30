@@ -13,11 +13,13 @@ const SugerenciaResumen = ({id, figuritasNecesarias, figuritasRecomendadas, perf
   const [error, setErrorState] = useState(errorTemplate())
 
   const handleToggleFavorito = async () => {
+    const prev = esFavorito
     try {
-      setEsFavorito(!esFavorito)
+      setEsFavorito(!prev)
       await alternarFavorito({ sugerenciaId: id })
     } catch (error) {
-      showToast(handleError(error, setErrorState),'error')
+      setEsFavorito(prev)
+      showToast(handleError(error, setErrorState), 'error')
     }
   }
 
@@ -42,7 +44,7 @@ const SugerenciaResumen = ({id, figuritasNecesarias, figuritasRecomendadas, perf
           <div className="small text-muted mb-1">ÉL/ELLA TIENE</div>
         </div>
         <div className="d-flex flex-row align-items-center gap-2">
-          <div className="flex-grow-1">
+          <div className="flex-grow-1 d-flex flex-column gap-1">
             {figuritasNecesarias.map((fig) => (
               <FiguritaChip fig={fig} key={fig.id} />
             ))}
@@ -50,7 +52,7 @@ const SugerenciaResumen = ({id, figuritasNecesarias, figuritasRecomendadas, perf
 
           <div className={styles.swapIcon}>⇄</div>
 
-          <div className="flex-grow-1 text-end">
+          <div className="flex-grow-1 d-flex flex-column gap-1">
             {figuritasRecomendadas.map((fig) => (
               <FiguritaChip fig={fig} key={fig.id} variante="azul" />
             ))}

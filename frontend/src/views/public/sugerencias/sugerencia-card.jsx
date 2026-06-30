@@ -16,10 +16,12 @@ const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias
   const { handleError } = useError()
 
   const handleToggleFavorito = async () => {
+    const prev = esFavorito
     try {
-      setEsFavorito(!esFavorito)
+      setEsFavorito(!prev)
       await alternarFavorito({ sugerenciaId: id })
     } catch (error) {
+      setEsFavorito(prev)
       showToast(handleError(error, () => {}), 'error')
     }
   }
@@ -51,13 +53,17 @@ const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias
         <div className={styles.cardBody}>
           <div className={styles.columns}>
             <div className={styles.column}>
-              <p className={styles.columnLabel}>Le interesa</p>
-              {figuritasNecesarias.map(fig => <FiguritaChip fig={fig} key={fig.id} />)}
+              <p className="label-seccion">Le interesa</p>
+              <div className="d-flex flex-column gap-1">
+                {figuritasNecesarias.map(fig => <FiguritaChip fig={fig} key={fig.id} />)}
+              </div>
             </div>
             <div className={styles.swapIcon}>⇄</div>
             <div className={styles.column}>
-              <p className={styles.columnLabel}>Él/ella tiene</p>
-              {figuritasRecomendadas.map(fig => <FiguritaChip fig={fig} key={fig.id} variante="azul" />)}
+              <p className="label-seccion">Él/ella tiene</p>
+              <div className="d-flex flex-column gap-1">
+                {figuritasRecomendadas.map(fig => <FiguritaChip fig={fig} key={fig.id} variante="azul" />)}
+              </div>
             </div>
           </div>
         </div>
@@ -72,7 +78,7 @@ const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias
         onCerrar={() => setModalAbierto(false)}
         perfil={perfil}
         id={id}
-        favorito={favorito}
+        favorito={esFavorito}
         figuritasNecesarias={figuritasNecesarias}
         figuritasRecomendadas={figuritasRecomendadas}
         onProponer={handleProponer}
