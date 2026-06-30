@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Breadcrumb from '../../../components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '../../../components/ui/section-card/section-card.jsx'
-import SectionTitle from '../../../components/ui/section-title/section-title.jsx'
 import PerfilSimple from '../../../components/ui/perfil-simple/perfil-simple.jsx'
+import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import Button from '../../../components/ui/button/button.jsx'
+import OfertaCard from './oferta-card.jsx'
+import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 
 import {
   obtenerPropuesta,
@@ -14,13 +16,16 @@ import {
   verificarConflictos,
 } from '@/services/propuestasService.js'
 
-import FiguritaCard from './figurita-card.jsx'
-import OfertaCard from './oferta-card.jsx'
-import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
-
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { construirAdvertenciaConflictos } from '@/utils/conflictos.js'
+
+const ESTADO_STYLE = {
+  ACEPTADO:  { backgroundColor: '#E1F5EE', color: '#085041' },
+  RECHAZADO: { backgroundColor: '#FAECE7', color: '#712B13' },
+  CANCELADO: { backgroundColor: '#F1EFE8', color: '#444441' },
+  PENDIENTE: { backgroundColor: '#FAEEDA', color: '#633806' },
+}
 
 const VerIntercambio = () => {
   const { intercambioId } = useParams()
@@ -38,10 +43,7 @@ const VerIntercambio = () => {
       const data = await obtenerPropuesta(intercambioId)
       setPropuesta(data)
     } catch (error) {
-      showToast(
-        handleError(error, (m) => {}),
-        'error',
-      )
+      showToast(handleError(error, () => {}), 'error')
     } finally {
       setCargando(false)
     }
@@ -57,7 +59,7 @@ const VerIntercambio = () => {
       setConflictosData(data)
       setShowConfirmAceptar(true)
     } catch (error) {
-      showToast(handleError(error, (m) => {}),'error')
+      showToast(handleError(error, () => {}), 'error')
     }
   }
 
@@ -69,10 +71,7 @@ const VerIntercambio = () => {
       setPropuesta((prev) => ({ ...prev, estado: 'ACEPTADO' }))
       showToast('Propuesta aceptada correctamente.')
     } catch (error) {
-      showToast(
-        handleError(error, (m) => {}),
-        'error',
-      )
+      showToast(handleError(error, () => {}), 'error')
     }
   }
 
@@ -82,10 +81,7 @@ const VerIntercambio = () => {
       setPropuesta((prev) => ({ ...prev, estado: 'RECHAZADO' }))
       showToast('Propuesta rechazada correctamente.')
     } catch (error) {
-      showToast(
-        handleError(error, (m) => {}),
-        'error',
-      )
+      showToast(handleError(error, () => {}), 'error')
     }
   }
 
@@ -95,121 +91,106 @@ const VerIntercambio = () => {
       setPropuesta((prev) => ({ ...prev, estado: 'CANCELADO' }))
       showToast('Propuesta cancelada correctamente.')
     } catch (error) {
-      showToast(
-        handleError(error, (m) => {}),
-        'error',
-      )
+      showToast(handleError(error, () => {}), 'error')
     }
   }
 
-  if (cargando) {
-    return (
-      <div className="container py-4">
-        <h3>Cargando intercambio...</h3>
-      </div>
-    )
-  }
+  if (cargando) return <div className="container py-4"><h3>Cargando intercambio...</h3></div>
+  if (!propuesta) return <div className="container py-4"><h3>No se encontró el intercambio</h3></div>
 
-  if (!propuesta) {
-    return (
-      <div className="container py-4">
-        <h3>No se encontró el intercambio</h3>
-      </div>
-    )
-  }
-
-  const esRecibida = propuesta?.tipo === 'RECIBIDA'
-  const esEnviada = propuesta?.tipo === 'ENVIADA'
-
+  const esRecibida = propuesta.tipo === 'RECIBIDA'
+  const esEnviada = propuesta.tipo === 'ENVIADA'
   const estaPendiente = propuesta.estado === 'PENDIENTE' && esRecibida
   const puedeCancelar = propuesta.estado === 'PENDIENTE' && esEnviada
 
   return (
     <div className="container py-4 px-3 px-md-4">
-      <Breadcrumb
-        crumbs={[
-          { name: 'Intercambios', to: '/intercambios' },
-          { name: `#${propuesta.id}`, to: `/intercambios/${propuesta.id}` },
-        ]}
-      />
+      <div className="mx-auto" style={{ maxWidth: '900px' }}>
+        <Breadcrumb
+          crumbs={[
+            { name: 'Intercambios', to: '/intercambios' },
+            { name: `#${propuesta.id}`, to: `/intercambios/${propuesta.id}` },
+          ]}
+        />
 
-      <SectionCard>
-        <SectionTitle>ESTADO DEL INTERCAMBIO</SectionTitle>
+        <div className="d-flex flex-column gap-3">
+          <SectionCard>
+            <SectionCard.Section>
+              <p className="label-seccion">Estado del intercambio</p>
+              <div className="d-flex justify-content-between align-items-center mt-2">
+                <span
+                  className="badge fs-6 fw-semibold px-3 py-2 rounded-3"
+                  style={ESTADO_STYLE[propuesta.estado] ?? ESTADO_STYLE.PENDIENTE}
+                >
+                  {propuesta.estado ?? 'PENDIENTE'}
+                </span>
 
-        <SectionCard.Section>
-          <div className="d-flex justify-content-between align-items-center">
-            <span
-              className="badge fs-6 fw-semibold px-3 py-2 rounded-3"
-              style={
-                {
-                  ACEPTADO: { backgroundColor: '#E1F5EE', color: '#085041' },
-                  RECHAZADO: { backgroundColor: '#FAECE7', color: '#712B13' },
-                  CANCELADO: { backgroundColor: '#F1EFE8', color: '#444441' },
-                  PENDIENTE: { backgroundColor: '#FAEEDA', color: '#633806' },
-                }[propuesta.estado] ?? { backgroundColor: '#F1EFE8', color: '#444441' }
-              }
-            >
-              {propuesta.estado ?? 'PENDIENTE'}
-            </span>
-
-            {estaPendiente && (
-              <div className="d-flex gap-2">
-                <Button label="Rechazar" onClick={ejecutarRechazar} variante="peligroBorde" />
-                <Button label="Aceptar" onClick={handleClickAceptar} variante="exitoBorde" />
+                {estaPendiente && (
+                  <div className="d-flex gap-2">
+                    <Button label="Rechazar" onClick={ejecutarRechazar} variante="peligroBorde" />
+                    <Button label="Aceptar" onClick={handleClickAceptar} variante="exitoBorde" />
+                  </div>
+                )}
+                {puedeCancelar && (
+                  <Button label="Cancelar" onClick={ejecutarCancelar} variante="peligroBorde" />
+                )}
               </div>
-            )}
-            {puedeCancelar && (
-              <Button label="Cancelar" onClick={ejecutarCancelar} variante="peligroBorde" />
-            )}
-          </div>
-        </SectionCard.Section>
-      </SectionCard>
+            </SectionCard.Section>
+          </SectionCard>
 
-      <SectionCard>
-        <SectionTitle>USUARIO</SectionTitle>
-        <SectionCard.Section>
-          <PerfilSimple perfil={esRecibida ? propuesta.autor : propuesta.destinatario} />
-        </SectionCard.Section>
-      </SectionCard>
+          <SectionCard>
+            <SectionCard.Section>
+              <p className="label-seccion">Usuario</p>
+              <div className="mt-2">
+                <PerfilSimple perfil={esRecibida ? propuesta.autor : propuesta.destinatario} />
+              </div>
+            </SectionCard.Section>
+          </SectionCard>
 
-      <SectionCard>
-        <SectionTitle>
-          {esRecibida ? 'FIGURITA QUE VOS ENTREGÁS' : 'FIGURITA QUE SOLICITÁS'}
-        </SectionTitle>
-        <SectionCard.Section>
-          <FiguritaCard figurita={propuesta.figurita_buscada} />
-        </SectionCard.Section>
-      </SectionCard>
+          <SectionCard>
+            <SectionCard.Section>
+              <p className="label-seccion">
+                {esRecibida ? 'Figurita que vos entregás' : 'Figurita que solicitás'}
+              </p>
+              <div className="d-flex flex-column gap-1 mt-2">
+                <FiguritaChip fig={propuesta.figurita_buscada} variante="verde" />
+              </div>
+            </SectionCard.Section>
+          </SectionCard>
 
-      <SectionCard>
-        <SectionTitle>
-          {`${esRecibida ? 'FIGURITAS QUE VOS RECIBÍS' : 'FIGURITAS QUE OFRECÉS'} (${propuesta.figuritas_ofrecidas.length})`}
-        </SectionTitle>
-        <SectionCard.Section>
-          <div className="d-flex flex-column gap-3">
-            {propuesta.figuritas_ofrecidas.map((fig) => (
-              <FiguritaCard key={fig.id} figurita={fig} />
-            ))}
-          </div>
-        </SectionCard.Section>
-      </SectionCard>
+          <SectionCard>
+            <SectionCard.Section>
+              <p className="label-seccion">
+                {esRecibida ? 'Figuritas que vos recibís' : 'Figuritas que ofrecés'} ({propuesta.figuritas_ofrecidas.length})
+              </p>
+              <div className="d-flex flex-column gap-1 mt-2">
+                {propuesta.figuritas_ofrecidas.map((fig) => (
+                  <FiguritaChip key={fig.id} fig={fig} variante="verde" />
+                ))}
+              </div>
+            </SectionCard.Section>
+          </SectionCard>
 
-      <SectionCard>
-        <SectionTitle>RESUMEN DE LA PROPUESTA</SectionTitle>
-        <SectionCard.Section>
-          <OfertaCard propuesta={propuesta} tipo={propuesta.tipo} />
-        </SectionCard.Section>
-      </SectionCard>
+          <SectionCard>
+            <SectionCard.Section>
+              <p className="label-seccion">Resumen de la propuesta</p>
+              <div className="mt-2">
+                <OfertaCard propuesta={propuesta} tipo={propuesta.tipo} />
+              </div>
+            </SectionCard.Section>
+          </SectionCard>
+        </div>
 
-      <ConfirmModal
-        show={showConfirmAceptar}
-        titulo="Aceptar intercambio"
-        mensaje="¿Querés aceptar este intercambio?"
-        labelConfirmar="Aceptar"
-        onConfirmar={ejecutarAceptar}
-        onCancelar={() => { setShowConfirmAceptar(false); setConflictosData(null) }}
-        advertencia={construirAdvertenciaConflictos(conflictosData)}
-      />
+        <ConfirmModal
+          show={showConfirmAceptar}
+          titulo="Aceptar intercambio"
+          mensaje="¿Querés aceptar este intercambio?"
+          labelConfirmar="Aceptar"
+          onConfirmar={ejecutarAceptar}
+          onCancelar={() => { setShowConfirmAceptar(false); setConflictosData(null) }}
+          advertencia={construirAdvertenciaConflictos(conflictosData)}
+        />
+      </div>
     </div>
   )
 }
