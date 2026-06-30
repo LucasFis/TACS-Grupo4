@@ -24,105 +24,42 @@ import CrearOferta from './views/public/crear-oferta/crear-oferta.jsx'
 import EditarOferta from './views/public/editar-oferta/editar-oferta.jsx'
 import VerIntercambio from './views/public/ver-intercambio/ver-intercambio.jsx'
 import Administrador from './views/public/administrador/administrador.jsx'
-import RutaPrivilegiada from '@/components/autenticacion/ruta-privilegiada.jsx'
+import RutaConRol from '@/components/autenticacion/ruta-con-rol.jsx'
 import VistaNoEncontrada from '@/views/public/errores/vista-no-encontrada/vista-no-encontrada.jsx'
 import ErrorBoundary from '@/contexts/errorBoundary.jsx'
 
-const publicas = [
-  {
-    path: '/',
-    element: <Navigate to="/explorar" replace />,
-  },
-  {
-    path: '/explorar',
-    element: <Explorar />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/registrar',
-    element: <Registrar />,
-  },
-  {
-    path: '/acceso-denegado',
-    element: <AccesoDenegado />,
-  },
-  {
-    path: '/servidor-caido',
-    element: <ServidorCaido />,
-  },
-  {
-    path: '/error-interno',
-    element: <ErrorInterno />,
-  },
+const rutasSinAdmin = [
+  { path: '/', element: <Navigate to="/explorar" replace /> },
+  { path: '/explorar', element: <Explorar /> },
+]
+
+const rutasPublicas = [
+  { path: '/login', element: <Login /> },
+  { path: '/registrar', element: <Registrar /> },
+  { path: '/acceso-denegado', element: <AccesoDenegado /> },
+  { path: '/servidor-caido', element: <ServidorCaido /> },
+  { path: '/error-interno', element: <ErrorInterno /> },
 ]
 
 const privadas = [
-  {
-    path: '/mis-figuritas',
-    element: <MisFiguritas />,
-  },
-  {
-    path: '/mis-figuritas/nueva-faltante',
-    element: <NuevaFaltante />,
-  },
-  {
-    path: '/mis-figuritas/nueva-repetida',
-    element: <NuevaRepetida />,
-  },
-  {
-    path: '/subastas/crear',
-    element: <CrearSubasta />,
-  },
-  {
-    path: '/sugerencias',
-    element: <Sugerencias />,
-  },
-  {
-    path: '/perfil',
-    element: <Perfil />,
-  },
-  {
-    path: '/intercambios',
-    element: <Intercambios />,
-  },
-  {
-    path: '/intercambios/crear',
-    element: <CrearPropuestaIntercambio />,
-  },
-  {
-    path: '/intercambios/:intercambioId',
-    element: <VerIntercambio />,
-  },
-  {
-    path: '/subastas/:subId',
-    element: <VerSubasta />,
-  },
-  {
-    path: '/subastas',
-    element: <Subastas />,
-  },
-  {
-    path: '/subastas/:subId/crear-oferta',
-    element: <CrearOferta />,
-  },
-  {
-    path: '/subastas/:subId/ofertas/:ofertaId/editar',
-    element: <EditarOferta />,
-  },
-  {
-    path: '/perfil/:perfilId',
-    element: <Perfil />,
-  }
+  { path: '/mis-figuritas', element: <MisFiguritas /> },
+  { path: '/mis-figuritas/nueva-faltante', element: <NuevaFaltante /> },
+  { path: '/mis-figuritas/nueva-repetida', element: <NuevaRepetida /> },
+  { path: '/subastas/crear', element: <CrearSubasta /> },
+  { path: '/sugerencias', element: <Sugerencias /> },
+  { path: '/perfil', element: <Perfil /> },
+  { path: '/intercambios', element: <Intercambios /> },
+  { path: '/intercambios/crear', element: <CrearPropuestaIntercambio /> },
+  { path: '/intercambios/:intercambioId', element: <VerIntercambio /> },
+  { path: '/subastas/:subId', element: <VerSubasta /> },
+  { path: '/subastas', element: <Subastas /> },
+  { path: '/subastas/:subId/crear-oferta', element: <CrearOferta /> },
+  { path: '/subastas/:subId/ofertas/:ofertaId/editar', element: <EditarOferta /> },
+  { path: '/perfil/:perfilId', element: <Perfil /> },
 ]
 
 const privilegiadas = [
-  {
-    path: '/estadisticas',
-    element: <Administrador />,
-  }
+  { path: '/estadisticas', element: <Administrador /> },
 ]
 
 const AppRoutes = () => {
@@ -133,7 +70,13 @@ const AppRoutes = () => {
           <AuthProvider>
             <Routes>
               <Route element={<Layout />}>
-                {publicas.map((route) => (
+                <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/estadisticas" invertir />}>
+                  {rutasSinAdmin.map((route) => (
+                    <Route key={route.path} path={route.path} element={route.element} />
+                  ))}
+                </Route>
+
+                {rutasPublicas.map((route) => (
                   <Route key={route.path} path={route.path} element={route.element} />
                 ))}
 
@@ -143,14 +86,13 @@ const AppRoutes = () => {
                   ))}
                 </Route>
 
-                <Route element={<RutaPrivilegiada />}>
+                <Route element={<RutaConRol rol="ADMINISTRADOR" redirigirA="/acceso-denegado" />}>
                   {privilegiadas.map((route) => (
                     <Route key={route.path} path={route.path} element={route.element} />
                   ))}
                 </Route>
 
                 <Route path="*" element={<VistaNoEncontrada />} />
-
               </Route>
             </Routes>
           </AuthProvider>

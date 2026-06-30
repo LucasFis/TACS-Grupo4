@@ -1,5 +1,5 @@
 import PerfilSimple from '../../../components/ui/perfil-simple/perfil-simple.jsx'
-import EtiquetaFiguritasPropuesta from '../../../components/ui/etiqueta-figuritas-propuesta/etiqueta-figuritas-propuesta.jsx'
+import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import Button from '@/components/ui/button/button.jsx'
 import styles from './oferta-card.module.css'
 
@@ -9,40 +9,60 @@ const OfertaCard = ({
   puedeAdjudicar = false,
   onAdjudicar,
 }) => {
-    const seleccionada = propuesta.seleccionada
+  const seleccionada = propuesta.seleccionada
+
   return (
     <div
       className={`
         ${styles.ofertaCard}
         ${seleccionada ? styles.ofertaSeleccionada : ''}
-        ps-3 pe-3 pt-1 pb-1 d-flex flex-row align-items-center gap-3
+        ps-3 pe-3 pt-2 pb-2 d-flex align-items-start gap-3
       `}
     >
       {position && (
-        <div className={styles.position + ' p-3 d-flex align-items-center justify-content-center'}>
+        <div
+          className={`${styles.position} d-flex align-items-center justify-content-center`}
+        >
           {position}°
         </div>
       )}
 
-      <div className="flex-grow-1">
+      <div className="d-flex flex-column gap-2 flex-grow-1">
         <PerfilSimple perfil={propuesta.autor} />
-        <EtiquetaFiguritasPropuesta propuesta={propuesta} />
+
+        <div className="d-flex flex-column gap-1">
+          {propuesta.figuritas_ofrecidas?.length > 0 ? (
+            propuesta.figuritas_ofrecidas.map((fig) => (
+              <FiguritaChip
+                key={fig.id}
+                fig={fig}
+                variante="neutro"
+              />
+            ))
+          ) : (
+            <span
+              className="text-muted"
+              style={{ fontSize: '0.82rem' }}
+            >
+              Sin figuritas ofrecidas
+            </span>
+          )}
+        </div>
+
+        {propuesta.seleccionada && (
+          <span className="badge bg-success">
+            Seleccionada
+          </span>
+        )}
+
+        {puedeAdjudicar && !propuesta.seleccionada && (
+          <Button
+            label="Adjudicar"
+            variante="secundarioBorde"
+            onClick={() => onAdjudicar(propuesta.id)}
+          />
+        )}
       </div>
-
-
-       {propuesta.seleccionada && (
-           <span className="badge bg-success">
-               Seleccionada
-           </span>
-       )}
-
-      {puedeAdjudicar && !propuesta.seleccionada && (
-        <Button
-          label="Adjudicar"
-          variante="secundarioBorde"
-          onClick={() => onAdjudicar(propuesta.id)}
-        />
-      )}
     </div>
   )
 }

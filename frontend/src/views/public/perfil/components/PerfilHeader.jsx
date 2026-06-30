@@ -1,4 +1,5 @@
 import Estrellas from '@/components/ui/estrellas/estrellas.jsx'
+import { useAuth } from '@/contexts/userContext.jsx'
 import styles from './PerfilHeader.module.css'
 
 const PerfilHeader = ({
@@ -11,6 +12,8 @@ const PerfilHeader = ({
   onEditarClick,
   onCerrarSesionClick,
 }) => {
+  const { user } = useAuth()
+  const esAdmin = user?.rol === 'ADMINISTRADOR'
   return (
     <div className={styles.wrapper}>
       <div
@@ -34,10 +37,12 @@ const PerfilHeader = ({
             ) : (
               <>
                 <h2 className={`mb-0 fw-bold ${styles.nombre}`}>{perfil?.nombre}</h2>
-                <div className="d-flex align-items-center gap-1">
-                  <Estrellas calificacion={promedio} mostrarNumero={true} varianteNumero="blanco"/>
-                  <span>({reviews.cantidad_de_elementos})</span>
-                </div>
+                {!esAdmin && (
+                  <div className="d-flex align-items-center gap-1">
+                    <Estrellas calificacion={promedio} mostrarNumero={true} varianteNumero="blanco"/>
+                    <span>({reviews.cantidad_de_elementos})</span>
+                  </div>
+                )}
               </>
             )}
           </div>

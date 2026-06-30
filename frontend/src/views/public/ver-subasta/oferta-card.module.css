@@ -1,31 +1,33 @@
-.ofertaCard, .position {
-    background-color: rgba(211, 211, 211, 0.2);
-    border: 3px rgba(211, 211, 211, 0.5) solid;
-
+.ofertaCard {
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    background-color: #f9f9f9;
 }
 
-.ofertaCard {
-    border-radius: 15px;
+.ofertaCard:first-child {
+    border-color: var(--color-secondary-acent);
+    background-color: rgba(177, 245, 199, 0.2);
 }
 
 .position {
-    height: 44px;
-    width: 44px;
-    border-radius: 100%;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    border: 1px solid #e9ecef;
+    background-color: #efefef;
+    font-size: 0.82rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.ofertaCard:first-child .position {
+    border-color: var(--color-secondary-acent);
+    background-color: rgba(177, 245, 199, 0.4);
+    color: var(--color-secondary);
 }
 
 .ofertaSeleccionada,
 .ofertaSeleccionada .position {
-    background-color: rgba(144,238,144,.2);
-    border: 3px rgba(144,238,144,.5) solid;
-}
-
-.ofertaCard:first-child {
-    border-radius: 15px;
-}
-
-.ofertaCard:first-child .position {
-    height: 44px;
-    width: 44px;
-    border-radius: 100%;
+    background-color: rgba(144, 238, 144, 0.2);
+    border: 3px solid rgba(144, 238, 144, 0.5);
 }

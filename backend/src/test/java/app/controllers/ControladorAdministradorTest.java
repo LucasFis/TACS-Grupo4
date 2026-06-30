@@ -43,4 +43,19 @@ class ControladorAdministradorTest {
             .andExpect(status().isOk());
     }
 
+    @Test
+    void getEstadisticas_conUsuarioComun_retorna403() throws Exception {
+
+        when(servicioJwt.obtenerSesion(any()))
+            .thenReturn(new SesionDto("u1", "USUARIO", "p1", "c1"));
+
+        mockMvc.perform(
+                get("/administrador/estadisticas")
+                    .param("desde", "2025-06-01")
+                    .param("hasta", "2025-06-15")
+                    .cookie(new Cookie("token", "token-usuario"))
+            )
+            .andExpect(status().isForbidden());
+    }
+
 }

@@ -9,6 +9,12 @@ const FiguritaCard = ({ figurita }) => {
       style={{ backgroundColor: '#E1F5EE' }}
     >
       <div className={styles.numeroFigurita}>#{figurita.numero}</div>
+      <img
+        src={figurita.imagen_url || '/jugador-placeholder.png'}
+        alt={figurita.jugador}
+        className="rounded-3"
+        style={{ width: 48, height: 48, objectFit: 'cover', flexShrink: 0 }}
+      />
       <div>
         <p className="mb-0 fw-semibold" style={{ fontSize: '0.9rem', color: '#085041' }}>
           {figurita.jugador}
