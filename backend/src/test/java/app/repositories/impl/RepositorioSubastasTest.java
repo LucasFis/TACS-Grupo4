@@ -507,6 +507,118 @@ class RepositorioSubastasTest extends MongoTestBase {
         assertTrue(resultado.contenido().isEmpty());
     }
 
+    @Test
+    void contarActivasConOfertaPendiente_cuandoOfertaPendiente_cuenta() {
+        Propuesta oferta = Propuesta.builder()
+            .autor(participante)
+            .figuritasOfrecidas(List.of())
+            .build();
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-conflict-1")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(messi)
+                .ofertas(List.of(oferta))
+                .build()
+        );
+
+        int count = repositorioSubastas.contarActivasConOfertaPendiente("ARG-10", participante.getId());
+        assertEquals(1, count);
+    }
+
+    @Test
+    void contarActivasConOfertaPendiente_cuandoOfertaSeleccionada_cuenta() {
+        Propuesta oferta = Propuesta.builder()
+            .id("o-seleccionada")
+            .autor(participante)
+            .destinatario(p1)
+            .figuritasOfrecidas(List.of())
+            .build();
+        oferta.getEstado().add(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.SELECCIONADO));
+        oferta.setEstadoActual(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.SELECCIONADO));
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-conflict-2")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(messi)
+                .ofertas(List.of(oferta))
+                .build()
+        );
+
+        int count = repositorioSubastas.contarActivasConOfertaPendiente("ARG-10", participante.getId());
+        assertEquals(1, count);
+    }
+
+    @Test
+    void contarActivasConOfertaPendiente_noCuentaOfertaRechazada() {
+        Propuesta oferta = Propuesta.builder()
+            .id("o-rechazada")
+            .autor(participante)
+            .destinatario(p1)
+            .figuritasOfrecidas(List.of())
+            .build();
+        oferta.getEstado().add(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.RECHAZADO));
+        oferta.setEstadoActual(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.RECHAZADO));
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-conflict-3")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(messi)
+                .ofertas(List.of(oferta))
+                .build()
+        );
+
+        int count = repositorioSubastas.contarActivasConOfertaPendiente("ARG-10", participante.getId());
+        assertEquals(0, count);
+    }
+
+    @Test
+    void contarActivasConOfertaPendiente_noCuentaSubastaCerrada() {
+        Propuesta oferta = Propuesta.builder()
+            .autor(participante)
+            .figuritasOfrecidas(List.of())
+            .build();
+
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-conflict-4")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusDays(5))
+                .fechaCierre(LocalDateTime.now().minusDays(1))
+                .figuritaSubastada(messi)
+                .ofertas(List.of(oferta))
+                .build()
+        );
+
+        int count = repositorioSubastas.contarActivasConOfertaPendiente("ARG-10", participante.getId());
+        assertEquals(0, count);
+    }
+
+    @Test
+    void contarActivasConOfertaPendiente_sinConflictos_devuelveCero() {
+        repositorioSubastas.guardar(
+            Subasta.builder()
+                .id("s-conflict-5")
+                .autor(p1)
+                .fechaInicio(LocalDateTime.now().minusHours(1))
+                .fechaCierre(LocalDateTime.now().plusDays(1))
+                .figuritaSubastada(diMaria)
+                .build()
+        );
+
+        int count = repositorioSubastas.contarActivasConOfertaPendiente("ARG-10", participante.getId());
+        assertEquals(0, count);
+    }
+
     private Subasta crearSubasta(
         String id,
         Perfil autor,

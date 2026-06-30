@@ -1,6 +1,5 @@
 package app.repositories.impl;
 
-import com.mongodb.DBRef;
 import app.dto.filtros.SubastasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.exceptions.NotFoundException;
@@ -56,7 +55,7 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
     Query query = new Query();
 
     query.addCriteria(
-        Criteria.where("autor").is(perfilId)
+        Criteria.where("autor.id").is(perfilId)
     );
 
     this.conCamposCargados(query, campos);
@@ -84,7 +83,7 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
 
     if (filtros.autorId() != null) {
       query.addCriteria(
-          Criteria.where("autor").is(filtros.autorId())
+          Criteria.where("autor.id").is(filtros.autorId())
       );
     }
 
@@ -105,10 +104,9 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
       );
     }
     if (filtros.participanteId() != null) {
-      DBRef autorRef = new DBRef("perfiles", filtros.participanteId());
       query.addCriteria(
           Criteria.where("ofertas").elemMatch(
-              Criteria.where("autor").is(autorRef)
+              Criteria.where("autor.id").is(filtros.participanteId())
                   .and("estadoActual.valor").ne(EstadoProceso.CANCELADO)
           )
       );
@@ -180,13 +178,9 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
   public List<Subasta> buscarActivasPorFiguritasSubastadas(List<String> figuritaIds) {
     Date ahora = new Date();
 
-    List<DBRef> refs = figuritaIds.stream()
-        .map(id -> new DBRef("figuritas", id))
-        .toList();
-
     Query query = new Query();
     query.addCriteria(new Criteria().andOperator(
-        Criteria.where("figuritaSubastada").in(refs),
+        Criteria.where("figuritaSubastada.id").in(figuritaIds),
         Criteria.where("fechaInicio").lte(ahora),
         Criteria.where("fechaCierre").gt(ahora)
     ));
@@ -201,6 +195,27 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
     if(!campos.getFiguritasSolicitadas()) {
       query.fields().exclude("figuritasSolicitadas");
     }
+  }
+
+  @Override
+  public int contarActivasConOfertaPendiente(String figuritaId, String perfilId) {
+    Date ahora = new Date();
+    Query query = new Query();
+    query.addCriteria(new Criteria().andOperator(
+        Criteria.where("figuritaSubastada.$id").is(figuritaId),
+        Criteria.where("fechaInicio").lte(ahora),
+        Criteria.where("fechaCierre").gt(ahora),
+        Criteria.where("ofertas").elemMatch(
+            new Criteria().andOperator(
+                Criteria.where("autor.id").is(perfilId),
+                new Criteria().orOperator(
+                    Criteria.where("estadoActual.valor").is(EstadoProceso.PENDIENTE),
+                    Criteria.where("estadoActual.valor").is(EstadoProceso.SELECCIONADO)
+                )
+            )
+        )
+    ));
+    return (int) mongoTemplate.count(query, Subasta.class);
   }
 
   private Subasta normalizar(Subasta subasta) {

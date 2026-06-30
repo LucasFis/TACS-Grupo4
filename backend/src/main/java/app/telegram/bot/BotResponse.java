@@ -4,7 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 public record BotResponse(
     String texto,
-    InlineKeyboardMarkup teclado  // null si no hay botones
+    InlineKeyboardMarkup teclado
 ) {
   public static BotResponse texto(String texto) {
     return new BotResponse(texto, null);
