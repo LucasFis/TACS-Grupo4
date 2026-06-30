@@ -8,6 +8,7 @@ import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioUsuarios;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioSesion;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,8 @@ class ServicioSesionTest {
     servicioSesion = new ServicioSesion(
         repoUsuario,
         repoPerfiles,
-        servicioJwt
+        servicioJwt,
+        new SimpleMeterRegistry()
     );
   }
 

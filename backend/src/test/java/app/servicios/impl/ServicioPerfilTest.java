@@ -19,6 +19,7 @@ import java.util.List;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioNotificacion;
 import app.servicios.ServicioPerfil;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class ServicioPerfilTest extends MongoTestBase {
 
   @BeforeEach
   void setUp() {
-    service = new ServicioPerfil(repositorioCalificacion, repositorioPerfiles, repositorioNotificaciones, servicioNotificacion, repositorioUsuarios);
+    service = new ServicioPerfil(repositorioCalificacion, repositorioPerfiles, repositorioNotificaciones, servicioNotificacion, repositorioUsuarios, new SimpleMeterRegistry());
 
     Usuario user = new Usuario("u-1", Rol.USUARIO, "lucas", "fiscella");
     Coleccion colec = new Coleccion("c-1");
@@ -189,58 +190,6 @@ class ServicioPerfilTest extends MongoTestBase {
             MetodoIntercambio.INTERCAMBIO
         )
     );
-  }
-
-  @Test
-  void obtenerSugerencias_conCoincidencias_retornaSugerencias() {
-    Figurita diMaria = Figurita.builder()
-        .id("ARG-11")
-        .numero(11)
-        .jugador("Di María")
-        .seleccion(Seleccion.ARGENTINA)
-        .build();
-    repositorioFiguritas.guardar(diMaria);
-    usuario.getColeccion().agregarFaltante(messi);
-    usuario.getColeccion().getRepetidas().add(new FiguritaIntercambiable(diMaria, 2, List.of(MetodoIntercambio.INTERCAMBIO)));
-    repositorioColecciones.guardar(usuario.getColeccion());
-
-    Coleccion coleccionOtro = new Coleccion("c-3");
-    coleccionOtro.getRepetidas().add(new FiguritaIntercambiable(messi, 2, List.of(MetodoIntercambio.INTERCAMBIO)));
-    coleccionOtro.getFaltantes().add(diMaria);
-
-    repositorioColecciones.guardar(coleccionOtro);
-
-    Usuario user = new Usuario("u-3", Rol.USUARIO, "lucas", "fiscella");
-    repositorioUsuarios.guardar(user);
-    Perfil otroConMessi = Perfil.builder()
-        .id("3").usuario(user).nombre("Juan")
-        .coleccion(coleccionOtro)
-        .mediosDeContacto(telegram("@juan"))
-        .build();
-    repositorioPerfiles.guardar(otroConMessi);
-
-    when(jwt.getPerfilId(any())).thenReturn("1");
-
-    var resultado = service.obtenerSugerencias("1", new SugerenciasFiltro(1, 10));
-
-    assertEquals(1, resultado.contenido().size());
-  }
-
-  @Test
-  void obtenerSugerencias_sinCoincidencias_retornaListaVacia() {
-    Figurita messi = Figurita.builder()
-        .id("ARG-10")
-        .numero(10)
-        .jugador("Messi")
-        .seleccion(Seleccion.ARGENTINA)
-        .build();
-    usuario.getColeccion().getFaltantes().add(messi);
-
-    when(jwt.getPerfilId(any())).thenReturn("1");
-
-    var resultado = service.obtenerSugerencias("1", new SugerenciasFiltro(1, 10));
-
-    assertEquals(0, resultado.contenido().size());
   }
 
   @Test

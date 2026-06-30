@@ -3,6 +3,7 @@ package app.repositories.impl;
 import app.dto.filtros.PropuestasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.exceptions.NotFoundException;
+import app.model.entities.EstadoProceso;
 import app.model.entities.Propuesta;
 import app.repositories.RepositorioPropuestas;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -45,9 +47,21 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
             );
         }
 
+        if (filtros.idFiguritaBuscada() != null) {
+            query.addCriteria(
+                Criteria.where("figuritaBuscada.$id").is(filtros.idFiguritaBuscada())
+            );
+        }
+
+        if (filtros.idFiguritaPropuesta() != null) {
+            query.addCriteria(
+                Criteria.where("figuritasOfrecidas.$id").is(filtros.idFiguritaPropuesta())
+            );
+        }
+
         long count = mongoTemplate.count(query, Propuesta.class);
 
-        query.skip((long) filtros.pagina() - 1 * filtros.limite());
+        query.skip((long) (filtros.pagina() - 1) * filtros.limite());
         query.limit(filtros.limite());
 
         List<Propuesta> contenido =
@@ -67,6 +81,14 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
     }
 
     @Override
+    public List<Propuesta> buscarEstadisticasPorRango(LocalDateTime desde, LocalDateTime hasta) {
+        Query query = new Query(
+            Criteria.where("estado.0.fecha").gte(desde).lte(hasta)
+        );
+        return mongoTemplate.find(query, Propuesta.class);
+    }
+
+    @Override
     public Propuesta buscarPorId(String id){
         Propuesta propuesta = this.mongoTemplate.findById(id, Propuesta.class);
 
@@ -79,5 +101,19 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
     @Override
     public int contar() {
         return (int) this.mongoTemplate.count(new Query(), Propuesta.class);
+    }
+
+    @Override
+    public int contarConflictos(String figuritaId, String perfilId, String excluirPropuestaId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").ne(excluirPropuestaId));
+        query.addCriteria(Criteria.where("estadoActual.valor").is(EstadoProceso.PENDIENTE));
+        query.addCriteria(new Criteria().orOperator(
+            Criteria.where("figuritaBuscada.$id").is(figuritaId)
+                .and("autor.id").is(perfilId),
+            Criteria.where("figuritasOfrecidas.$id").is(figuritaId)
+                .and("destinatario.id").is(perfilId)
+        ));
+        return (int) this.mongoTemplate.count(query, Propuesta.class);
     }
 }

@@ -45,7 +45,7 @@ export const ErrorProvider = ({ children }) => {
                 }
 
                 setter(errorProcesado)
-                return errorProcesado.mensaje
+                return errorProcesado.mensaje || "Ocurrió un error inesperado"
             }
         }
     };

@@ -8,15 +8,17 @@ const TYPE_LABELS = {
   intercambio: { label: 'intercambio', className: styles.badgeIntercambio },
   subasta: { label: 'subasta', className: styles.badgeSubasta },
   ambos: { label: 'ambos', className: styles.badgeAmbos },
+  faltante: { label: 'faltante', className: styles.badgeFaltante },
+  repetida: { label: 'repetida', className: styles.badgeRepetida },
 }
 
-const CARD_CLASS = {
+export const CARD_CLASS = {
   intercambio: styles.cardIntercambio,
   subasta: styles.cardSubasta,
   ambos: styles.cardAmbos,
 }
 
-const CardHero = ({ strCutout, jugador, numero, tipo }) => {
+export const CardHero = ({ strCutout, jugador, numero, tipo }) => {
   const badge = TYPE_LABELS[tipo] ?? TYPE_LABELS.intercambio
   return (
     <div className={styles.hero}>
@@ -64,7 +66,7 @@ const CardBody = ({
     {!esPropio && (tipo === 'intercambio' || tipo === 'ambos') && (
       <CardActionBtn to="/intercambios/crear" label="Proponer intercambio ↗" state={{ figurita }} />
     )}
-    {(tipo === 'subasta' || tipo === 'ambos') && figurita.subasta_id && (
+    {!esPropio && (tipo === 'subasta' || tipo === 'ambos') && figurita.subasta_id && (
       <CardActionBtn
         to={`/subastas/${figurita.subasta_id}`}
         label="Ver subasta ↗"

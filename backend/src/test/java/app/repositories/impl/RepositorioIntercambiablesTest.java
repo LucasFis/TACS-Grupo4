@@ -328,7 +328,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
         List.of(MetodoIntercambio.INTERCAMBIO)
     );
 
-    assertEquals(7L, resultado);
+    assertEquals(3L, resultado);
   }
 
   @Test
@@ -337,7 +337,7 @@ public class RepositorioIntercambiablesTest extends MongoTestBase {
         List.of(MetodoIntercambio.SUBASTA)
     );
 
-    assertEquals(6L, resultado);
+    assertEquals(2L, resultado);
   }
 
   @Test

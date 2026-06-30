@@ -22,6 +22,7 @@ import app.repositories.RepositorioNotificaciones;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioUsuarios;
 import app.repositories.impl.campos.CamposPerfil;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class ServicioPerfil {
   private final RepositorioNotificaciones repositorioNotificaciones;
   private final ServicioNotificacion servicioNotificacion;
   private final RepositorioUsuarios repositorioUsuarios;
+  private final MeterRegistry meterRegistry;
 
 
   /**
@@ -110,29 +112,11 @@ public class ServicioPerfil {
 
     this.repositorioCalificacion.guardar(calificacion);
     this.repositorioPerfiles.guardar(perfilDestino, sinCampos);
+    meterRegistry.counter("calificaciones_creadas_total", "valor", String.valueOf(valor)).increment();
 
     // Notificación al destinatario de que fue calificado
     String cuerpo = autor.getNombre() + " te calificó con " + valor + " estrella" + (valor == 1 ? "" : "s");
     servicioNotificacion.notificarInteresados(List.of(perfilDestino), cuerpo, "/perfil");
-  }
-
-  /**
-   * Genera sugerencias de intercambio para un perfil basándose en su colección
-   * y los filtros de búsqueda proporcionados.
-   *
-   * @param perfilId identificador del perfil para el cual se generarán sugerencias
-   * @param filtros  criterios de filtrado y paginación de las sugerencias
-   * @return página de sugerencias encontradas
-   * @throws app.exceptions.NotFoundException si no se encuentra el perfil indicado
-   */
-  public PaginaResultado<SugerenciaDto> obtenerSugerencias(String perfilId, SugerenciasFiltro filtros) {
-    CamposPerfil campos = new CamposPerfil(false);
-    Perfil perfilObjetivo = this.repositorioPerfiles.buscarPorId(perfilId, campos);
-
-    PaginaResultado<Sugerencia> sugerencias = this.repositorioPerfiles.generarSugerencias(perfilObjetivo.getColeccion(), filtros);
-
-    return new PaginaResultado<>(sugerencias.contenido().stream().map(SugerenciaDto::new).toList(),
-        sugerencias.cantidadDeElementos(), sugerencias.cantidadDePaginas(), sugerencias.numero());
   }
 
   /**

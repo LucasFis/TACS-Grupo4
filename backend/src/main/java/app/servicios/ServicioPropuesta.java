@@ -6,6 +6,7 @@ import app.dto.filtros.PropuestasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.dto.request.CrearPropuestaRequest;
 import app.exceptions.BadRequestException;
+import app.exceptions.ForbiddenException;
 import app.model.entities.Coleccion;
 import app.model.entities.Figurita;
 import app.model.entities.MetodoIntercambio;
@@ -16,11 +17,18 @@ import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioPropuestas;
+import app.repositories.RepositorioSubastas;
 import app.exceptions.NotFoundException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.repositories.impl.campos.CamposPerfil;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,11 +39,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioPropuesta {
 
   private final RepositorioPropuestas repositorioPropuestas;
+  private final RepositorioSubastas repositorioSubastas;
   private final RepositorioPerfiles repositorioPerfiles;
   private final RepositorioFiguritas repositorioFiguritas;
   private final RepositorioColecciones repositorioColecciones;
   private final RepositorioCalificacion repositorioCalificacion;
   private final ServicioNotificacion notificacionService;
+  private final MeterRegistry meterRegistry;
 
   /**
    * Crea una propuesta de intercambio. Valida que el usuario origen,
@@ -79,6 +89,7 @@ public class ServicioPropuesta {
         .build();
     repositorioColecciones.guardar(autor.getColeccion());
     repositorioPropuestas.guardar(propuesta);
+    meterRegistry.counter("propuestas_creadas_total", "metodo", "intercambio").increment();
 
     String cuerpo = "Tenes una nueva propuesta de: " + autor.getNombre()
         + " por la figurita " + figuritaBuscada.getJugador() + " de " + figuritaBuscada.getSeleccion();
@@ -133,6 +144,8 @@ public class ServicioPropuesta {
     );
 
     propuesta.aceptar(perfilId);
+    meterRegistry.counter("propuestas_transiciones_total", "estado", "aceptado", "origen", "intercambio").increment();
+    registrarTiempoResolucion(propuesta, "aceptado");
 
     repositorioColecciones.guardar(autor.getColeccion());
     repositorioColecciones.guardar(coleccionDestinatario);
@@ -156,6 +169,8 @@ public class ServicioPropuesta {
   public void rechazar(String id, String perfilId) {
     Propuesta propuesta = repositorioPropuestas.buscarPorId(id);
     propuesta.rechazar(perfilId);
+    meterRegistry.counter("propuestas_transiciones_total", "estado", "rechazado", "origen", "intercambio").increment();
+    registrarTiempoResolucion(propuesta, "rechazado");
 
     Perfil autor = propuesta.getAutor();;
 
@@ -182,12 +197,53 @@ public class ServicioPropuesta {
   public void cancelar(String id, String perfilId) {
     Propuesta propuesta = repositorioPropuestas.buscarPorId(id);
     propuesta.cancelar(perfilId);
+    meterRegistry.counter("propuestas_transiciones_total", "estado", "cancelado", "origen", "intercambio").increment();
+    registrarTiempoResolucion(propuesta, "cancelado");
 
     Perfil autor = propuesta.getAutor();;
 
     repositorioColecciones.guardar(autor.getColeccion());
 
     this.repositorioPropuestas.guardar(propuesta);
+  }
+
+  /**
+   * Verifica si las figuritas que el destinatario va a recibir en una propuesta
+   * también están involucradas en otras transacciones pendientes del mismo perfil
+   * (propuestas como autor/destinatario y subastas activas con oferta pendiente).
+   *
+   * @param propuestaId identificador de la propuesta a verificar
+   * @param perfilId    identificador del perfil que va a aceptar (destinatario)
+   * @return mapa con "tieneConflictos" (boolean) y "figuritasEnConflicto" (lista con id y jugador)
+   */
+  public Map<String, Object> verificarConflictos(String propuestaId, String perfilId) {
+    Propuesta propuesta = repositorioPropuestas.buscarPorId(propuestaId);
+    if (!propuesta.getDestinatario().getId().equals(perfilId)) {
+      throw new ForbiddenException("No sos el destinatario de esta propuesta");
+    }
+    List<Figurita> recibidas = propuesta.getFiguritasOfrecidas();
+    if (recibidas == null) {
+      recibidas = List.of();
+    }
+
+    List<Map<String, String>> figuritasEnConflicto = new ArrayList<>();
+
+    for (Figurita figurita : recibidas) {
+      int total = repositorioPropuestas.contarConflictos(figurita.getId(), perfilId, propuestaId)
+          + repositorioSubastas.contarActivasConOfertaPendiente(figurita.getId(), perfilId);
+
+      if (total > 0) {
+        Map<String, String> entry = new HashMap<>();
+        entry.put("id", figurita.getId());
+        entry.put("jugador", figurita.getJugador());
+        figuritasEnConflicto.add(entry);
+      }
+    }
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("tieneConflictos", !figuritasEnConflicto.isEmpty());
+    result.put("figuritasEnConflicto", figuritasEnConflicto);
+    return result;
   }
 
   /**
@@ -217,5 +273,15 @@ public class ServicioPropuesta {
 
       return new IntercambioDto(p, yaCalificado);
     });
+  }
+
+  /**
+   * Registra cuánto tardó la propuesta desde su primer estado PENDIENTE hasta la transición
+   * final. Insumo para decidir recordatorios por demora. Tag de conjunto cerrado.
+   */
+  private void registrarTiempoResolucion(Propuesta propuesta, String estadoFinal) {
+    LocalDateTime inicio = propuesta.getEstado().get(0).getFecha();
+    meterRegistry.timer("propuestas_tiempo_resolucion_segundos", "estado_final", estadoFinal)
+        .record(Duration.between(inicio, LocalDateTime.now()));
   }
 }

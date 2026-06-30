@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.MongoTransactionManager;
 @Configuration
 public class MongoConfig {
   @Bean
-  @Profile("!test")
+  @Profile("!test & !loadtest")
   public MongoTransactionManager transactionManager(MongoDatabaseFactory factory) {
     return new MongoTransactionManager(factory);
   }

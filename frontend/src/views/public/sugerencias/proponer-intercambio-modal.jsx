@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
-import FiguritaRecomendadaCard from '@/views/public/sugerencias/figurita-recomendada-card.jsx'
 import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repetidas.jsx'
 import SelectorFaltantes from '@/components/ui/selector-faltantes/selector-faltantes.jsx'
 import Button from '@/components/ui/button/button.jsx'
@@ -25,6 +24,8 @@ const ProponerIntercambioModal = ({
   figuritasNecesarias = [],
   figuritasRecomendadas = [],
   onProponer,
+  id,
+  favorito
 }) => {
   const backdropRef = useRef(null)
   const [repetidas, setRepetidas] = useState([])
@@ -66,7 +67,7 @@ const ProponerIntercambioModal = ({
     >
       <div className={styles.modal}>
 
-        <SugerenciaResumen perfil={perfil} figuritasNecesarias={figuritasNecesarias} figuritasRecomendadas={figuritasRecomendadas} />
+        <SugerenciaResumen id={id} favorito={favorito} perfil={perfil} figuritasNecesarias={figuritasNecesarias} figuritasRecomendadas={figuritasRecomendadas} />
 
         <hr className={styles.divisor} />
 

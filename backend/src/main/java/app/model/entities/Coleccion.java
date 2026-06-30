@@ -62,7 +62,6 @@ public class Coleccion {
    * Remueve una faltante de la lista de figuritas faltantes.
    */
   public void eliminarFaltante(Figurita faltante) {
-    if (!tieneFaltante(faltante)) throw new BadRequestException("Faltante no existe: " + faltante.getJugador());
     this.faltantes.removeIf(
         f -> f.getId().equals(faltante.getId())
     );
@@ -121,7 +120,6 @@ public class Coleccion {
       if (tieneRepetida(figurita)) {
 
         FiguritaIntercambiable repetida = obtenerRepetida(figurita);
-        System.out.println("Con metodos: " + repetida.getMetodos());
 
         repetida.reservar(metodo);
       }

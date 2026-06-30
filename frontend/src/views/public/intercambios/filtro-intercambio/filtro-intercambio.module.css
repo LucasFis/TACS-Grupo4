@@ -1,0 +1,58 @@
+.filtrosCard {
+    background: var(--color-primary);
+    border: 1.5px solid var(--border-color-light);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filtrosRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filtrosLabel {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.seccionBusqueda {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.seccionBusqueda > div:first-child {
+    flex: 1;
+    min-width: 220px;
+}
+
+@media (max-width: 768px) {
+    .seccionBusqueda {
+        align-items: stretch;
+    }
+
+    .seccionBusqueda > :nth-child(3) {
+        order: 1;
+    }
+
+    .seccionBusqueda > :nth-child(4) {
+        order: 2;
+    }
+
+    .seccionBusqueda > * {
+        width: 100%;
+    }
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid var(--color-subtitle);
+    margin: 0;
+}

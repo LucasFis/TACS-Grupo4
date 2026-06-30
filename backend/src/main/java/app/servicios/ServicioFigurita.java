@@ -12,6 +12,7 @@ import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioSubastas;
 import app.repositories.projections.FiguritaIntercambiableConPerfil;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ public class ServicioFigurita {
   private final RepositorioColecciones repositorioColecciones;
   private final RepositorioFiguritas repositorioFiguritas;
   private final RepositorioSubastas repositorioSubastas;
+  private final MeterRegistry meterRegistry;
 
   /**
    * Busca figuritas intercambiables de forma paginada aplicando los filtros
@@ -114,6 +116,10 @@ public class ServicioFigurita {
             figuritaIdASubastaId.get(resultado.figurita().getFigurita().getId())
         ))
         .toList();
+
+    // Cuántos matches devuelve cada consulta de intercambiables. Una distribución con muchos
+    // ceros señala matching/inventario pobre que el HTTP 200 oculta. Sin tags: cardinalidad nula.
+    meterRegistry.summary("figuritas_intercambiables_matches").record(paginaRepo.cantidadDeElementos());
 
     return new PaginaResultado<>(contenido, paginaRepo.cantidadDeElementos(),
         paginaRepo.cantidadDePaginas(), paginaRepo.numero());

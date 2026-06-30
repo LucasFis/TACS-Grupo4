@@ -226,3 +226,35 @@
     background: var(--color-terciary);
     color: #fff;
 }
+
+.badgeFaltante {
+    background: #e6f1fb;
+    color: #185fa5;
+}
+
+.badgeRepetida {
+    background: #e1f5ee;
+    color: #0f6e56;
+}
+
+.actionBtnEdit {
+    display: block;
+    width: 100%;
+    padding: 9px 0;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    background: transparent;
+    color: #6b7280;
+    font-size: 0.84rem;
+    font-weight: 600;
+    font-family: var(--font-family);
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.18s, color 0.18s;
+    margin-top: 2px;
+}
+
+.actionBtnEdit:hover {
+    background: #f3f4f6;
+    color: #111827;
+}

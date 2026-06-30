@@ -93,6 +93,23 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
   }
 
   @Override
+  public Perfil buscarPorNombre(String nombre, CamposPerfil campos) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("nombre").regex("^" + nombre + "$", "i") // case-insensitive, exacto
+    );
+
+    this.conCamposCargados(query, campos);
+    Perfil perfil = mongoTemplate.findOne(query, Perfil.class);
+
+    if (perfil == null) {
+      throw new NotFoundException("Perfil no encontrado con nombre: " + nombre);
+    }
+
+    return this.normalizar(perfil);
+  }
+
+  @Override
   public List<Perfil> buscarPorFiguritaFaltante(Figurita figurita, CamposPerfil campos) {
     Query queryColecciones = new Query(
         Criteria.where("faltantes").is(figurita.getId())
@@ -124,122 +141,6 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
   public long contar() {
     Query query = new Query();
     return mongoTemplate.count(query, Perfil.class);
-  }
-
-  @Override
-  public PaginaResultado<Sugerencia> generarSugerencias(Coleccion coleccionObjetivo, SugerenciasFiltro filtro) {
-
-    List<String> faltantesObjetivo = coleccionObjetivo.getFaltantes()
-        .stream().map(Figurita::getId).toList();
-
-    List<String> repetidasObjetivo = coleccionObjetivo.getRepetidas().stream()
-        .map(r -> r.getFigurita().getId())
-        .toList();
-
-    List<AggregationOperation> ops = new ArrayList<>();
-
-    ops.add(Aggregation.match(
-        Criteria.where("_id").ne(coleccionObjetivo.getId())
-    ));
-
-    ops.add(Aggregation.lookup("perfiles", "_id", "coleccion.$id", "perfil"));
-    ops.add(Aggregation.unwind("perfil"));
-
-    List<String> repetidasObjetivoConIntercambio = coleccionObjetivo.getRepetidas().stream()
-        .filter(r -> r.getMetodos() != null && r.getMetodos().contains(MetodoIntercambio.INTERCAMBIO))
-        .map(r -> r.getFigurita().getId())
-        .toList();
-
-    ops.add(context -> new Document("$addFields", new Document()
-        .append("sugeridas", new Document("$filter", new Document()
-            .append("input", "$repetidas")
-            .append("as", "r")
-            .append("cond", new Document("$and", List.of(
-                new Document("$in", List.of(
-                    new Document("$toString", "$$r.figurita.$id"),
-                    faltantesObjetivo
-                )),
-                new Document("$in", List.of("INTERCAMBIO", "$$r.metodos")),
-                new Document("$gt", List.of(
-                    new Document("$subtract", List.of("$$r.cantidadExistente", "$$r.cantidadReservada")),
-                    0
-                ))
-            )))
-        ))
-        .append("necesarias", new Document("$filter", new Document()
-            .append("input", "$faltantes")
-            .append("as", "f")
-            .append("cond", new Document("$in", List.of(
-                new Document("$toString", "$$f.$id"),
-                repetidasObjetivoConIntercambio
-            )))
-        ))
-    ));
-
-    ops.add(Aggregation.match(
-        new Criteria().andOperator(
-            Criteria.where("sugeridas.0").exists(true),
-            Criteria.where("necesarias.0").exists(true)
-        )
-    ));
-
-    // Count
-    List<AggregationOperation> countOps = new ArrayList<>(ops);
-    countOps.add(Aggregation.count().as("total"));
-    Document countDoc = mongoTemplate.aggregate(
-        Aggregation.newAggregation(countOps), "colecciones", Document.class
-    ).getUniqueMappedResult();
-    int total = countDoc != null ? countDoc.getInteger("total") : 0;
-
-    // Paginación
-    List<AggregationOperation> pageOps = new ArrayList<>(ops);
-    pageOps.add(Aggregation.skip((long) (filtro.pagina() - 1) * filtro.limite()));
-    pageOps.add(Aggregation.limit(filtro.limite()));
-
-    AggregationResults<Document> resultados = mongoTemplate.aggregate(
-        Aggregation.newAggregation(pageOps), "colecciones", Document.class
-    );
-
-    // Mapeo
-    MongoConverter converter = mongoTemplate.getConverter();
-    List<Sugerencia> sugerencias = resultados.getMappedResults().stream()
-        .map(doc -> {
-          Perfil perfil = converter.read(Perfil.class, (Document) doc.get("perfil"));
-
-          List<Figurita> sugeridas = ((List<Document>) doc.get("sugeridas")).stream()
-              .map(d -> {
-                Object figuritaRef = d.get("figurita");
-                if (figuritaRef instanceof com.mongodb.DBRef ref) {
-                  return mongoTemplate.findById(ref.getId().toString(), Figurita.class);
-                }
-                if (figuritaRef instanceof Document figDoc) {
-                  return converter.read(Figurita.class, figDoc);
-                }
-                return null;
-              })
-              .filter(Objects::nonNull)
-              .toList();
-
-          List<Figurita> necesarias = ((List<Object>) doc.get("necesarias")).stream()
-              .map(item -> {
-                if (item instanceof com.mongodb.DBRef ref) {
-                  return mongoTemplate.findById(ref.getId().toString(), Figurita.class);
-                }
-                return converter.read(Figurita.class, (Document) item);
-              })
-              .filter(Objects::nonNull)
-              .toList();
-
-          return new Sugerencia(perfil, sugeridas, necesarias);
-        })
-        .toList();
-
-    return new PaginaResultado<>(
-        sugerencias,
-        total,
-        (int) Math.ceil((double) total / filtro.limite()),
-        filtro.pagina()
-    );
   }
 
   /**

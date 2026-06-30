@@ -14,6 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,21 +38,76 @@ class ControladorSesionTest {
   private ServicioJwt servicioJwt;
 
   @Test
-  void obtenerEstadisticas_retorna200() throws Exception {
+  void obtenerEstadisticas_conRangoValido_retorna200() throws Exception {
     EstadisticasDto estadisticasDto = mock(EstadisticasDto.class);
     SesionDto sesionDto = mock(SesionDto.class);
 
-    when(servicioJwt.obtenerSesion("fake-token"))
-        .thenReturn(sesionDto);
-
-    when(estadisticasService.obtenerEstadisticas(sesionDto))
+    when(servicioJwt.obtenerSesion("fake-token")).thenReturn(sesionDto);
+    when(estadisticasService.obtenerEstadisticas(any(SesionDto.class), any(LocalDate.class), any(LocalDate.class)))
         .thenReturn(estadisticasDto);
 
     mockMvc.perform(
             get("/administrador/estadisticas")
+                .param("desde", "2025-06-01")
+                .param("hasta", "2025-06-15")
                 .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
         )
         .andExpect(status().isOk());
+  }
+
+  @Test
+  void obtenerEstadisticas_sinDesde_retorna400ConMensaje() throws Exception {
+    mockMvc.perform(
+            get("/administrador/estadisticas")
+                .param("hasta", "2025-06-15")
+                .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors.desde").value("el parámetro 'desde' es requerido"));
+  }
+
+  @Test
+  void obtenerEstadisticas_sinHasta_retorna400ConMensaje() throws Exception {
+    mockMvc.perform(
+            get("/administrador/estadisticas")
+                .param("desde", "2025-06-01")
+                .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors.hasta").value("el parámetro 'hasta' es requerido"));
+  }
+
+  @Test
+  void obtenerEstadisticas_sinParams_retorna400ConAmbosErrores() throws Exception {
+    mockMvc.perform(
+            get("/administrador/estadisticas")
+                .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errors.desde").value("el parámetro 'desde' es requerido"))
+        .andExpect(jsonPath("$.errors.hasta").value("el parámetro 'hasta' es requerido"));
+  }
+
+  @Test
+  void obtenerEstadisticas_formatoInvalido_retorna400() throws Exception {
+    mockMvc.perform(
+            get("/administrador/estadisticas")
+                .param("desde", "01-06-2025")
+                .param("hasta", "2025-06-15")
+                .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
+        )
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void obtenerEstadisticas_desdeMayorQueHasta_retorna400() throws Exception {
+    mockMvc.perform(
+            get("/administrador/estadisticas")
+                .param("desde", "2025-06-15")
+                .param("hasta", "2025-06-01")
+                .cookie(new jakarta.servlet.http.Cookie("token", "fake-token"))
+        )
+        .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -74,7 +131,7 @@ class ControladorSesionTest {
         .andExpect(header().string("Set-Cookie",
             org.hamcrest.Matchers.containsString("HttpOnly")))
         .andExpect(header().string("Set-Cookie",
-            org.hamcrest.Matchers.containsString("SameSite=None")));
+            org.hamcrest.Matchers.containsString("SameSite=Lax")));
 
     verify(servicioSesion).login(any(LoginRequest.class));
   }

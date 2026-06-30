@@ -2,6 +2,7 @@ import { useState } from 'react'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import { usePerfil } from './hooks/usePerfil.js'
 import { useCalificaciones } from './hooks/useCalificaciones.js'
+import { useAuth } from '@/contexts/userContext.jsx'
 import PerfilHeader from './components/PerfilHeader.jsx'
 import PerfilStats from './components/PerfilStats.jsx'
 import PerfilCalificaciones from './components/PerfilCalificaciones.jsx'
@@ -13,7 +14,7 @@ const Perfil = () => {
 
   const { perfil, setPerfil, loading, stats, promedio, perfilId, manejarCierreDeSesion } = usePerfil()
   const { reviews, loading: loadingCalificaciones, pagina, setPagina } = useCalificaciones()
-
+  const { user } = useAuth()
   return (
     <div className="d-flex flex-column">
       <PerfilHeader
@@ -26,14 +27,19 @@ const Perfil = () => {
         onCerrarSesionClick={() => setShowConfirmModal(true)}
       />
 
-      <PerfilStats stats={stats} />
+      {user?.rol !== 'ADMINISTRADOR' && (
+          <PerfilStats stats={stats}/>
+        )
+      }
 
-      <PerfilCalificaciones
-        reviews={reviews}
-        loadingNotificaciones={loadingCalificaciones}
-        pagina={pagina}
-        onPaginaChange={setPagina}
-      />
+      {user?.rol !== 'ADMINISTRADOR' && (
+        <PerfilCalificaciones
+          reviews={reviews}
+          loadingNotificaciones={loadingCalificaciones}
+          pagina={pagina}
+          onPaginaChange={setPagina}
+        />
+      )}
 
       {showModal && (
         <ModalEditarPerfil

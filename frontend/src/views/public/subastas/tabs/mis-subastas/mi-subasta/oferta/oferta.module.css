@@ -1,8 +1,8 @@
-.oferta-seleccionada {
+.ofertaSeleccionada {
   background-color: #f0f9f4;
 }
 
-.oferta-default {
+.ofertaDefault {
   background-color: #fafafa;
 }
 
@@ -14,22 +14,14 @@
   font-weight: 700;
 }
 
-.nombre-oferta {
+.nombreOferta {
   font-size: 0.82rem;
 }
 
-.calificacion {
-  font-size: 0.72rem;
-}
-
-.label-oferta {
+.labelOferta {
   font-size: 0.75rem;
 }
 
-.badge-seleccionada {
-  font-size: 0.7rem;
-}
-
-.btn-adjudicar {
+.btnAdjudicar {
   font-size: 0.78rem;
 }

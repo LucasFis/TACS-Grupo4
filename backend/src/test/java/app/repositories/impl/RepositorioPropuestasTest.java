@@ -26,6 +26,9 @@ class RepositorioPropuestasTest extends MongoTestBase {
     private Perfil u2;
     private Perfil u3;
 
+    private Figurita messi;
+    private Figurita diMaria;
+
     private List<MedioDeContacto> telegram(String usuario) {
         return List.of(
             new MedioDeContacto(
@@ -60,6 +63,22 @@ class RepositorioPropuestasTest extends MongoTestBase {
             .nombre("Matias")
             .mediosDeContacto(telegram("@mati"))
             .build();
+
+        messi = Figurita.builder()
+            .id("ARG-10")
+            .numero(10)
+            .jugador("Messi")
+            .seleccion(Seleccion.ARGENTINA)
+            .build();
+        repositorioFiguritas.guardar(messi);
+
+        diMaria = Figurita.builder()
+            .id("ARG-11")
+            .numero(11)
+            .jugador("Di María")
+            .seleccion(Seleccion.ARGENTINA)
+            .build();
+        repositorioFiguritas.guardar(diMaria);
     }
 
     private Propuesta propuesta(
@@ -179,6 +198,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "RECIBIDAS",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 
@@ -210,6 +231,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "ENVIADAS",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 
@@ -250,7 +273,9 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "",
                 0,
                 10,
-                EstadoProceso.RECHAZADO
+                EstadoProceso.RECHAZADO,
+                null,
+                null
             );
 
         PaginaResultado<Propuesta> resultado =
@@ -274,6 +299,35 @@ class RepositorioPropuestasTest extends MongoTestBase {
     }
 
     @Test
+    void buscarEstadisticasPorRango_incluyeDentroYExcluyeFuera() {
+        LocalDateTime dentroDelRango = LocalDateTime.now().minusDays(3);
+        LocalDateTime fueraDelRango = LocalDateTime.now().minusDays(10);
+
+        EstadoPropuesta estadoDentro = new EstadoPropuesta(dentroDelRango, EstadoProceso.PENDIENTE);
+        Propuesta dentro = Propuesta.builder()
+            .autor(u1).destinatario(u2).figuritasOfrecidas(List.of())
+            .estado(new ArrayList<>(List.of(estadoDentro))).estadoActual(estadoDentro)
+            .build();
+
+        EstadoPropuesta estadoFuera = new EstadoPropuesta(fueraDelRango, EstadoProceso.PENDIENTE);
+        Propuesta fuera = Propuesta.builder()
+            .autor(u2).destinatario(u3).figuritasOfrecidas(List.of())
+            .estado(new ArrayList<>(List.of(estadoFuera))).estadoActual(estadoFuera)
+            .build();
+
+        repositorio.guardar(dentro);
+        repositorio.guardar(fuera);
+
+        List<Propuesta> resultado = repositorio.buscarEstadisticasPorRango(
+            LocalDateTime.now().minusDays(7),
+            LocalDateTime.now()
+        );
+
+        assertEquals(1, resultado.size());
+        assertEquals(dentro.getId(), resultado.get(0).getId());
+    }
+
+    @Test
     void buscarTodos_sinResultados_devuelveListaVacia() {
 
         PropuestasFiltro filtros =
@@ -281,6 +335,8 @@ class RepositorioPropuestasTest extends MongoTestBase {
                 "",
                 0,
                 10,
+                null,
+                null,
                 null
             );
 
@@ -293,5 +349,211 @@ class RepositorioPropuestasTest extends MongoTestBase {
         assertTrue(
             resultado.contenido().isEmpty()
         );
+    }
+
+    @Test
+    void contarConflictos_cuandoEsFiguritaBuscadaYPerfilEsAutor_cuenta() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u1).destinatario(u2)
+            .figuritaBuscada(f1).figuritasOfrecidas(List.of())
+            .build();
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F1", u1.getId(), "otro-id");
+        assertEquals(1, count);
+    }
+
+    @Test
+    void contarConflictos_cuandoEsFiguritaOfrecidaYPerfilEsDestinatario_cuenta() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u2).destinatario(u1)
+            .figuritasOfrecidas(List.of(f1))
+            .build();
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F1", u1.getId(), "otro-id");
+        assertEquals(1, count);
+    }
+
+    @Test
+    void contarConflictos_excluyePropuestaActual() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u1).destinatario(u2)
+            .figuritaBuscada(f1).figuritasOfrecidas(List.of())
+            .build();
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F1", u1.getId(), propuesta.getId());
+        assertEquals(0, count);
+    }
+
+    @Test
+    void contarConflictos_noCuentaPropuestasNoPendientes() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u1).destinatario(u2)
+            .figuritaBuscada(f1).figuritasOfrecidas(List.of())
+            .build();
+
+        EstadoPropuesta aceptado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.ACEPTADO);
+        propuesta.setEstado(new ArrayList<>(List.of(aceptado)));
+        propuesta.setEstadoActual(aceptado);
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F1", u1.getId(), "otro-id");
+        assertEquals(0, count);
+    }
+
+    @Test
+    void contarConflictos_sinConflictos_devuelveCero() {
+        Figurita f1 = Figurita.builder()
+            .id("F1").numero(1).jugador("Jugador 1").seleccion(Seleccion.ARGENTINA)
+            .build();
+
+        Propuesta propuesta = Propuesta.builder()
+            .autor(u1).destinatario(u2)
+            .figuritaBuscada(f1).figuritasOfrecidas(List.of())
+            .build();
+        repositorio.guardar(propuesta);
+
+        int count = repositorio.contarConflictos("F2", u1.getId(), "otro-id");
+        assertEquals(0, count);
+    }
+    @Test
+    void buscarTodos_filtraPorFiguritaBuscada() {
+        EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-1")
+                .autor(u1)
+                .destinatario(u2)
+                .figuritaBuscada(diMaria)
+                .figuritasOfrecidas(List.of())
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-2")
+                .autor(u1)
+                .destinatario(u3)
+                .figuritaBuscada(messi)
+                .figuritasOfrecidas(List.of())
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        PropuestasFiltro filtros =
+            new PropuestasFiltro("", 0, 10, null, "ARG-10", null);
+
+        PaginaResultado<Propuesta> resultado =
+            repositorio.buscarTodos(u1.getId(), filtros);
+
+        assertEquals(1, resultado.contenido().size());
+        assertEquals("p-2", resultado.contenido().get(0).getId());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaBuscada_sinResultados_retornaVacio() {
+        EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-1")
+                .autor(u1)
+                .destinatario(u2)
+                .figuritaBuscada(messi)
+                .figuritasOfrecidas(List.of())
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        PropuestasFiltro filtros =
+            new PropuestasFiltro("", 0, 10, null, "INEXISTENTE", null);
+
+        PaginaResultado<Propuesta> resultado =
+            repositorio.buscarTodos(u1.getId(), filtros);
+
+        assertTrue(resultado.contenido().isEmpty());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaPropuesta() {
+        EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-1")
+                .autor(u1)
+                .destinatario(u2)
+                .figuritasOfrecidas(List.of(messi))
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-2")
+                .autor(u1)
+                .destinatario(u3)
+                .figuritasOfrecidas(List.of(diMaria))
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        PropuestasFiltro filtros =
+            new PropuestasFiltro("", 0, 10, null, null, "ARG-10");
+
+        PaginaResultado<Propuesta> resultado =
+            repositorio.buscarTodos(u1.getId(), filtros);
+
+        assertEquals(1, resultado.contenido().size());
+        assertEquals("p-1", resultado.contenido().get(0).getId());
+    }
+
+    @Test
+    void buscarTodos_filtraPorFiguritaPropuesta_sinResultados_retornaVacio() {
+        EstadoPropuesta estado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
+
+        repositorio.guardar(
+            Propuesta.builder()
+                .id("p-1")
+                .autor(u1)
+                .destinatario(u2)
+                .figuritasOfrecidas(List.of(messi))
+                .estado(new ArrayList<>(List.of(estado)))
+                .estadoActual(estado)
+                .build()
+        );
+
+        PropuestasFiltro filtros =
+            new PropuestasFiltro("", 0, 10, null, null, "INEXISTENTE");
+
+        PaginaResultado<Propuesta> resultado =
+            repositorio.buscarTodos(u1.getId(), filtros);
+
+        assertTrue(resultado.contenido().isEmpty());
     }
 }

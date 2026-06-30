@@ -6,13 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import app.MongoTestBase;
 import app.dto.EstadisticasDto;
 import app.dto.SesionDto;
-import app.exceptions.UnauthorizedException;
+import app.exceptions.ForbiddenException;
 import app.model.entities.*;
+
+import java.time.LocalDate;
 import app.servicios.ServicioEstadisticas;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -67,15 +68,10 @@ class ServicioEstadisticaTest extends MongoTestBase {
         return new FiguritaIntercambiable(f, 1, List.of(MetodoIntercambio.INTERCAMBIO, MetodoIntercambio.SUBASTA));
     }
 
-    @BeforeEach
-    void setUp() {
-        service = new ServicioEstadisticas(repositorioPerfiles, repositorioPropuestas, repositorioSubastas, repositorioColecciones);
-    }
-
     @Test
     void getEstadisticas_sinDatos_retornaTodosCeros() {
 
-        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion());
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
 
         assertEquals(0, resultado.getTotalUsuarios());
         assertEquals(0, resultado.getTotalFiguritasPublicadas());
@@ -126,7 +122,7 @@ class ServicioEstadisticaTest extends MongoTestBase {
 
         repositorioSubastas.guardar(subastaActiva);
 
-        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion());
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
 
         assertEquals(2, resultado.getTotalUsuarios());
         assertEquals(3, resultado.getTotalFiguritasPublicadas());
@@ -149,7 +145,7 @@ class ServicioEstadisticaTest extends MongoTestBase {
         repositorioSubastas.guardar(activa);
         repositorioSubastas.guardar(vencida);
 
-        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion());
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
 
         assertEquals(1, resultado.getTotalSubastasActivas());
     }
@@ -157,7 +153,7 @@ class ServicioEstadisticaTest extends MongoTestBase {
     @Test
     void propuestasPorEstado_sinPropuestas_retornaCeros() {
 
-        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion());
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
 
         assertEquals(0, resultado.getPropuestasPorEstado().getPendientes());
         assertEquals(0, resultado.getPropuestasPorEstado().getAceptadas());
@@ -197,7 +193,7 @@ class ServicioEstadisticaTest extends MongoTestBase {
         repositorioPropuestas.guardar(aceptada);
         repositorioPropuestas.guardar(rechazada);
 
-        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion());
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
 
         assertEquals(1, resultado.getPropuestasPorEstado().getPendientes());
         assertEquals(1, resultado.getPropuestasPorEstado().getAceptadas());
@@ -238,7 +234,7 @@ class ServicioEstadisticaTest extends MongoTestBase {
         repositorioPropuestas.guardar(pendiente2);
         repositorioPropuestas.guardar(aceptada);
 
-        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion());
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
 
         assertEquals(2, resultado.getPropuestasPorEstado().getPendientes());
         assertEquals(1, resultado.getPropuestasPorEstado().getAceptadas());
@@ -248,7 +244,7 @@ class ServicioEstadisticaTest extends MongoTestBase {
     @Test
     void figuritasPorModalidad_sinFiguritas_retornaCeros() {
 
-        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion());
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
 
         assertEquals(0, resultado.getFiguritasPorModalidad().getSoloIntercambio());
         assertEquals(0, resultado.getFiguritasPorModalidad().getSoloSubasta());
@@ -280,21 +276,34 @@ class ServicioEstadisticaTest extends MongoTestBase {
 
         repositorioPerfiles.guardar(u1);
 
-        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion());
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
 
-        assertEquals(2, resultado.getFiguritasPorModalidad().getSoloIntercambio());
-        assertEquals(2, resultado.getFiguritasPorModalidad().getSoloSubasta());
+        assertEquals(1, resultado.getFiguritasPorModalidad().getSoloIntercambio());
+        assertEquals(1, resultado.getFiguritasPorModalidad().getSoloSubasta());
         assertEquals(1, resultado.getFiguritasPorModalidad().getAmbos());
     }
 
     @Test
-    void obtenerEstadisticas_usuarioNoAdmin_lanzaUnauthorized() {
+    void obtenerEstadisticas_usuarioNoAdmin_lanzaForbidden() {
         SesionDto sesion = new SesionDto("u1", "USUARIO", "p-11", "c-10");
 
         assertThrows(
-            UnauthorizedException.class,
-            () -> service.obtenerEstadisticas(sesion)
+            ForbiddenException.class,
+            () -> service.obtenerEstadisticas(sesion, LocalDate.now().minusDays(7), LocalDate.now())
         );
+    }
+
+    @Test
+    void propuestasPorEstado_incluyeCanceladas() {
+        Perfil autor = perfil("a", "usr-a", "Autor");
+        Perfil destinatario = perfil("d", "usr-d", "Dest");
+
+        repositorioPropuestas.guardar(propuestaConEstado("p1", autor, destinatario, EstadoProceso.CANCELADO));
+
+        EstadisticasDto resultado = service.obtenerEstadisticas(adminSesion(), LocalDate.now().minusDays(7), LocalDate.now());
+
+        assertEquals(1, resultado.getPropuestasPorEstado().getCanceladas());
+        assertEquals(0, resultado.getPropuestasPorEstado().getPendientes());
     }
 
     private Propuesta propuestaConEstado(

@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
+import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -448,5 +449,45 @@ class ControladorPropuestaTest {
                 """)
             )
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void verificarConflictos_retorna200_conConflictos() throws Exception {
+        Map<String, Object> conflictos = new java.util.HashMap<>();
+        conflictos.put("tieneConflictos", true);
+        conflictos.put("figuritasEnConflicto", List.of(Map.of("id", "ARG-10", "jugador", "Messi")));
+
+        when(propuestaService.verificarConflictos("p-1", "1000"))
+            .thenReturn(conflictos);
+
+        mockMvc.perform(get("/propuestas/p-1/conflictos")
+                .cookie(cookie))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.tieneConflictos").value(true))
+            .andExpect(jsonPath("$.figuritasEnConflicto[0].id").value("ARG-10"));
+    }
+
+    @Test
+    void verificarConflictos_retorna200_sinConflictos() throws Exception {
+        Map<String, Object> conflictos = new java.util.HashMap<>();
+        conflictos.put("tieneConflictos", false);
+        conflictos.put("figuritasEnConflicto", List.of());
+
+        when(propuestaService.verificarConflictos("p-1", "1000"))
+            .thenReturn(conflictos);
+
+        mockMvc.perform(get("/propuestas/p-1/conflictos")
+                .cookie(cookie))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.tieneConflictos").value(false))
+            .andExpect(jsonPath("$.figuritasEnConflicto").isEmpty());
+    }
+
+    @Test
+    void verificarConflictos_usaTokenParaObtenerPerfil() throws Exception {
+        mockMvc.perform(get("/propuestas/p-1/conflictos")
+                .cookie(cookie));
+
+        verify(servicioJwt).getPerfilId("fake-token");
     }
 }

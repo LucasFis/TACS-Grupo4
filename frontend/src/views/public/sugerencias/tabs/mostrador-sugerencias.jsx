@@ -1,9 +1,9 @@
 import SugerenciaCard from "@/views/public/sugerencias/sugerencia-card.jsx";
 import {useCallback, useEffect, useState} from "react";
-import {buscarSugerencias} from "@/services/perfilService.js";
 import Paginacion from "@/components/ui/paginacion/paginacion.jsx";
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { buscarSugerencias } from '@/services/sugerenciasService.js'
 
 const MostradorSugerencias = () => {
 
@@ -21,6 +21,7 @@ const MostradorSugerencias = () => {
             setCargando(true)
             const payload = await buscarSugerencias({ pagina: pagina, limite:10})
             setPaginasTotales(payload.cantidad_de_paginas)
+
             setSugerencias(payload.contenido)
         } catch (error) {
           showToast(handleError(error, setError),'error')
@@ -39,9 +40,9 @@ const MostradorSugerencias = () => {
             <>
                 {
                     sugerencias.length > 0 ?
-                        sugerencias.map(s => <SugerenciaCard key={s.perfil.id} perfil={s.perfil}
+                        sugerencias.map(s => <SugerenciaCard key={s.sugerido.id} id={s.id} perfil={s.sugerido}
                                                      figuritasNecesarias = {s.figuritas_necesarias}
-                                                     figuritasRecomendadas = {s.figuritas_recomendadas}/>
+                                                     figuritasRecomendadas = {s.figuritas_recomendadas} favorito = {s.favorito}/>
                         ) : <h2 className="text-center text-muted py-4 fw-light">No pudimos encontrar sugerencias!</h2>
                 }
                 <Paginacion page={pagina} totalPages={paginasTotales} onChange={setPagina}/>
@@ -50,7 +51,7 @@ const MostradorSugerencias = () => {
     }
 
     return (
-        <div className="d-flex flex-column gap-3 ms-2 me-2">
+        <div className="d-flex flex-column gap-3">
             {cargando ? <h2>Cargando sugerencias...</h2> : mostrarSugerencias()}
         </div>
     )

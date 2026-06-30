@@ -12,4 +12,5 @@ public class EstadisticasDto {
     private int totalSubastasActivas;
     private PropuestasPorEstadoDto propuestasPorEstado;
     private FiguritasPorModalidadDto figuritasPorModalidad;
+    private RankingsDto rankings;
 }

@@ -1,0 +1,55 @@
+services:
+  mongodb-test:
+    image: mongo:7
+    command: ["--replSet", "rs0"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  mongo-init-test:
+    image: mongo:7
+    depends_on:
+      mongodb-test:
+        condition: service_healthy
+    command:
+      - mongosh
+      - --host
+      - mongodb-test:27017
+      - --eval
+      - |
+        try { rs.status() }
+        catch(e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongodb-test:27017'}]}) }
+    restart: "no"
+
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    env_file: .env.example
+    environment:
+      MONGO_URI: mongodb://mongodb-test:27017/tacs-test
+      SEED_DATA: "true"
+      SPRING_PROFILES_ACTIVE: loadtest
+    command: mvn spring-boot:run
+    depends_on:
+      mongo-init-test:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  loadtest:
+    image: grafana/k6
+    depends_on:
+      backend-test:
+        condition: service_healthy
+    volumes:
+      - ./backend/src/test/loadtest:/loadtest
+    entrypoint: ["/bin/sh", "-c", "cp /loadtest/entrypoint.sh /tmp/entrypoint.sh && sed -i 's/\\r//' /tmp/entrypoint.sh && /bin/sh /tmp/entrypoint.sh"]
