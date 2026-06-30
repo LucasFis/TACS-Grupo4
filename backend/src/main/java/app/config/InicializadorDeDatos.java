@@ -384,10 +384,12 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   reservar(sofia, "GER-6");
 
   // P09 FINALIZADA — Valentina → Lucas : ofrece Sergio Rochet (URU-1 INTERCAMBIO), busca Guillermo Varela (URU-2 INTERCAMBIO ✅)
+  EstadoPropuesta aceptado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.ACEPTADO);
   Propuesta p09 = Propuesta.builder()
-      .autor(valentina).destinatario(lucas).estado(List.of(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.ACEPTADO)))
+      .autor(valentina).destinatario(lucas).estado(List.of(aceptado)).estadoActual(aceptado)
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("URU-1"))))
       .figuritaBuscada(figs.get("URU-2")).build();
+
 
   propuestas.guardar(p09);
 

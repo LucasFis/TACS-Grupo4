@@ -44,19 +44,8 @@ public class Propuesta {
         List.of(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE))
     );
 
-    @Getter(AccessLevel.NONE)
     @Builder.Default
     private EstadoPropuesta estadoActual = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
-
-    public EstadoPropuesta getEstadoActual() {
-        if (estado == null || estado.isEmpty()) {
-            EstadoPropuesta inicial = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
-            estado = new ArrayList<>();
-            estado.add(inicial);
-            return inicial;
-        }
-        return estado.get(estado.size() - 1);
-    }
 
     /**
      * Acepta la propuesta. Valida que {@code usuario} sea el destinatario
@@ -164,20 +153,20 @@ public class Propuesta {
     }
 
     private void validarPendiente() {
-        if (getEstadoActual().getValor() != EstadoProceso.PENDIENTE) {
+        if (estadoActual.getValor() != EstadoProceso.PENDIENTE) {
             throw new BadRequestException("La propuesta ya fue respondida");
         }
     }
 
     private void validarPendienteOSeleccionada() {
-        EstadoProceso estado = getEstadoActual().getValor();
+        EstadoProceso estado = estadoActual.getValor();
         if (estado != EstadoProceso.PENDIENTE && estado != EstadoProceso.SELECCIONADO) {
             throw new BadRequestException("La propuesta ya fue respondida");
         }
     }
 
     private void validarAceptable() {
-        EstadoProceso estado = getEstadoActual().getValor();
+        EstadoProceso estado = estadoActual.getValor();
 
         if (
             estado != EstadoProceso.PENDIENTE &&
