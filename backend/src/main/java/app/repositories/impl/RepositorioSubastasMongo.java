@@ -178,7 +178,7 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
 
     Query query = new Query();
     query.addCriteria(new Criteria().andOperator(
-        Criteria.where("figuritaSubastada.id").in(figuritaIds),
+        Criteria.where("figuritaSubastada.$id").in(figuritaIds),
         Criteria.where("fechaInicio").lte(ahora),
         Criteria.where("fechaCierre").gt(ahora)
     ));
