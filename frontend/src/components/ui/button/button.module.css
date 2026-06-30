@@ -87,7 +87,7 @@
 }
 
 .primario:hover:not(:disabled) {
-  background-color: #0f3d1e;
+  background-color: var(--color-secondary-dark);
   color: #fff;
 }
 
@@ -98,6 +98,6 @@
 }
 
 .terciario:hover:not(:disabled) {
-  background-color: #a87820;
+  background-color: var(--color-terciary-dark);
   color: #fff;
 }
