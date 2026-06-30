@@ -48,7 +48,7 @@ Browser → figunet.onrender.com/api/login
 
 Desde la perspectiva del browser, la cookie la setea `figunet.onrender.com` → es **first-party** → WebKit la acepta y la envía en todas las requests siguientes.
 
-La URL del backend se parametriza vía la variable de entorno `BACKEND_URL`, resuelta por `envsubst` al arrancar el contenedor. Esto permite usar el mismo artefacto Docker en distintos entornos (staging, producción) cambiando solo esa variable en Render.
+La URL del backend se parametriza vía la variable de entorno `VITE_BACKEND_URI`, resuelta por `envsubst` al arrancar el contenedor. Esto permite usar el mismo artefacto Docker en distintos entornos (staging, producción) cambiando solo esa variable en Render.
 
 ### Cambio en la cookie
 
