@@ -433,7 +433,7 @@ public class ControladorUsuarioTest {
                     "rol": "ADMINISTRADOR"
                 }
                 """))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().isForbidden());
   }
 
   @Test
