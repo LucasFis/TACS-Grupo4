@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Button from '../../../components/ui/button/button.jsx'
 import styles from './sugerencia-card.module.css'
 import ProponerIntercambioModal from '@/views/public/sugerencias/proponer-intercambio-modal.jsx'
-import FiguritaRecomendadaCard from '@/views/public/sugerencias/figurita-recomendada-card.jsx'
+import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
 import { crearPropuesta } from '@/services/propuestasService.js'
 import { alternarFavorito } from '@/services/sugerenciasService.js'
@@ -52,12 +52,12 @@ const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias
           <div className={styles.columns}>
             <div className={styles.column}>
               <p className={styles.columnLabel}>Le interesa</p>
-              {figuritasNecesarias.map(fig => <FiguritaRecomendadaCard fig={fig} key={fig.id} />)}
+              {figuritasNecesarias.map(fig => <FiguritaChip fig={fig} key={fig.id} />)}
             </div>
             <div className={styles.swapIcon}>⇄</div>
             <div className={styles.column}>
               <p className={styles.columnLabel}>Él/ella tiene</p>
-              {figuritasRecomendadas.map(fig => <FiguritaRecomendadaCard fig={fig} key={fig.id} verde={false} />)}
+              {figuritasRecomendadas.map(fig => <FiguritaChip fig={fig} key={fig.id} variante="azul" />)}
             </div>
           </div>
         </div>

@@ -2,6 +2,8 @@ import Button from '@/components/ui/button/button.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import HeaderUsuarioEstado from './header-usuario-estado.jsx'
 import { useNavigate } from 'react-router'
+import styles from './intercambio-card.module.css'
+import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import {
   cancelarPropuesta,
   aceptarPropuesta,
@@ -16,13 +18,6 @@ import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { construirAdvertenciaConflictos } from '@/utils/conflictos.js'
 
-const ChipFigurita = ({ figurita }) => (
-  <div className="border rounded p-2 mb-1 d-flex align-items-center gap-2">
-    <small className="text-muted">#{figurita.numero}</small>
-    <span>{figurita.jugador}</span>
-    {figurita.seleccion && <small className="text-muted">· {figurita.seleccion}</small>}
-  </div>
-)
 
 const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => {
   const [showCalificacion, setShowCalificacion] = useState(false)
@@ -144,16 +139,16 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
         <SectionCard.Section>
           <div className="row mt-2">
             <div className="col">
-              <small className="text-uppercase text-muted fw-semibold">Vos recibís</small>
+              <div className={styles.columnLabel}>Vos recibís</div>
               {izq.map((f) => (
-                <ChipFigurita key={f.id} figurita={f} />
+                <FiguritaChip key={f.id} fig={f} variante="neutro" />
               ))}
             </div>
             <div className="col-auto d-flex align-items-center">⇄</div>
             <div className="col">
-              <small className="text-uppercase text-muted fw-semibold">Vos entregás</small>
+              <div className={styles.columnLabel}>Vos entregás</div>
               {der.map((f) => (
-                <ChipFigurita key={f.id} figurita={f} />
+                <FiguritaChip key={f.id} fig={f} variante="neutro" />
               ))}
             </div>
           </div>
