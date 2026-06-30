@@ -6,10 +6,11 @@ import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import SectionTitle from '@/components/ui/section-title/section-title.jsx'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
+import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import OfertaCard from './oferta-card.jsx'
 import TuOfertaCard from './tu-oferta-card.jsx'
 import Button from '@/components/ui/button/button.jsx'
-import {useAuth} from "@/contexts/userContext.jsx";
+import { useAuth } from '@/contexts/userContext.jsx'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
@@ -18,7 +19,7 @@ const VerSubasta = () => {
   const { subId } = useParams()
   const { user } = useAuth()
   const { showToast } = useToast()
-  const {handleError, errorTemplate} = useError()
+  const { handleError, errorTemplate } = useError()
 
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(errorTemplate())
@@ -31,47 +32,23 @@ const VerSubasta = () => {
     const horas = Math.floor(tiempo / 3600)
     const minutos = Math.floor((tiempo % 3600) / 60)
     const segundos = tiempo % 60
-
     return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`
   }
 
   const calcularDuracionTotal = () => {
-    const inicio = new Date(subasta.inicio)
-    const cierre = new Date(subasta.cierre)
-
-    const diffMs = cierre - inicio
-
+    const diffMs = new Date(subasta.cierre) - new Date(subasta.inicio)
     const horas = Math.floor(diffMs / (1000 * 60 * 60))
     const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
-
     return `${horas}h ${minutos}m`
   }
 
   const formatearFecha = (fecha) => {
     const f = new Date(fecha)
-
     const dia = f.getDate()
-    const mes = f.toLocaleString('es-AR', { month: 'short' }) // abr, may, etc
+    const mes = f.toLocaleString('es-AR', { month: 'short' })
     const horas = f.getHours().toString().padStart(2, '0')
     const minutos = f.getMinutes().toString().padStart(2, '0')
-
     return `${dia} ${mes}, ${horas}:${minutos}`
-  }
-
-  const mostrarOfertaDeUsuario = (ofertas) => {
-    const ofertaPropia = ofertas.find((o) => o.autor.id === user.perfil_id) 
-    return ofertaPropia !== undefined ? (
-      <TuOfertaCard oferta={ofertaPropia} subasta={subasta} subastaAbierta={subastaAbierta} />
-    ) : (
-      subastaAbierta && (
-        <div className={'d-flex flex-row justify-content-center align-items-center gap-2'}>
-          <p>¿Aún no ofertaste?</p>
-          <Button onClick={() => navigate(`/subastas/${subId}/crear-oferta`)}>
-            Proponer Oferta
-          </Button>
-        </div>
-      )
-    )
   }
 
   const cargarSubasta = async () => {
@@ -82,7 +59,7 @@ const VerSubasta = () => {
       setSubastaAbierta(new Date(payload.cierre) > new Date())
       setTiempo(payload.tiempo_restante)
     } catch (err) {
-      showToast(handleError(err, setError),'error')
+      showToast(handleError(err, setError), 'error')
     } finally {
       setCargando(false)
     }
@@ -94,225 +71,185 @@ const VerSubasta = () => {
 
   useEffect(() => {
     if (!tiempo) return
-
     const interval = setInterval(() => {
       setTiempo((prev) => Math.max(prev - 1, 0))
     }, 1000)
-
     return () => clearInterval(interval)
   }, [tiempo])
 
-  const mostrarSubasta = () => {
-    return (
-      <>
-        <div
-          className={
-            styles.figuritaSubastada +
-            ' p-2 d-flex flex-column justify-content-center align-items-center gap-2 w-100 rounded-2 mb-3'
-          }
-        >
-          <img
-            src={subasta.figurita.imagen_url || '/jugador-placeholder.png'}
-            alt={subasta.figurita.jugador}
-            className={styles.figuritaImagen + ' bg-white rounded-3'}
-            style={{ objectFit: 'cover' }}
-          />
-
-          <h4 className={'text-white'}>{subasta.figurita.jugador}</h4>
-          <h6 className={'text-white'}>{subasta.figurita.seleccion}</h6>
-        </div>
-        <SectionCard>
-          <SectionTitle>TIEMPO RESTANTE</SectionTitle>
-          <SectionCard.Section>
-            <div className="d-flex flex-row align-items-end gap-2">
-              <h2>{procesarDuracion()}</h2>
-              <p>HH:MM:SS</p>
-            </div>
-          </SectionCard.Section>
-        </SectionCard>
-
-        <SectionCard>
-          <SectionTitle>DETALLES DE LA SUBASTA</SectionTitle>
-          <SectionCard.Section>
-            <div className="d-flex flex-column gap-3">
-              {/* FILA 1 */}
-              <div className="d-flex">
-                <div className="w-50">
-                  <h5>Inicio</h5>
-                  <p>{formatearFecha(subasta.inicio)}</p>
-                </div>
-                <div className="w-50">
-                  <h5>Cierre</h5>
-                  <p>{formatearFecha(subasta.cierre)}</p>
-                </div>
-              </div>
-
-              {/* FILA 2 */}
-              <div className="d-flex">
-                <div className="w-50">
-                  <h5>Duración</h5>
-                  <p>{calcularDuracionTotal()}</p>
-                </div>
-                <div className="w-50">
-                  <h5>Ofertas recibidas</h5>
-                  <p>{subasta.ofertas.length} ofertas</p>
-                </div>
-              </div>
-            </div>
-          </SectionCard.Section>
-        </SectionCard>
-
-        <SectionCard>
-          <SectionTitle>PUBLICADO POR</SectionTitle>
-          <SectionCard.Section>
-            <PerfilSimple perfil={subasta.perfil} />
-          </SectionCard.Section>
-        </SectionCard>
-
-        <SectionCard>
-          <SectionTitle>CONDICIONES PARA OFERTAR</SectionTitle>
-          <SectionCard.Section>
-            <div className="d-flex flex-column gap-3">
-              {/* Figuritas requeridas — siempre visible */}
-              <div className="d-flex flex-column gap-2">
-                <p
-                  className="mb-0 text-uppercase fw-semibold text-muted"
-                  style={{ fontSize: '0.72rem', letterSpacing: '0.06em' }}
-                >
-                  Figuritas requeridas
-                </p>
-                {subasta.figuritas_solicitadas.length > 0 ? (
-                  <>
-                    <div className="d-flex flex-column gap-2">
-                      {subasta.figuritas_solicitadas.map((fig, i) => (
-                        <div
-                          key={i}
-                          className="d-flex align-items-center gap-2 px-3 py-2 rounded-3"
-                          style={{ backgroundColor: '#E1F5EE' }}
-                        >
-                          <div
-                            className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                            style={{ width: 32, height: 32, backgroundColor: '#0F6E56' }}
-                          >
-                            <span style={{ fontSize: '0.7rem', fontWeight: 500, color: '#E1F5EE' }}>
-                              {fig.numero}
-                            </span>
-                          </div>
-                          <div>
-                            <p
-                              className="mb-0 fw-semibold"
-                              style={{ fontSize: '0.85rem', color: '#085041' }}
-                            >
-                              {fig.jugador}
-                            </p>
-                            <p className="mb-0" style={{ fontSize: '0.72rem', color: '#0F6E56' }}>
-                              {fig.seleccion}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="mb-0 text-muted" style={{ fontSize: '0.72rem' }}>
-                      El ofertante debe incluir al menos una de estas figuritas
-                    </p>
-                  </>
-                ) : (
-                  <p
-                    className="mb-0 fst-italic"
-                    style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}
-                  >
-                    Sin restricción — el ofertante puede ofrecer cualquier figurita
-                  </p>
-                )}
-              </div>
-
-              {/* Calificación mínima — siempre visible */}
-              <div
-                className="d-flex align-items-center justify-content-between pt-2"
-                style={{ borderTop: '0.5px solid #9FE1CB' }}
-              >
-                <div>
-                  <p
-                    className="mb-0 text-uppercase fw-semibold text-muted"
-                    style={{ fontSize: '0.72rem', letterSpacing: '0.06em' }}
-                  >
-                    Calificación mínima
-                  </p>
-                  <p className="mb-0 text-muted" style={{ fontSize: '0.72rem' }}>
-                    {subasta.calificacion_minima_solicitada <= 1
-                      ? 'Cualquier usuario puede ofertar'
-                      : 'Solo usuarios con esta calificación pueden ofertar'}
-                  </p>
-                </div>
-                {subasta.calificacion_minima_solicitada <= 1 ? (
-                  <div
-                    className="px-3 py-2 rounded-3 flex-shrink-0"
-                    style={{
-                      backgroundColor: 'var(--bs-secondary-bg)',
-                      border: '0.5px solid var(--bs-border-color)',
-                    }}
-                  >
-                    <span style={{ fontSize: '0.82rem', color: 'var(--bs-secondary-color)' }}>
-                      Sin mínimo
-                    </span>
-                  </div>
-                ) : (
-                  <div
-                    className="d-flex align-items-center gap-1 px-3 py-2 rounded-3 flex-shrink-0"
-                    style={{ backgroundColor: '#E1F5EE' }}
-                  >
-                    <span className="fw-semibold" style={{ fontSize: '0.95rem', color: '#085041' }}>
-                      {subasta.calificacion_minima_solicitada}
-                    </span>
-                    <span style={{ fontSize: '0.82rem', color: '#0F6E56' }}>★ o más</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </SectionCard.Section>
-        </SectionCard>
-
-        <SectionCard>
-          <SectionTitle>
-            OFERTAS {subastaAbierta ? 'ACTUALES' : 'HISTORICAS'} ({subasta.ofertas.length})
-          </SectionTitle>
-          <SectionCard.Section>
-            <div className="d-flex flex-column gap-2">
-              {subasta.ofertas.length > 0 ? (
-                subasta.ofertas.map((oferta, index) => (
-                  <OfertaCard key={index} position={index + 1} propuesta={oferta} />
-                ))
-              ) : (
-                <h4>Aún no hay ofertas!</h4>
-              )}
-            </div>
-          </SectionCard.Section>
-          {subasta.perfil.id !== user.perfil_id && subastaAbierta ? (
-            <>
-              <SectionTitle>TU OFERTA</SectionTitle>
-              <SectionCard.Section>{mostrarOfertaDeUsuario(subasta.ofertas)}</SectionCard.Section>
-            </>
-          ) : null}
-        </SectionCard>
-      </>
-    )
-  }
+  const ofertaPropia = subasta?.ofertas.find((o) => o.autor.id === user.perfil_id)
+  const esAutor = subasta?.perfil.id === user.perfil_id
 
   return (
     <div className="container py-4 px-3 px-md-4">
-      <Breadcrumb
-        crumbs={[
-          { name: 'Subasta', to: '/subastas' },
-          { name: `#${subId}`, to: `/subastas/${subId}` },
-        ]}
-      />
-      {cargando ? (
-        <h2>Cargando subasta...</h2>
-      ) : error.codigo ? (
-        <h2 className="text-center text-secondary">No se pudo cargar la información</h2>
-      ) : (
-        mostrarSubasta()
-      )}
+      <div className="mx-auto" style={{ maxWidth: '900px' }}>
+        <Breadcrumb
+          crumbs={[
+            { name: 'Subasta', to: '/subastas' },
+            { name: `#${subId}`, to: `/subastas/${subId}` },
+          ]}
+        />
+
+        {cargando ? (
+          <h2>Cargando subasta...</h2>
+        ) : error.codigo ? (
+          <h2 className="text-center text-secondary">No se pudo cargar la información</h2>
+        ) : (
+          <>
+            {/* Hero del jugador */}
+            <div className={`${styles.figuritaSubastada} p-3 d-flex align-items-center gap-3 mb-3`}>
+              <img
+                src={subasta.figurita.imagen_url || '/jugador-placeholder.png'}
+                alt={subasta.figurita.jugador}
+                className={styles.figuritaImagen}
+              />
+              <div>
+                <p className={styles.figuritaNombre}>{subasta.figurita.jugador}</p>
+                <p className={styles.figuritaSeleccion}>{subasta.figurita.seleccion}</p>
+                <span className={styles.figuritaNumero}>#{subasta.figurita.numero}</span>
+              </div>
+            </div>
+
+            {/* Tiempo restante */}
+            <SectionCard>
+              <SectionCard.Section>
+                <p className={styles.sectionLabel}>Tiempo restante</p>
+                <div className="d-flex align-items-end gap-2">
+                  <h2 className="mb-0">{procesarDuracion()}</h2>
+                  <p className="mb-1 text-muted">HH:MM:SS</p>
+                </div>
+              </SectionCard.Section>
+            </SectionCard>
+
+            {/* Detalles */}
+            <SectionCard>
+              <SectionCard.Section>
+                <p className={styles.sectionLabel}>Detalles de la subasta</p>
+                <div className="d-flex flex-column gap-3 mt-2">
+                  <div className="d-flex">
+                    <div className="w-50">
+                      <h6 className="mb-1">Inicio</h6>
+                      <p className="mb-0 text-muted">{formatearFecha(subasta.inicio)}</p>
+                    </div>
+                    <div className="w-50">
+                      <h6 className="mb-1">Cierre</h6>
+                      <p className="mb-0 text-muted">{formatearFecha(subasta.cierre)}</p>
+                    </div>
+                  </div>
+                  <div className="d-flex">
+                    <div className="w-50">
+                      <h6 className="mb-1">Duración</h6>
+                      <p className="mb-0 text-muted">{calcularDuracionTotal()}</p>
+                    </div>
+                    <div className="w-50">
+                      <h6 className="mb-1">Ofertas recibidas</h6>
+                      <p className="mb-0 text-muted">{subasta.ofertas.length} ofertas</p>
+                    </div>
+                  </div>
+                </div>
+              </SectionCard.Section>
+            </SectionCard>
+
+            {/* Publicado por */}
+            <SectionCard>
+              <SectionCard.Section>
+                <p className={styles.sectionLabel}>Publicado por</p>
+                <div className="mt-2">
+                  <PerfilSimple perfil={subasta.perfil} />
+                </div>
+              </SectionCard.Section>
+            </SectionCard>
+
+            {/* Condiciones */}
+            <SectionCard>
+              <SectionCard.Section>
+                <p className={styles.sectionLabel}>Condiciones para ofertar</p>
+
+                <div className="d-flex flex-column gap-3 mt-2">
+                  {/* Figuritas requeridas */}
+                  <div className="d-flex flex-column gap-2">
+                    <p className={styles.sectionLabel}>Figuritas requeridas</p>
+                    {subasta.figuritas_solicitadas.length > 0 ? (
+                      <>
+                        {subasta.figuritas_solicitadas.map((fig, i) => (
+                          <FiguritaChip key={i} fig={fig} variante="verde" />
+                        ))}
+                        <p className="mb-0 text-muted" style={{ fontSize: '0.72rem' }}>
+                          El ofertante debe incluir al menos una de estas figuritas
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mb-0 fst-italic text-muted" style={{ fontSize: '0.85rem' }}>
+                        Sin restricción — el ofertante puede ofrecer cualquier figurita
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Calificación mínima */}
+                  <div className={`${styles.condicionesDivisor} d-flex align-items-center justify-content-between pt-2`}>
+                    <div>
+                      <p className={styles.sectionLabel}>Calificación mínima</p>
+                      <p className="mb-0 text-muted" style={{ fontSize: '0.72rem' }}>
+                        {subasta.calificacion_minima_solicitada <= 1
+                          ? 'Cualquier usuario puede ofertar'
+                          : 'Solo usuarios con esta calificación pueden ofertar'}
+                      </p>
+                    </div>
+                    {subasta.calificacion_minima_solicitada <= 1 ? (
+                      <div className={`${styles.calBadge} ${styles.calSinMinimo}`}>
+                        Sin mínimo
+                      </div>
+                    ) : (
+                      <div className={`${styles.calBadge} ${styles.calConMinimo} d-flex align-items-center gap-1`}>
+                        {subasta.calificacion_minima_solicitada}
+                        <span className={styles.calConMinimoStar}>★ o más</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </SectionCard.Section>
+            </SectionCard>
+
+            {/* Ofertas */}
+            <SectionCard>
+              <SectionCard.Section>
+                <p className={styles.sectionLabel}>
+                  Ofertas {subastaAbierta ? 'actuales' : 'históricas'} ({subasta.ofertas.length})
+                </p>
+                <div className="d-flex flex-column gap-2 mt-2">
+                  {subasta.ofertas.length > 0 ? (
+                    subasta.ofertas.map((oferta, index) => (
+                      <OfertaCard key={index} position={index + 1} propuesta={oferta} />
+                    ))
+                  ) : (
+                    <p className="mb-0 text-muted text-center py-3">Aún no hay ofertas</p>
+                  )}
+                </div>
+              </SectionCard.Section>
+
+              {!esAutor && subastaAbierta && (
+                <SectionCard.Section>
+                  <p className={styles.sectionLabel}>Tu oferta</p>
+                  <div className="mt-2">
+                    {ofertaPropia ? (
+                      <TuOfertaCard oferta={ofertaPropia} subasta={subasta} subastaAbierta={subastaAbierta} />
+                    ) : (
+                      <div className="d-flex align-items-center gap-3">
+                        <p className="mb-0 text-muted">¿Aún no ofertaste?</p>
+                        <Button
+                          label="Proponer oferta"
+                          variante="terciario"
+                          onClick={() => navigate(`/subastas/${subId}/crear-oferta`)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </SectionCard.Section>
+              )}
+            </SectionCard>
+          </>
+        )}
+      </div>
     </div>
   )
 }
