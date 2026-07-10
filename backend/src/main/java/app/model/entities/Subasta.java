@@ -44,6 +44,9 @@ public class Subasta {
     @Builder.Default
     private Integer calificacionMinimaSolicitada = 1;
 
+    @Builder.Default
+    private boolean avisoFinalEnviado = false;
+
     /**
      * Agrega una oferta a la subasta. Valida que se cumplan las condiciones mínimas
      * (figuritas solicitadas y calificación mínima) y reserva las figuritas ofrecidas.
@@ -181,6 +184,18 @@ public class Subasta {
             .filter(p -> p.getEstadoActual().getValor() == EstadoProceso.SELECCIONADO)
             .findFirst()
             .orElse(null);
+    }
+
+    public boolean necesitaAvisoFinal() {
+        if (avisoFinalEnviado) {
+            return false;
+        }
+
+        LocalDateTime ahora = LocalDateTime.now();
+
+        return estaActivo()
+                && fechaCierre.isAfter(ahora)
+                && fechaCierre.isBefore(ahora.plusHours(1));
     }
 }
 

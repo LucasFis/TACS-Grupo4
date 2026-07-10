@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import org.bson.types.ObjectId;
+import java.util.Arrays;
 
 @Repository
 public class RepositorioCalificacionesMongo implements RepositorioCalificacion {
@@ -28,9 +30,9 @@ public class RepositorioCalificacionesMongo implements RepositorioCalificacion {
 
     Query query = new Query();
 
-    query.addCriteria(
-        Criteria.where("destinatario.$id").is(destinatarioId)
-    );
+      query.addCriteria(
+              criterioDbRefId("destinatario.$id", destinatarioId)
+      );
 
     long count = mongoTemplate.count(query, Calificacion.class);
 
@@ -57,13 +59,13 @@ public class RepositorioCalificacionesMongo implements RepositorioCalificacion {
 
     Query query = new Query();
 
-    query.addCriteria(
-        Criteria.where("destinatario.$id").is(perfilDestinoId)
-    );
+      query.addCriteria(
+              criterioDbRefId("destinatario.$id", perfilDestinoId)
+      );
 
-    query.addCriteria(
-        Criteria.where("autor.$id").is(perfilAutorId)
-    );
+      query.addCriteria(
+              criterioDbRefId("autor.$id", perfilAutorId)
+      );
 
     query.addCriteria(
         Criteria.where("transaccionId").is(transaccionId)
@@ -75,4 +77,13 @@ public class RepositorioCalificacionesMongo implements RepositorioCalificacion {
 
     return mongoTemplate.exists(query, Calificacion.class);
   }
+
+    private Criteria criterioDbRefId(String campo, String id) {
+        try {
+            return Criteria.where(campo)
+                    .in(Arrays.asList(id, new ObjectId(id)));
+        } catch (IllegalArgumentException e) {
+            return Criteria.where(campo).is(id);
+        }
+    }
 }

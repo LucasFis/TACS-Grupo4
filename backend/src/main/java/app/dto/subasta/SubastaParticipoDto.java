@@ -9,6 +9,7 @@ import app.model.entities.Propuesta;
 import app.model.entities.Subasta;
 import lombok.Getter;
 import java.time.LocalDateTime;
+import java.time.Duration;
 
 @Getter
 public class SubastaParticipoDto {
@@ -19,6 +20,8 @@ public class SubastaParticipoDto {
   private LocalDateTime fechaCierre;
   MiOfertaDto tuOferta;
   private boolean yaCalificado;
+  private String finalizadaHace;
+  private long tiempoRestante;
 
   public SubastaParticipoDto(Subasta subasta, Propuesta tuOferta, boolean yaCalificado) {
     this.id = subasta.getId();
@@ -28,5 +31,26 @@ public class SubastaParticipoDto {
     this.fechaCierre = subasta.getFechaCierre();
     this.tuOferta = new MiOfertaDto(tuOferta);
     this.yaCalificado = yaCalificado;
+
+      Duration d = Duration.between(subasta.getFechaCierre(), LocalDateTime.now());
+
+      if (d.toDays() > 0) {
+          this.finalizadaHace = d.toDays() + "d";
+      } else if (d.toHours() > 0) {
+          this.finalizadaHace = d.toHours() + "h";
+      } else if (d.toMinutes() > 0) {
+          this.finalizadaHace = d.toMinutes() + "m";
+      } else {
+          this.finalizadaHace = "Ahora";
+      }
+
+      if (subasta.getFechaCierre().isAfter(LocalDateTime.now())) {
+          this.tiempoRestante = Duration.between(
+                  LocalDateTime.now(),
+                  subasta.getFechaCierre()
+          ).getSeconds();
+      } else {
+          this.tiempoRestante = 0;
+      }
   }
 }

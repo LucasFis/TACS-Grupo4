@@ -72,6 +72,7 @@ const Participo = () => {
                 key={sub.id}
                 subasta={sub}
                 finalizada={estado === 'FINALIZADA'}
+                finalizadaHace={sub.finalizada_hace}
                 onVerSubasta={() => navigate(`/subastas/${sub.id}`)}
                 onRefresh={() => setRefresh((r) => r + 1)}
               />

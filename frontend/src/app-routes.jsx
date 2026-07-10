@@ -55,6 +55,7 @@ const privadas = [
   { path: '/subastas', element: <Subastas /> },
   { path: '/subastas/:subId/crear-oferta', element: <CrearOferta /> },
   { path: '/subastas/:subId/ofertas/:ofertaId/editar', element: <EditarOferta /> },
+  { path: '/perfil/:perfilId', element: <Perfil /> },
 ]
 
 const privilegiadas = [

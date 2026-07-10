@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
+import java.time.Duration;
 
 @Getter
 public class MiSubastaActivaDto {
@@ -15,6 +16,7 @@ public class MiSubastaActivaDto {
   private LocalDateTime fechaCierre;
   private FiguritaDto figuritaSubastada;
   private List<OfertaSubastaDto> ofertas;
+  private Long tiempoRestante;
 
   public MiSubastaActivaDto(Subasta subasta) {
     this.id = subasta.getId();
@@ -26,5 +28,7 @@ public class MiSubastaActivaDto {
         .filter(o -> !Set.of(EstadoProceso.CANCELADO, EstadoProceso.RECHAZADO)
             .contains(o.getEstadoActual().getValor()))
         .map(OfertaSubastaDto::new).toList();
+    this.tiempoRestante =
+            Duration.between(LocalDateTime.now(), subasta.getFechaCierre()).getSeconds();
   }
 }

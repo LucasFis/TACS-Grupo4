@@ -6,15 +6,16 @@ import BarraTiempo from '../../../../../../components/ui/barra-tiempo/barra-tiem
 import EtiquetaFiguritasOfrecidas from '../../../../../../components/ui/etiqueta-figuritas-propuesta/etiqueta-figuritas-propuesta.jsx'
 import Etiqueta from '../../../../../../components/ui/etiqueta/etiqueta.jsx'
 import Button from '../../../../../../components/ui/button/button.jsx'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
-const SubastaParticipo = ({ subasta, finalizada, onRefresh }) => {
+const SubastaParticipo = ({ subasta, finalizada, finalizadaHace, onRefresh }) => {
   const { id, autor, figurita_subastada, fecha_cierre, tu_oferta, ya_calificado } = subasta
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
   const navigate = useNavigate()
 
-  const { tiempoRestante, finalizadaHace, finalizaPronto } = derivarTiempo({ fecha_cierre })
+  const [tiempoRestante, setTiempoRestante] = useState(subasta.tiempo_restante)
+  const finalizaPronto = tiempoRestante > 0 && tiempoRestante <= 3600
 
   const badgeEstado = finalizada
     ? null
@@ -34,6 +35,28 @@ const SubastaParticipo = ({ subasta, finalizada, onRefresh }) => {
     onRefresh()
   }
 
+    useEffect(() => {
+      if (tiempoRestante <= 0) return
+
+      const interval = setInterval(() => {
+        setTiempoRestante((prev) => Math.max(prev - 1, 0))
+      }, 1000)
+
+      return () => clearInterval(interval)
+    }, [tiempoRestante])
+
+    const formatearTiempo = (segundos) => {
+      if (segundos <= 0) return '00:00:00'
+
+      const horas = Math.floor(segundos / 3600)
+      const minutos = Math.floor((segundos % 3600) / 60)
+      const segs = segundos % 60
+
+      return `${horas.toString().padStart(2, '0')}:${minutos
+        .toString()
+        .padStart(2, '0')}:${segs.toString().padStart(2, '0')}`
+    }
+
   const puedoCalificar = finalizada && tu_oferta?.seleccionada && !ya_calificado
 
   return (
@@ -42,7 +65,7 @@ const SubastaParticipo = ({ subasta, finalizada, onRefresh }) => {
 
       <BarraTiempo
         finalizada={finalizada}
-        tiempoRestante={tiempoRestante}
+        tiempoRestante={formatearTiempo(tiempoRestante)}
         finalizadaHace={finalizadaHace}
         derecha={
           <>

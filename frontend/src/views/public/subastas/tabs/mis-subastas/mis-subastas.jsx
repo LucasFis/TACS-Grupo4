@@ -6,6 +6,7 @@ import FiltroSubasta from '../../filtro-subasta/filtro-subasta.jsx'
 import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { derivarTiempo } from '../../../../../utils/subastasTiempo.js'
 
 const MisSubastas = () => {
   const [data, setData] = useState({})
@@ -64,7 +65,8 @@ const MisSubastas = () => {
                 key={sub.id}
                 subasta={sub}
                 finalizada={estado === 'FINALIZADA'}
-                onRefresh={() => setRefresh((r) => r + 1)}
+                finalizadaHace={sub.finalizada_hace}
+                onRefresh={() => setRefresh(r => r + 1)}
               />
             ))}
           </div>

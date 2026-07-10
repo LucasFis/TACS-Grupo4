@@ -7,14 +7,18 @@ import PerfilHeader from './components/PerfilHeader.jsx'
 import PerfilStats from './components/PerfilStats.jsx'
 import PerfilCalificaciones from './components/PerfilCalificaciones.jsx'
 import ModalEditarPerfil from './components/ModalEditarPerfil/ModalEditarPerfil.jsx'
+import { useParams } from 'react-router-dom'
 
 const Perfil = () => {
   const [showModal, setShowModal] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const { perfilId: perfilIdUrl } = useParams()
+  const esMiPerfil = !perfilIdUrl
 
-  const { perfil, setPerfil, loading, stats, promedio, perfilId, manejarCierreDeSesion } = usePerfil()
-  const { reviews, loading: loadingCalificaciones, pagina, setPagina } = useCalificaciones()
+  const { perfil, setPerfil, loading, stats, promedio, perfilId, manejarCierreDeSesion } = usePerfil(perfilIdUrl)
+  const { reviews, loading: loadingCalificaciones, pagina, setPagina } = useCalificaciones(perfilIdUrl)
   const { user } = useAuth()
+
   return (
     <div className="d-flex flex-column">
       <PerfilHeader
@@ -23,6 +27,7 @@ const Perfil = () => {
         promedio={promedio}
         reviews={reviews}
         perfilId={perfilId}
+        esMiPerfil={esMiPerfil}
         onEditarClick={() => setShowModal(true)}
         onCerrarSesionClick={() => setShowConfirmModal(true)}
       />
@@ -41,7 +46,7 @@ const Perfil = () => {
         />
       )}
 
-      {showModal && (
+      {esMiPerfil && showModal && (
         <ModalEditarPerfil
           perfil={perfil}
           reviews={reviews}
@@ -53,14 +58,15 @@ const Perfil = () => {
           onCerrar={() => setShowModal(false)}
         />
       )}
-
-      <ConfirmModal
-        show={showConfirmModal}
-        titulo={'Esta seguro que quiere cerrar su sesion?'}
-        labelConfirmar={'Aceptar'}
-        onConfirmar={manejarCierreDeSesion}
-        onCancelar={() => setShowConfirmModal(false)}
-      />
+        {esMiPerfil && (
+          <ConfirmModal
+            show={showConfirmModal}
+            titulo={'Esta seguro que quiere cerrar su sesion?'}
+            labelConfirmar={'Aceptar'}
+            onConfirmar={manejarCierreDeSesion}
+            onCancelar={() => setShowConfirmModal(false)}
+          />
+        )}
     </div>
   )
 }

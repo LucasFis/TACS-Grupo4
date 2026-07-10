@@ -30,9 +30,13 @@ const Oferta = ({ oferta, onAdjudicar, onRechazar }) => (
         Adjudicar
       </button>
     )}
+
+    {
     <button className="btn btn-outline-secondary btn-sm px-2" onClick={onRechazar}>
       ✕
     </button>
+     }
+
   </div>
 )
 
