@@ -23,7 +23,10 @@ const useCrearPropuesta = (figurita) => {
       showToast('Propuesta creada correctamente', 'success')
       navigate('/intercambios')
     } catch (e) {
-      handleError(e, (err) => showToast(err.mensaje, 'error'))
+      handleError(e, (err) => {
+        const texto = err.mensaje || 'No se pudo crear la propuesta'
+        showToast(texto, 'error')
+      })
     } finally {
       setEnviando(false)
     }

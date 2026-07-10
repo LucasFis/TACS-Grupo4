@@ -6,6 +6,16 @@ import useCrearPropuesta from './useCrearPropuesta'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
 import styles from './crear-propuesta-intercambio.module.css'
 
+const calcularIniciales = (nombre) => {
+  if (!nombre) return '?'
+  return nombre
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+}
+
 const CrearPropuestaIntercambio = () => {
   const { state } = useLocation()
   const figurita = state?.figurita
@@ -15,14 +25,9 @@ const CrearPropuestaIntercambio = () => {
 
   const perfilDuenio = {
     id: figurita.perfil_id,
-    nombre: figurita.nombre_usuario,
-    iniciales: figurita.nombre_usuario
-      .split(' ')
-      .map((w) => w[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase(),
-    calificacion_media: figurita.reputacion,
+    nombre: figurita.nombre_usuario ?? 'Usuario',
+    iniciales: calcularIniciales(figurita.nombre_usuario),
+    calificacion_media: figurita.reputacion ?? 0,
   }
 
   return (
@@ -53,13 +58,16 @@ const CrearPropuestaIntercambio = () => {
         <SectionCard>
           <SectionCard.Section>
             <p className="label-seccion">Seleccioná las figuritas que querés ofrecer</p>
+            <p className="text-muted" style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>
+              Solo tus repetidas publicadas para intercambio
+            </p>
             <div className="mt-2">
               <SelectorRepetidas
                 modo="multiple"
                 bloqueadas={[]}
                 onChange={setSeleccionadas}
                 metodoIntercambio="INTERCAMBIO"
-                perfilId={figurita.perfil_id}
+                mensajeVacio="No tenés repetidas publicadas para intercambio. Publicá repetidas para poder ofrecer."
               />
             </div>
           </SectionCard.Section>
