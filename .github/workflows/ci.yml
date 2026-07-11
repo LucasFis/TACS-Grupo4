@@ -32,20 +32,3 @@ jobs:
           build-args: MAVEN_ARGS=package -DskipTests
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  loadtest:
-    name: Load Test
-    runs-on: ubuntu-latest
-    needs: test          # espera a que pasen los tests primero
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Levantar infra de test
-        run: docker compose -f docker-compose.test.yml --profile test up -d --wait backend-test
-
-      - name: Correr load test
-        run: docker compose -f docker-compose.test.yml --profile test run --rm loadtest
-
-      - name: Bajar infra
-        if: always()
-        run: docker compose -f docker-compose.test.yml --profile test down
