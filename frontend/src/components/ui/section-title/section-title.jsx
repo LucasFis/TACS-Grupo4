@@ -1,7 +1,7 @@
 import styles from './section-title.module.css';
 
 const SectionTitle = ({ children }) => {
-  return <p className={styles.title}>{children}</p>;
+  return <div className={styles.title}>{children}</div>;
 };
 
 export default SectionTitle;

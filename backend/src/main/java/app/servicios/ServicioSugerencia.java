@@ -8,6 +8,7 @@ import app.model.entities.Sugerencia;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioSugerencias;
 import app.repositories.impl.campos.CamposPerfil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,5 +40,13 @@ public class ServicioSugerencia {
   public void alternarFavorito(String sugerenciaId, String perfilId) {
 
     this.repositorioSugerencias.alternarFavorito(sugerenciaId, perfilId);
+  }
+
+  public void recalcularSugerencias(String perfilId) {
+    CamposPerfil campos = new CamposPerfil(false);
+    Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, campos);
+    this.repositorioSugerencias.eliminarNoFavoritasPorPerfil(perfil);
+    List<Sugerencia> sugerencias = this.repositorioSugerencias.generarSugerencias(perfil);
+    this.repositorioSugerencias.guardar(sugerencias);
   }
 }
