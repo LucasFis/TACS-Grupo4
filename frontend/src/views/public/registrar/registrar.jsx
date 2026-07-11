@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { crearAdministrador, crearUsuario, verificarNombre } from '@/services/usuarioService.js'
+import { buscarUsuario } from '@/services/sesionService.js'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
@@ -29,7 +30,7 @@ function Registrar() {
   })
 
   const { showToast } = useToast()
-  const { user } = useAuth()
+  const { user, asignarUsuario } = useAuth()
   const navigate = useNavigate()
 
   const validarNombre = (nombre) => {
@@ -152,11 +153,15 @@ function Registrar() {
       setOnSubmit(true)
       if (user?.rol === 'ADMINISTRADOR') {
         await crearAdministrador(usuario)
+        showToast(`Usuario creado correctamente`)
+        navigate('/')
       } else {
         await crearUsuario(usuario)
+        // Auto-login: el backend ya emitió la cookie; poblar el contexto de sesión
+        await buscarUsuario(asignarUsuario)
+        showToast(`Cuenta creada. ¡Bienvenido!`, 'success')
+        navigate('/')
       }
-      showToast(`Usuario creado correctamente`)
-      navigate('/')
     } catch (error) {
       showToast(
         handleError(error, () => {}),

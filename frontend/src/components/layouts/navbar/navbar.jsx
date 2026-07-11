@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Link, NavLink } from 'react-router-dom'
 import './navbar.css'
 import { useAuth } from '@/contexts/userContext.jsx'
@@ -18,6 +18,7 @@ const Navbar = () => {
   const [iniciales, setIniciales] = useState(undefined)
   const [notificaciones, setNotificaciones] = useState([])
   const wrapperRef = useRef(null)
+  const location = useLocation()
 
   const NAV_LINKS = [
     { to: '/explorar', label: 'Explorar' },
@@ -64,6 +65,26 @@ const Navbar = () => {
     document.addEventListener('mousedown', handleClickFuera)
     return () => document.removeEventListener('mousedown', handleClickFuera)
   }, [abierto])
+
+  // Cierra el popover con tecla Escape
+  useEffect(() => {
+    const handleEscape = async (e) => {
+      if (e.key === 'Escape' && abierto) {
+        await marcarTodasLeidas()
+        setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+        setAbierto(false)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [abierto])
+
+  // Cierra el popover al navegar a otra ruta
+  useEffect(() => {
+    if (abierto) {
+      setAbierto(false)
+    }
+  }, [location.pathname])
 
   const toggleNotificaciones = async () => {
     if (abierto) {
