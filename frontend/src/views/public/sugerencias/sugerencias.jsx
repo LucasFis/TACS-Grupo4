@@ -19,6 +19,7 @@ const Sugerencias = () => {
     const [error, setError] = useState(errorTemplate())
     const [contadores, setContadores] = useState([])
     const [recalculando, setRecalculando] = useState(false)
+    const [revision, setRevision] = useState(0)
 
     const cargarContadores = useCallback(async () => {
         try {
@@ -50,6 +51,7 @@ const Sugerencias = () => {
             setRecalculando(true)
             await recalcularSugerencias()
             await cargarContadores()
+            setRevision(r => r + 1)
             showToast('Sugerencias recalculadas', 'success')
         } catch (error) {
             showToast(handleError(error, setError), 'error')
@@ -80,7 +82,7 @@ const Sugerencias = () => {
                           o esperar a que se actualicen automaticamente cada 24hs. Si queres conservar una sugerencia, dale al favorito!</p>
                     </ExtraInfo>
 
-                    <MostradorSugerencias />
+                    <MostradorSugerencias key={revision} />
                 </div>
             </div>
         </main>
