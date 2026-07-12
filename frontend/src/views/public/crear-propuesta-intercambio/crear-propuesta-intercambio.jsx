@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repetidas.jsx'
 import Button from '@/components/ui/button/button.jsx'
@@ -19,9 +19,10 @@ const calcularIniciales = (nombre) => {
 const CrearPropuestaIntercambio = () => {
   const { state } = useLocation()
   const figurita = state?.figurita
-  const { seleccionadas, setSeleccionadas, enviar, enviando } = useCrearPropuesta(figurita)
+  const { seleccionadas, setSeleccionadas, enviar, enviando, validando } = useCrearPropuesta(figurita)
 
   if (!figurita) return <h2>No se pudo cargar la figurita.</h2>
+  if (validando) return null
 
   const perfilDuenio = {
     id: figurita.perfil_id,
@@ -58,9 +59,14 @@ const CrearPropuestaIntercambio = () => {
         <SectionCard>
           <SectionCard.Section>
             <p className="label-seccion">Seleccioná las figuritas que querés ofrecer</p>
-            <p className="text-muted" style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>
-              Solo tus repetidas publicadas para intercambio
-            </p>
+            <div className={styles.aviso}>
+              <span className={styles.avisoIcono}>⚠️</span>
+              <p className={styles.avisoTexto}>
+                <strong>Solo aparecen tus repetidas publicadas para intercambio.</strong>{' '}
+                Si una figurita no aparece acá, probablemente la cargaste solo como <strong>subasta</strong>.
+                Podés cambiar su método en <Link to="/mis-figuritas">Mis Figuritas</Link>.
+              </p>
+            </div>
             <div className="mt-2">
               <SelectorRepetidas
                 modo="multiple"
