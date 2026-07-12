@@ -52,6 +52,9 @@ public class Coleccion {
           existente.getCantidadExistente()
               + repetida.getCantidadExistente()
       );
+      repetida.getMetodos().forEach(m -> {
+        if (!existente.getMetodos().contains(m)) existente.getMetodos().add(m);
+      });
       return;
     }
 

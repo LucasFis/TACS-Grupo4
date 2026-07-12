@@ -88,8 +88,9 @@ public class ServicioFigurita {
     return repositorioSubastas.buscarActivasPorFiguritasSubastadas(figuritaIds)
         .stream()
         .collect(Collectors.toMap(
-            s -> s.getFiguritaSubastada().getId(),
-            Subasta::getId
+            s -> s.getFiguritaSubastada().getId() + ":" + s.getAutor().getId(),
+            Subasta::getId,
+            (a, b) -> a
         ));
   }
 
@@ -113,7 +114,7 @@ public class ServicioFigurita {
         .map(resultado -> new FiguritaIntercambiableDto(
             resultado.figurita(),
             resultado.perfil(),
-            figuritaIdASubastaId.get(resultado.figurita().getFigurita().getId())
+            figuritaIdASubastaId.get(resultado.figurita().getFigurita().getId() + ":" + resultado.figurita().getPerfilId())
         ))
         .toList();
 

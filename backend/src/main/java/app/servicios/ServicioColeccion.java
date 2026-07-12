@@ -70,8 +70,8 @@ public class ServicioColeccion {
 
     List<Perfil> interesados = this.repositorioPerfiles.buscarPorFiguritaFaltante(figurita, new CamposPerfil(true));
 
-    String cuerpo = "Nueva figurita disponible, Numero: " + figurita.getId() +
-        ", Cantidad: " + cantidadExistente;
+    String cuerpo = "Nueva figurita disponible: " + figurita.getJugador() +
+        " (" + figurita.getId() + "), Cantidad: " + cantidadExistente;
 
     this.notificacionService.notificarInteresados(interesados, cuerpo);
   }

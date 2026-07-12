@@ -84,7 +84,9 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
         Criteria.where("_id").is(colId)
             .and("repetidas.figurita").is(repetida.getFigurita().getId())
     );
-    Update incrementar = new Update().inc("repetidas.$.cantidadExistente", repetida.getCantidadExistente());
+    Update incrementar = new Update()
+        .inc("repetidas.$.cantidadExistente", repetida.getCantidadExistente())
+        .addToSet("repetidas.$.metodos").each(repetida.getMetodos().toArray());
     UpdateResult result = mongoTemplate.updateFirst(query, incrementar, Coleccion.class);
 
     if (result.getMatchedCount() == 0) {
