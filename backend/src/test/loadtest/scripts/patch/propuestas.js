@@ -32,7 +32,7 @@ function fetchPropuestas(authHeaders) {
 export function testCancelarPropuesta(authHeaders) {
     const yo = fetchYo(authHeaders);
     const props = fetchPropuestas(authHeaders);
-    const mia = props.filter(p => p.autor?.id === yo.id);
+    const mia = props.filter(p => p.autor?.id === yo.perfilId);
     if (!mia.length) return;
 
     const propId = pick(mia).id;
@@ -45,7 +45,7 @@ export function testCancelarPropuesta(authHeaders) {
 export function testAceptarPropuesta(authHeaders) {
     const yo = fetchYo(authHeaders);
     const props = fetchPropuestas(authHeaders);
-    const paraMi = props.filter(p => p.destinatario?.id === yo.id);
+    const paraMi = props.filter(p => p.destinatario?.id === yo.perfilId);
     if (!paraMi.length) return;
 
     const propId = pick(paraMi).id;
@@ -58,7 +58,7 @@ export function testAceptarPropuesta(authHeaders) {
 export function testRechazarPropuesta(authHeaders) {
     const yo = fetchYo(authHeaders);
     const props = fetchPropuestas(authHeaders);
-    const paraMi = props.filter(p => p.destinatario?.id === yo.id);
+    const paraMi = props.filter(p => p.destinatario?.id === yo.perfilId);
     if (!paraMi.length) return;
 
     const propId = pick(paraMi).id;

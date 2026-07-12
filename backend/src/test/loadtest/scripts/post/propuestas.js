@@ -20,7 +20,7 @@ export function testCrearPropuesta(authHeaders) {
 
     const yoRes = http.get(`${BASE}/yo`, { headers: authHeaders });
     const yo = yoRes.json();
-    const miId = yo?.id || 'self';
+    const miId = yo?.perfilId || 'self';
 
     const idx1 = Math.floor(Math.random() * figuritas.length);
     let idx2 = Math.floor(Math.random() * figuritas.length);

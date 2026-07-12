@@ -32,7 +32,7 @@ function pick(arr) {
 export function testCancelarSubasta(authHeaders) {
     const yo = fetchYo(authHeaders);
     const subs = fetchSubastas(authHeaders);
-    const mias = subs.filter(s => s.autor?.id === yo.id && !s.fecha_cierre);
+    const mias = subs.filter(s => s.autor?.id === yo.perfilId && !s.fecha_cierre);
     if (!mias.length) return;
 
     const subId = pick(mias).id;
@@ -45,7 +45,7 @@ export function testCancelarSubasta(authHeaders) {
 export function testCerrarSubasta(authHeaders) {
     const yo = fetchYo(authHeaders);
     const subs = fetchSubastas(authHeaders);
-    const mias = subs.filter(s => s.autor?.id === yo.id && !s.fecha_cierre);
+    const mias = subs.filter(s => s.autor?.id === yo.perfilId && !s.fecha_cierre);
     if (!mias.length) return;
 
     const subId = pick(mias).id;
