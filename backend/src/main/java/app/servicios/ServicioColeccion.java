@@ -15,6 +15,8 @@ import app.dto.filtros.RepetidasFiltro;
 import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioFiguritas;
 import app.repositories.RepositorioPerfiles;
+import app.repositories.RepositorioSugerencias;
+import app.model.entities.Sugerencia;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,19 +33,23 @@ public class ServicioColeccion {
   private final RepositorioColecciones repositorioColecciones;
   private final RepositorioPerfiles repositorioPerfiles;
   private final ServicioNotificacion notificacionService;
+  private final RepositorioSugerencias repositorioSugerencias;
 
   /**
-   * Agrega una figurita a la lista de faltantes de una colección.
+   * Agrega una figurita a la lista de faltantes de una colección y regenera las sugerencias del perfil.
    *
-   * @param colId identificador de la colección a la que se le agregará la figurita faltante
-   * @param figId identificador de la figurita que se marcará como faltante
+   * @param colId    identificador de la colección a la que se le agregará la figurita faltante
+   * @param perfilId identificador del perfil dueño de la colección
+   * @param figId    identificador de la figurita que se marcará como faltante
    * @throws app.exceptions.NotFoundException si la figurita con el {@code figId} indicado no existe
    * @throws app.exceptions.BadRequestException si la figurita ya está listada como faltante
    */
-  public void agregarFaltante(String colId, String figId) {
+  public void agregarFaltante(String colId, String perfilId, String figId) {
     Figurita faltante = this.repositorioFiguritas.buscarPorId(figId);
 
     repositorioColecciones.agregarFaltante(colId, faltante);
+
+    regenerarSugerencias(perfilId);
   }
 
   /**
@@ -74,6 +80,8 @@ public class ServicioColeccion {
         ", Cantidad: " + cantidadExistente;
 
     this.notificacionService.notificarInteresados(interesados, cuerpo);
+
+    regenerarSugerencias(perfilId);
   }
 
   /**
@@ -162,6 +170,13 @@ public class ServicioColeccion {
           "No se pueden eliminar métodos de intercambio existentes"
       );
     }
+  }
+
+  private void regenerarSugerencias(String perfilId) {
+    repositorioSugerencias.eliminarPorPerfil(perfilId);
+    Perfil perfil = repositorioPerfiles.buscarPorId(perfilId, new CamposPerfil(false));
+    List<Sugerencia> nuevas = repositorioSugerencias.generarSugerencias(perfil);
+    repositorioSugerencias.guardar(nuevas);
   }
 }
 

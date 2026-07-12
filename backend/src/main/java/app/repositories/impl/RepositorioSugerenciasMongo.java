@@ -201,4 +201,10 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
 
     mongoTemplate.findAllAndRemove(query, Sugerencia.class);
   }
+
+  @Override
+  public void eliminarPorPerfil(String perfilId) {
+    Query query = new Query(Criteria.where("autor.$id").is(perfilId));
+    mongoTemplate.remove(query, Sugerencia.class);
+  }
 }

@@ -17,10 +17,17 @@ import app.model.entities.MetodoIntercambio;
 import app.model.entities.Perfil;
 import app.model.entities.Sugerencia;
 import app.model.entities.Usuario;
+import app.exceptions.ForbiddenException;
+import app.model.entities.EstadoProceso;
+import app.model.entities.Propuesta;
+import app.model.entities.Subasta;
 import app.repositories.RepositorioCalificacion;
 import app.repositories.RepositorioNotificaciones;
 import app.repositories.RepositorioPerfiles;
+import app.repositories.RepositorioPropuestas;
+import app.repositories.RepositorioSubastas;
 import app.repositories.RepositorioUsuarios;
+import app.repositories.impl.campos.CamposSubasta;
 import app.repositories.impl.campos.CamposPerfil;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.ArrayList;
@@ -40,6 +47,8 @@ public class ServicioPerfil {
   private final ServicioNotificacion servicioNotificacion;
   private final RepositorioUsuarios repositorioUsuarios;
   private final MeterRegistry meterRegistry;
+  private final RepositorioPropuestas repositorioPropuestas;
+  private final RepositorioSubastas repositorioSubastas;
 
 
   /**
@@ -84,6 +93,8 @@ public class ServicioPerfil {
     if (valor < 1 || valor > 5) {
       throw new BadRequestException("El valor de la calificación debe estar entre 1 y 5");
     }
+
+    validarTransaccionCompletada(autorId, transaccionId, tipoTransaccion);
 
     CamposPerfil sinCampos = new CamposPerfil(false);
 
@@ -228,5 +239,25 @@ public class ServicioPerfil {
    */
   public void marcarTodasNotifsLeidas(String perfilId) {
       servicioNotificacion.marcarTodasLeidas(perfilId);
+  }
+
+  private void validarTransaccionCompletada(String autorId, String transaccionId, MetodoIntercambio tipo) {
+    if (tipo == MetodoIntercambio.INTERCAMBIO) {
+      Propuesta propuesta = repositorioPropuestas.buscarPorId(transaccionId);
+      if (propuesta == null) throw new NotFoundException("Propuesta no encontrada");
+      if (propuesta.getEstadoActual().getValor() != EstadoProceso.ACEPTADO)
+        throw new BadRequestException("Solo podés calificar intercambios completados");
+      if (!propuesta.getAutor().getId().equals(autorId) && !propuesta.getDestinatario().getId().equals(autorId))
+        throw new ForbiddenException("No participaste en este intercambio");
+    } else if (tipo == MetodoIntercambio.SUBASTA) {
+      Subasta subasta = repositorioSubastas.buscarPorId(transaccionId, new CamposSubasta(true, false));
+      if (subasta == null) throw new NotFoundException("Subasta no encontrada");
+      boolean tieneGanadora = subasta.getOfertas().stream()
+          .anyMatch(o -> o.getEstadoActual().getValor() == EstadoProceso.ACEPTADO);
+      if (!tieneGanadora) throw new BadRequestException("Solo podés calificar subastas completadas");
+      boolean esParticipante = subasta.getAutor().getId().equals(autorId) ||
+          subasta.getOfertas().stream().anyMatch(o -> o.getAutor().getId().equals(autorId));
+      if (!esParticipante) throw new ForbiddenException("No participaste en esta subasta");
+    }
   }
 }

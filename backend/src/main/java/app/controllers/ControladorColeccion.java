@@ -41,7 +41,8 @@ public class ControladorColeccion {
         @Valid @RequestBody FaltanteRequest request
     ) {
         String colId = this.servicioJwt.getColeccionId(token);
-        coleccionService.agregarFaltante(colId, request.getFigId());
+        String perfilId = this.servicioJwt.getPerfilId(token);
+        coleccionService.agregarFaltante(colId, perfilId, request.getFigId());
 
         return ResponseEntity.status(201).build();
     }

@@ -28,4 +28,6 @@ public interface RepositorioSugerencias {
   Sugerencia buscarPorId(String id);
 
   void eliminacionProgramada();
+
+  void eliminarPorPerfil(String perfilId);
 }
