@@ -60,6 +60,7 @@ const CrearPropuestaIntercambio = () => {
                 onChange={setSeleccionadas}
                 metodoIntercambio="INTERCAMBIO"
                 perfilId={figurita.perfil_id}
+                mensajeVacio="Ninguna de tus repetidas coincide con los faltantes de este usuario."
               />
             </div>
           </SectionCard.Section>

@@ -64,7 +64,12 @@ const CardBody = ({
     )}
 
     {!esPropio && (tipo === 'intercambio' || tipo === 'ambos') && (
-      <CardActionBtn to="/intercambios/crear" label="Proponer intercambio ↗" state={{ figurita }} />
+      <>
+        <CardActionBtn to="/intercambios/crear" label="Proponer intercambio ↗" state={{ figurita }} />
+        <p style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: '4px', marginBottom: 0 }}>
+          Solo si esta figurita está en tus faltantes
+        </p>
+      </>
     )}
     {!esPropio && (tipo === 'subasta' || tipo === 'ambos') && figurita.subasta_id && (
       <CardActionBtn

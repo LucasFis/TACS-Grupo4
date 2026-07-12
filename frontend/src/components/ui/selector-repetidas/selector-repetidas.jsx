@@ -14,6 +14,7 @@ const SelectorRepetidas = ({
   seleccionadasIniciales = [],
   metodoIntercambio = null,
   perfilId = null,
+  mensajeVacio = 'No hay resultados',
 }) => {
   const [figuritas, setFiguritas] = useState([])
   const [loading, setLoading] = useState(false)
@@ -83,6 +84,7 @@ const SelectorRepetidas = ({
         bloqueadas={bloqueadas}
         titulo="Tus repetidas"
         placeholder="Buscar en tus repetidas..."
+        mensajeVacio={mensajeVacio}
       />
 
       {todasVisibles.length > 0 && (
