@@ -8,24 +8,34 @@ export const options = optionsEscritura;
 
 const BASE = 'http://backend-test:8080';
 
-function fetchFiguritas(authHeaders) {
-    const res = http.get(`${BASE}/figuritas`, { headers: authHeaders });
+function fetchRepetidasSubasta(authHeaders) {
+    const res = http.get(`${BASE}/colecciones/repetidas`, { headers: authHeaders });
     const body = res.json();
-    return Array.isArray(body) ? body : [];
+    if (!Array.isArray(body)) return [];
+    return body
+        .filter(r => r.metodos?.includes('SUBASTA') && (r.cantidad_existente - r.cantidad_reservada) > 0)
+        .map(r => r.figurita.id);
+}
+
+function fetchFaltantesIds(authHeaders) {
+    const res = http.get(`${BASE}/colecciones/faltantes`, { headers: authHeaders });
+    const body = res.json();
+    return body?.contenido?.map(f => f.id) || [];
+}
+
+function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
 }
 
 export function testCrearSubasta(authHeaders) {
-    const figuritas = fetchFiguritas(authHeaders);
-    if (figuritas.length < 2) return;
-
-    const idx1 = Math.floor(Math.random() * figuritas.length);
-    let idx2 = Math.floor(Math.random() * figuritas.length);
-    while (idx2 === idx1 && figuritas.length > 1) idx2 = Math.floor(Math.random() * figuritas.length);
+    const subastables = fetchRepetidasSubasta(authHeaders);
+    const faltantesIds = fetchFaltantesIds(authHeaders);
+    if (!subastables.length || !faltantesIds.length) return;
 
     const res = http.post(`${BASE}/subastas`, JSON.stringify({
-        figurita_id: figuritas[idx1].id,
+        figurita_id: pick(subastables),
         duracion_en_horas: 24,
-        figuritas_deseadas_ids: [figuritas[idx2].id],
+        figuritas_deseadas_ids: [pick(faltantesIds)],
         calificacion_minima: 0,
     }), { headers: { ...authHeaders, 'Content-Type': 'application/json' } });
     check(res, {
