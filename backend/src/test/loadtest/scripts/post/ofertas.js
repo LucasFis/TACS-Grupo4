@@ -1,10 +1,10 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
-import { optionsDefault } from '../helpers/options.js';
+import { optionsEscritura } from '../helpers/options.js';
 import { usuarioRandom } from '../helpers/usuarios.js';
 
-export const options = optionsDefault;
+export const options = optionsEscritura;
 
 const BASE = 'http://backend-test:8080';
 
@@ -34,7 +34,7 @@ export function testOfertarEnSubasta(authHeaders) {
         figuritas_ofrecidas_id: [figuritaOfrecida],
     }), { headers: { ...authHeaders, 'Content-Type': 'application/json' } });
     check(res, {
-        '[ofertar] status 201 o 4xx': (r) => r.status === 201 || r.status >= 400,
+        '[ofertar] status 201 o 4xx': (r) => r.status === 201 || r.status >= 400 && r.status < 500,
     });
 }
 

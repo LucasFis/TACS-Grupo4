@@ -1,10 +1,10 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
-import { optionsDefault } from '../helpers/options.js';
+import { optionsEscrituraConEfectos } from '../helpers/options.js';
 import { usuarioRandom } from '../helpers/usuarios.js';
 
-export const options = optionsDefault;
+export const options = optionsEscrituraConEfectos;
 
 const BASE = 'http://backend-test:8080';
 
@@ -18,66 +18,53 @@ function pick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function crearPropuesta(authHeaders, figuritas) {
-    const yoRes = http.get(`${BASE}/yo`, { headers: authHeaders });
-    const yo = yoRes.json();
-    const miId = yo?.id || 'self';
+function fetchYo(authHeaders) {
+    const res = http.get(`${BASE}/yo`, { headers: authHeaders });
+    return res.json();
+}
 
-    http.post(`${BASE}/propuestas`, JSON.stringify({
-        destinatario_id: miId,
-        figurita_buscada_id: pick(figuritas).id,
-        figuritas_ofrecidas_ids: [pick(figuritas).id],
-    }), { headers: { ...authHeaders, 'Content-Type': 'application/json' } });
+function fetchPropuestas(authHeaders) {
+    const res = http.get(`${BASE}/propuestas`, { headers: authHeaders });
+    const body = res.json();
+    return body?.contenido || [];
 }
 
 export function testCancelarPropuesta(authHeaders) {
-    const figuritas = fetchFiguritas(authHeaders);
-    if (figuritas.length === 0) return;
+    const yo = fetchYo(authHeaders);
+    const props = fetchPropuestas(authHeaders);
+    const mia = props.filter(p => p.autor?.id === yo.id);
+    if (!mia.length) return;
 
-    crearPropuesta(authHeaders, figuritas);
-
-    const propRes = http.get(`${BASE}/propuestas`, { headers: authHeaders });
-    const propBody = propRes.json();
-    if (!propBody?.contenido?.length) return;
-
-    const propId = pick(propBody.contenido).id;
+    const propId = pick(mia).id;
     const res = http.patch(`${BASE}/propuestas/${propId}/cancelar`, null, { headers: authHeaders });
     check(res, {
-        '[cancelar-propuesta] status 204 o 4xx': (r) => r.status === 204 || r.status >= 400,
+        '[cancelar-propuesta] status 204 o 4xx': (r) => r.status === 204 || r.status >= 400 && r.status < 500,
     });
 }
 
 export function testAceptarPropuesta(authHeaders) {
-    const figuritas = fetchFiguritas(authHeaders);
-    if (figuritas.length === 0) return;
+    const yo = fetchYo(authHeaders);
+    const props = fetchPropuestas(authHeaders);
+    const paraMi = props.filter(p => p.destinatario?.id === yo.id);
+    if (!paraMi.length) return;
 
-    crearPropuesta(authHeaders, figuritas);
-
-    const propRes = http.get(`${BASE}/propuestas`, { headers: authHeaders });
-    const propBody = propRes.json();
-    if (!propBody?.contenido?.length) return;
-
-    const propId = pick(propBody.contenido).id;
+    const propId = pick(paraMi).id;
     const res = http.patch(`${BASE}/propuestas/${propId}/aceptar`, null, { headers: authHeaders });
     check(res, {
-        '[aceptar-propuesta] status 204 o 4xx': (r) => r.status === 204 || r.status >= 400,
+        '[aceptar-propuesta] status 204 o 4xx': (r) => r.status === 204 || r.status >= 400 && r.status < 500,
     });
 }
 
 export function testRechazarPropuesta(authHeaders) {
-    const figuritas = fetchFiguritas(authHeaders);
-    if (figuritas.length === 0) return;
+    const yo = fetchYo(authHeaders);
+    const props = fetchPropuestas(authHeaders);
+    const paraMi = props.filter(p => p.destinatario?.id === yo.id);
+    if (!paraMi.length) return;
 
-    crearPropuesta(authHeaders, figuritas);
-
-    const propRes = http.get(`${BASE}/propuestas`, { headers: authHeaders });
-    const propBody = propRes.json();
-    if (!propBody?.contenido?.length) return;
-
-    const propId = pick(propBody.contenido).id;
+    const propId = pick(paraMi).id;
     const res = http.patch(`${BASE}/propuestas/${propId}/rechazar`, null, { headers: authHeaders });
     check(res, {
-        '[rechazar-propuesta] status 204 o 4xx': (r) => r.status === 204 || r.status >= 400,
+        '[rechazar-propuesta] status 204 o 4xx': (r) => r.status === 204 || r.status >= 400 && r.status < 500,
     });
 }
 

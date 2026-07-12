@@ -1,9 +1,9 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { optionsDefault } from '../helpers/options.js';
+import { optionsLectura } from '../helpers/options.js';
 import { usuarioRandom } from '../helpers/usuarios.js';
 
-export const options = optionsDefault;
+export const options = optionsLectura;
 
 const BASE = 'http://backend-test:8080';
 

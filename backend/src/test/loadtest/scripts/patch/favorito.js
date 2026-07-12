@@ -1,10 +1,10 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
-import { optionsDefault } from '../helpers/options.js';
+import { optionsEscrituraConEfectos } from '../helpers/options.js';
 import { usuarioRandom } from '../helpers/usuarios.js';
 
-export const options = optionsDefault;
+export const options = optionsEscrituraConEfectos;
 
 const BASE = 'http://backend-test:8080';
 
@@ -21,7 +21,7 @@ export function testAlternarFavorito(authHeaders) {
     const sugId = pick(body.contenido).id;
     const res = http.patch(`${BASE}/sugerencias/${sugId}/favorito`, null, { headers: authHeaders });
     check(res, {
-        '[favorito] status 204 o 4xx': (r) => r.status === 204 || r.status >= 400,
+        '[favorito] status 204 o 4xx': (r) => r.status === 204 || r.status >= 400 && r.status < 500,
     });
 }
 

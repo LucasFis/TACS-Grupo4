@@ -1,11 +1,11 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
-import { optionsDefault } from '../helpers/options.js';
+import { optionsLectura } from '../helpers/options.js';
 import { usuarioRandom } from '../helpers/usuarios.js';
 import { checkHttp, checkPaginacion } from '../helpers/checks.js';
 
-export const options = optionsDefault;
+export const options = optionsLectura;
 
 const BASE = 'http://backend-test:8080';
 
