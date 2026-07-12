@@ -8,10 +8,23 @@ export const options = optionsEscritura;
 
 const BASE = 'http://backend-test:8080';
 
-function fetchFiguritas(authHeaders) {
-    const res = http.get(`${BASE}/figuritas`, { headers: authHeaders });
+function fetchFaltantesIds(authHeaders) {
+    const res = http.get(`${BASE}/colecciones/faltantes`, { headers: authHeaders });
     const body = res.json();
-    return Array.isArray(body) ? body : [];
+    const contenido = body?.contenido || [];
+    return new Set(contenido.map(f => f.id));
+}
+
+function fetchRepetidasIds(authHeaders) {
+    const res = http.get(`${BASE}/colecciones/repetidas`, { headers: authHeaders });
+    const body = res.json();
+    return Array.isArray(body) ? body.map(r => r.figurita.id) : [];
+}
+
+function fetchSubastas(authHeaders) {
+    const res = http.get(`${BASE}/subastas`, { headers: authHeaders });
+    const body = res.json();
+    return body?.contenido || [];
 }
 
 function pick(arr) {
@@ -19,16 +32,16 @@ function pick(arr) {
 }
 
 export function testOfertarEnSubasta(authHeaders) {
-    const figRes = http.get(`${BASE}/figuritas`, { headers: authHeaders });
-    const figuritas = figRes.json();
-    if (!Array.isArray(figuritas) || figuritas.length === 0) return;
+    const faltantesIds = fetchFaltantesIds(authHeaders);
+    const repetidasIds = fetchRepetidasIds(authHeaders);
+    if (!repetidasIds.length) return;
 
-    const subRes = http.get(`${BASE}/subastas`, { headers: authHeaders });
-    const subBody = subRes.json();
-    if (!subBody?.contenido?.length) return;
+    const subs = fetchSubastas(authHeaders);
+    const abiertas = subs.filter(s => !s.fecha_cierre && faltantesIds.has(s.figurita_subastada?.id));
+    if (!abiertas.length) return;
 
-    const subId = pick(subBody.contenido).id;
-    const figuritaOfrecida = pick(figuritas).id;
+    const subId = pick(abiertas).id;
+    const figuritaOfrecida = pick(repetidasIds);
 
     const res = http.post(`${BASE}/subastas/${subId}/ofertas`, JSON.stringify({
         figuritas_ofrecidas_id: [figuritaOfrecida],
