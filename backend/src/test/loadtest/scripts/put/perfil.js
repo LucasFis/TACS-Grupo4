@@ -2,16 +2,16 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
 import { optionsDefault } from '../helpers/options.js';
+import { usuarioRandom } from '../helpers/usuarios.js';
 
 export const options = optionsDefault;
 
 const BASE = 'http://backend-test:8080';
-const USUARIO = { nombre: 'lucas_fis', contrasenia: 'Gordo123!' };
 
-export function testEditarPerfil(authHeaders) {
+export function testEditarPerfil(authHeaders, usuario) {
     const res = http.put(`${BASE}/perfil`, JSON.stringify({
         nombre: 'Lucas',
-        nombre_usuario: USUARIO.nombre,
+        nombre_usuario: usuario.nombre,
         medios_de_contacto: [],
     }), { headers: { ...authHeaders, 'Content-Type': 'application/json' } });
     check(res, {
@@ -20,8 +20,9 @@ export function testEditarPerfil(authHeaders) {
 }
 
 export default function () {
-    const token = login(BASE, USUARIO);
+    const usuario = usuarioRandom();
+    const token = login(BASE, usuario);
     if (!token) return;
-    testEditarPerfil({ 'Cookie': `token=${token}` });
+    testEditarPerfil({ 'Cookie': `token=${token}` }, usuario);
     sleep(1);
 }

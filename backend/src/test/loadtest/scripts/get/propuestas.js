@@ -2,12 +2,12 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
 import { optionsDefault } from '../helpers/options.js';
+import { usuarioRandom } from '../helpers/usuarios.js';
 import { checkHttp, checkPaginacion } from '../helpers/checks.js';
 
 export const options = optionsDefault;
 
 const BASE = 'http://backend-test:8080';
-const USUARIO = { nombre: 'lucas_fis', contrasenia: 'Gordo123!' };
 
 export function testIntercambios(authHeaders) {
     const res = http.get(`${BASE}/propuestas`, { headers: authHeaders });
@@ -24,7 +24,7 @@ export function testIntercambios(authHeaders) {
 }
 
 export default function () {
-    const token = login(BASE, USUARIO);
+    const token = login(BASE, usuarioRandom());
     if (!token) return;
     testIntercambios({ 'Cookie': `token=${token}` });
     sleep(1);

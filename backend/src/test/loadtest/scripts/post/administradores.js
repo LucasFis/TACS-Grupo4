@@ -2,11 +2,11 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
 import { optionsDefault } from '../helpers/options.js';
+import { usuarioAdmin } from '../helpers/usuarios.js';
 
 export const options = optionsDefault;
 
 const BASE = 'http://backend-test:8080';
-const USUARIO = { nombre: 'lucas_fis', contrasenia: 'Gordo123!' };
 
 export function testRegistrarAdministrador(authHeaders) {
     const nombre = `lt_adm_${__VU}_${__ITER}`;
@@ -21,7 +21,7 @@ export function testRegistrarAdministrador(authHeaders) {
 }
 
 export default function () {
-    const token = login(BASE, USUARIO);
+    const token = login(BASE, usuarioAdmin());
     if (!token) return;
     testRegistrarAdministrador({ 'Cookie': `token=${token}` });
     sleep(1);

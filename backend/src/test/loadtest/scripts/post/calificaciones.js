@@ -2,11 +2,11 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
 import { optionsDefault } from '../helpers/options.js';
+import { usuarioRandom } from '../helpers/usuarios.js';
 
 export const options = optionsDefault;
 
 const BASE = 'http://backend-test:8080';
-const USUARIO = { nombre: 'lucas_fis', contrasenia: 'Gordo123!' };
 
 export function testCalificarPerfil(authHeaders) {
     const res = http.post(`${BASE}/perfil/calificaciones`, JSON.stringify({
@@ -21,7 +21,7 @@ export function testCalificarPerfil(authHeaders) {
 }
 
 export default function () {
-    const token = login(BASE, USUARIO);
+    const token = login(BASE, usuarioRandom());
     if (!token) return;
     testCalificarPerfil({ 'Cookie': `token=${token}` });
     sleep(1);
