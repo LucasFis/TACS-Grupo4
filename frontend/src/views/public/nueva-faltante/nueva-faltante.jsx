@@ -8,6 +8,7 @@ import {useToast} from "@/contexts/toastContext.jsx";
 import {useError} from "@/contexts/errorContext.jsx";
 import Breadcrumb from "@/components/ui/breadcrumb/breadcrumb.jsx";
 import { IconoAdvertencia } from '@/components/ui/iconos/advertencia/advertencia.jsx'
+import { CardHero } from '@/components/ui/figurita-card/figurita-card.jsx'
 
 const NuevaFaltante = () => {
     const [figurita, setFigurita] = useState(undefined);
@@ -73,26 +74,24 @@ const NuevaFaltante = () => {
                 {name: "Mis figuritas", to: "/mis-figuritas"},
                 {name: "Nueva faltante", to: "/mis-figuritas/nueva-faltante"}
             ]}/>
-            <div
-                className="d-flex flex-column align-items-center justify-content-center rounded-3 py-4"
-                style={{ backgroundColor: '#f8f9fa', border: '1.5px dashed #ced4da', minHeight: '140px' }}
-            >
+            <div className="mb-2">
                 {figurita ? (
-                    <>
-                        <p className="mb-0 fw-semibold" style={{ fontSize: '1rem' }}>
-                            {figurita.jugador}
-                        </p>
-                        <p className="mb-0 text-muted" style={{ fontSize: '0.8rem' }}>
-                            {figurita.seleccion} · #{figurita.numero}
-                        </p>
-                    </>
+                    <CardHero
+                        strCutout={figurita.imagen_url}
+                        jugador={figurita.jugador}
+                        numero={figurita.numero}
+                        tipo="faltante"
+                    />
                 ) : (
-                    <>
+                    <div
+                        className="d-flex flex-column align-items-center justify-content-center rounded-3 py-4"
+                        style={{ backgroundColor: '#f8f9fa', border: '1.5px dashed #ced4da', minHeight: '140px' }}
+                    >
                         <span style={{ fontSize: '2rem' }}>🔍</span>
                         <p className="mb-0 text-muted mt-2" style={{ fontSize: '0.85rem' }}>
                             Buscá una figurita para ver la vista previa
                         </p>
-                    </>
+                    </div>
                 )}
             </div>
 

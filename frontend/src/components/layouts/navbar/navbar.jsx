@@ -22,7 +22,7 @@ const Navbar = () => {
   const NAV_LINKS = [
     { to: '/explorar', label: 'Explorar' },
     { to: '/mis-figuritas', label: 'Mis figuritas' },
-    { to: '/intercambios', label: 'Intercambios' },
+    { to: '/intercambios', label: 'Propuestas' },
     { to: '/subastas', label: 'Subastas' },
     { to: '/estadisticas', label: 'Estadisticas', privilege: 'ADMINISTRADOR' },
     { to: '/registrar', label: 'Nuevo Admin', privilege: 'ADMINISTRADOR' },

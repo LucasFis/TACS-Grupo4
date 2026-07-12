@@ -26,8 +26,8 @@ const Oferta = ({ oferta, onAdjudicar, onRechazar }) => (
 
     {oferta.seleccionada && <Etiqueta label="Seleccionada" variante="exito" />}
     {!oferta.seleccionada && (
-      <button className={`${styles.btnAdjudicar} btn btn-outline-secondary btn-sm`} onClick={onAdjudicar}>
-        Adjudicar
+      <button className={`${styles.btnAdjudicar} btn btn-success btn-sm`} onClick={onAdjudicar}>
+        Adjudicar ✓
       </button>
     )}
     <button className="btn btn-outline-secondary btn-sm px-2" onClick={onRechazar}>
