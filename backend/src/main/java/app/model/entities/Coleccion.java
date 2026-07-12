@@ -138,6 +138,11 @@ public class Coleccion {
     });
   }
 
+  public List<MetodoIntercambio> getMetodosDe(Figurita figurita) {
+    FiguritaIntercambiable fi = obtenerRepetida(figurita);
+    return fi != null ? new ArrayList<>(fi.getMetodos()) : List.of();
+  }
+
   private FiguritaIntercambiable obtenerRepetida(Figurita figurita) {
     return this.repetidas.stream()
         .filter(r -> r.getFigurita().getId().equals(figurita.getId()))
