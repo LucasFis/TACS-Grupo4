@@ -167,6 +167,10 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
 
     List<AggregationOperation> filtrado = new ArrayList<>();
 
+    filtrado.add(Aggregation.match(
+        Criteria.where("repetidas.cantidadExistente").gt(0)
+    ));
+
     if (filtros.metodoIntercambio() != null) {
       filtrado.add(Aggregation.match(
           Criteria.where("repetidas.metodos").is(filtros.metodoIntercambio())

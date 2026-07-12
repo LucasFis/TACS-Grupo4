@@ -69,6 +69,8 @@ const CrearOferta = () => {
   const faltantesRequeridas = obtenerFaltantesRequeridas(repetidas, subasta.figuritas_solicitadas)
   const tieneTodasRequeridas = faltantesRequeridas.length === 0
   const puedeOfertar = cumpleCalificacion && tieneTodasRequeridas
+  const tieneRepetidasSoloIntercambio =
+    repetidas.length > 0 && !repetidas.some((r) => r.metodos?.includes('SUBASTA'))
 
   const onEnviar = async () => {
     try {
@@ -162,6 +164,14 @@ const CrearOferta = () => {
           No tenés todas las figuritas requeridas. Te falta
           {faltantesRequeridas.length > 1 ? 'n' : ''}:{' '}
           <strong>{faltantesRequeridas.map((f) => f.jugador).join(', ')}</strong>.
+        </div>
+      )}
+
+      {/* Alerta método incorrecto */}
+      {cumpleCalificacion && tieneTodasRequeridas && tieneRepetidasSoloIntercambio && (
+        <div className="alert alert-info">
+          Tenés figuritas repetidas pero están habilitadas solo para intercambio. Editá tus
+          repetidas en "Mis figuritas" para habilitarlas en subastas también.
         </div>
       )}
 
