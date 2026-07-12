@@ -1,35 +1,48 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { login } from '../helpers/auth.js';
-import { optionsEscritura } from '../helpers/options.js';
+import {optionsEscritura} from '../helpers/options.js';
 import { usuarioRandom } from '../helpers/usuarios.js';
 
 export const options = optionsEscritura;
 
 const BASE = 'http://backend-test:8080';
 
-function fetchFiguritas(authHeaders) {
-    const res = http.get(`${BASE}/figuritas`, { headers: authHeaders });
+const PERFILES = [
+    'lucas-id-001',
+    'sofia-id-001',
+    'matias-id-001',
+    'juan-id-001',
+    'valentina-id-001',
+    'diego-id-001',
+];
+
+function fetchFaltantesIds(authHeaders) {
+    const res = http.get(`${BASE}/colecciones/faltantes`, { headers: authHeaders });
     const body = res.json();
-    return Array.isArray(body) ? body : [];
+    const contenido = body?.contenido || [];
+    return contenido.map(f => f.id);
+}
+
+function fetchRepetidasIds(authHeaders) {
+    const res = http.get(`${BASE}/colecciones/repetidas`, { headers: authHeaders });
+    const body = res.json();
+    return Array.isArray(body) ? body.map(r => r.figurita.id) : [];
+}
+
+function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
 }
 
 export function testCrearPropuesta(authHeaders) {
-    const figuritas = fetchFiguritas(authHeaders);
-    if (figuritas.length < 2) return;
-
-    const yoRes = http.get(`${BASE}/yo`, { headers: authHeaders });
-    const yo = yoRes.json();
-    const miId = yo?.perfilId || 'self';
-
-    const idx1 = Math.floor(Math.random() * figuritas.length);
-    let idx2 = Math.floor(Math.random() * figuritas.length);
-    while (idx2 === idx1 && figuritas.length > 1) idx2 = Math.floor(Math.random() * figuritas.length);
+    const faltantesIds = fetchFaltantesIds(authHeaders);
+    const repetidasIds = fetchRepetidasIds(authHeaders);
+    if (!faltantesIds.length || !repetidasIds.length) return;
 
     const res = http.post(`${BASE}/propuestas`, JSON.stringify({
-        destinatario_id: miId,
-        figurita_buscada_id: figuritas[idx1].id,
-        figuritas_ofrecidas_ids: [figuritas[idx2].id],
+        destinatario_id: pick(PERFILES),
+        figurita_buscada_id: pick(faltantesIds),
+        figuritas_ofrecidas_ids: [pick(repetidasIds)],
     }), { headers: { ...authHeaders, 'Content-Type': 'application/json' } });
     check(res, {
         '[crear-propuesta] status 201 o 4xx': (r) => r.status === 201 || r.status >= 400 && r.status < 500,

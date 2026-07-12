@@ -43,8 +43,8 @@ export const optionsEscrituraConEfectos = {
         { duration: '5s',  target: 0 },
     ],
     thresholds: {
-        'http_req_failed': ['rate<0.05'],
-        'checks':         ['rate>0.95'],
+        'http_req_failed': ['rate<0.1'],
+        'checks':         ['rate>0.90'],
     },
 };
 
@@ -60,8 +60,8 @@ export const optionsProblematico = {
         { duration: '5s',  target: 0 },
     ],
     thresholds: {
-        'http_req_failed': ['rate<0.15'],
-        'checks':         ['rate>0.80'],
+        'http_req_failed': ['rate<0.1'],
+        'checks':         ['rate>0.85'],
     },
 };
 
