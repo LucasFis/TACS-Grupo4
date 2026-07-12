@@ -46,6 +46,7 @@ public class ServicioSesion {
 
     Usuario usuario = this.repoUsuario.buscarPorNombre(request.nombre());
 
+    System.out.println("[DEBUG] contrasenia from DB: " + (usuario.getContrasenia() == null ? "NULL" : usuario.getContrasenia().substring(0, Math.min(10, usuario.getContrasenia().length())) + "..."));
     boolean coincide = passwordEncoder.matches(request.contrasenia(), usuario.getContrasenia());
 
     if (!coincide) {

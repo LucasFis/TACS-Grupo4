@@ -1,15 +1,20 @@
 #!/bin/sh
 if [ -z "$1" ]; then
-  for script in /loadtest/scripts/*.js
+  for script in $(find /loadtest/scripts -name '*.js' -not -path '*/helpers/*' | sort)
   do
-    case "$script" in
-      */helpers/*) continue ;;
-    esac
     echo "==============================="
     echo "Corriendo: $script"
     echo "==============================="
     k6 run "$script"
   done
 else
-  k6 run "/loadtest/scripts/$1"
+  SCRIPT="/loadtest/scripts/$1"
+  if [ ! -f "$SCRIPT" ]; then
+    echo "Error: no se encontro '$SCRIPT'"
+    exit 1
+  fi
+  echo "==============================="
+  echo "Corriendo: $SCRIPT"
+  echo "==============================="
+  k6 run "$SCRIPT"
 fi

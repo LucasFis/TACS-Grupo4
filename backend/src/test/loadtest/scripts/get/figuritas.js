@@ -1,10 +1,10 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { login } from './helpers/auth.js';
-import {optionsDefault} from './helpers/options.js'
-import {checkHttp} from "./helpers/checks.js";
+import { login } from '../helpers/auth.js';
+import { optionsDefault } from '../helpers/options.js';
+import { checkHttp } from '../helpers/checks.js';
 
-export const options = optionsDefault
+export const options = optionsDefault;
 
 const BASE = 'http://backend-test:8080';
 const USUARIO = { nombre: 'lucas_fis', contrasenia: 'Gordo123!' };

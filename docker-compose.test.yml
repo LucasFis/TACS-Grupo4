@@ -52,4 +52,4 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/src/test/loadtest:/loadtest
-    entrypoint: ["/bin/sh", "-c", "cp /loadtest/entrypoint.sh /tmp/entrypoint.sh && sed -i 's/\\r//' /tmp/entrypoint.sh && /bin/sh /tmp/entrypoint.sh"]
+    entrypoint: ["/bin/sh", "-c", "cp /loadtest/entrypoint.sh /tmp/entrypoint.sh && sed -i 's/\\r//' /tmp/entrypoint.sh && /bin/sh /tmp/entrypoint.sh $@", "--"]
