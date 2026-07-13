@@ -21,7 +21,6 @@ public class CrearSubastaRequest {
   @NotNull
   private Integer duracionEnHoras;
 
-  @NotEmpty
   private List<String> figuritasDeseadasIds = new ArrayList<>();
 
   @Min(0)

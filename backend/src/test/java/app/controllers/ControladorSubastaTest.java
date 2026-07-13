@@ -351,11 +351,11 @@ class ControladorSubastaTest {
                 }
                 """)
             )
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isOk());
     }
 
     @Test
-    void crearSubastaFalla_figuritasDeseadasIdsVacio() throws Exception {
+    void crearSubastaNoFalla_figuritasDeseadasIdsVacio() throws Exception {
 
         mockMvc.perform(
                 post("/subastas")
@@ -370,7 +370,7 @@ class ControladorSubastaTest {
                 }
                 """)
             )
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isOk());
     }
 
     @Test
