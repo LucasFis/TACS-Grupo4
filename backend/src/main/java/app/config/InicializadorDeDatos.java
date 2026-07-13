@@ -330,6 +330,8 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   // P01 — Lucas → Juan : ofrece Messi (ARG-10 INTERCAMBIO), busca Modrić (CRO-10 INTERCAMBIO ✅)
   propuestas.guardar(Propuesta.builder()
       .autor(lucas).destinatario(juan)
+      .estado(new ArrayList<>(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))))
+      .estadoActual(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("ARG-10"))))
       .figuritaBuscada(figs.get("CRO-10")).build());
   reservar(lucas, "ARG-10");
@@ -337,6 +339,8 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   // P02 — Lucas → Juan : ofrece Di María (ARG-11 INTERCAMBIO), busca Modrić (CRO-10 INTERCAMBIO ✅)
   propuestas.guardar(Propuesta.builder()
       .autor(lucas).destinatario(juan)
+      .estado(new ArrayList<>(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))))
+      .estadoActual(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("ARG-11"))))
       .figuritaBuscada(figs.get("CRO-10")).build());
   reservar(lucas, "ARG-11");
@@ -344,6 +348,8 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   // P03 — Lucas → Juan : ofrece Neymar (BRA-10 INTERCAMBIO), busca Modrić (CRO-10 INTERCAMBIO ✅)
   propuestas.guardar(Propuesta.builder()
       .autor(lucas).destinatario(juan)
+      .estado(new ArrayList<>(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))))
+      .estadoActual(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("BRA-10"))))
       .figuritaBuscada(figs.get("CRO-10")).build());
   reservar(lucas, "BRA-10");
@@ -351,6 +357,8 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   // P04 — Lucas → Valentina : ofrece Vinícius (BRA-11 INTERCAMBIO), busca Perišić (CRO-7 INTERCAMBIO ✅)
   propuestas.guardar(Propuesta.builder()
       .autor(lucas).destinatario(valentina)
+      .estado(new ArrayList<>(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))))
+      .estadoActual(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("BRA-11"))))
       .figuritaBuscada(figs.get("CRO-7")).build());
   reservar(lucas, "BRA-11");
@@ -358,6 +366,8 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   // P05 — Lucas → Sofía : ofrece Griezmann (FRA-7 INTERCAMBIO), busca Kimmich (GER-6 INTERCAMBIO ✅)
   propuestas.guardar(Propuesta.builder()
       .autor(lucas).destinatario(sofia)
+      .estado(new ArrayList<>(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))))
+      .estadoActual(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("FRA-7"))))
       .figuritaBuscada(figs.get("GER-6")).build());
   reservar(lucas, "FRA-7");
@@ -365,6 +375,8 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   // P06 — Lucas → Sofía : ofrece J.Álvarez (ARG-9 INTERCAMBIO), busca Kimmich (GER-6 INTERCAMBIO ✅)
   propuestas.guardar(Propuesta.builder()
       .autor(lucas).destinatario(sofia)
+      .estado(new ArrayList<>(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))))
+      .estadoActual(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("ARG-9"))))
       .figuritaBuscada(figs.get("GER-6")).build());
   reservar(lucas, "ARG-9");
@@ -372,6 +384,8 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   // P07 — Valentina → Lucas : ofrece Perišić (CRO-7 INTERCAMBIO), busca Messi (ARG-10 INTERCAMBIO ✅)
   propuestas.guardar(Propuesta.builder()
       .autor(valentina).destinatario(lucas)
+      .estado(new ArrayList<>(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))))
+      .estadoActual(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("CRO-7"))))
       .figuritaBuscada(figs.get("ARG-10")).build());
   reservar(valentina, "CRO-7");
@@ -379,6 +393,8 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   // P08 — Sofía → Lucas : ofrece Kimmich (GER-6 INTERCAMBIO), busca Messi (ARG-10 INTERCAMBIO ✅)
   propuestas.guardar(Propuesta.builder()
       .autor(sofia).destinatario(lucas)
+      .estado(new ArrayList<>(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))))
+      .estadoActual(new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.PENDIENTE))
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("GER-6"))))
       .figuritaBuscada(figs.get("ARG-10")).build());
   reservar(sofia, "GER-6");
@@ -450,7 +466,7 @@ private void reservar(Perfil perfil, String figuritaId) {
         .autor(lucas)
         .figuritaSubastada(figs.get("FRA-7"))
         .fechaInicio(LocalDateTime.of(2026, 1, 15, 10, 0))
-        .fechaCierre(LocalDateTime.now().plusDays(7))
+        .fechaCierre(LocalDateTime.of(2026, 12, 31, 23, 59))
         .build();
     reservar(lucas, "FRA-7");
     subastas.guardar(s1);
@@ -484,7 +500,7 @@ private void reservar(Perfil perfil, String figuritaId) {
         .autor(sofia)
         .figuritaSubastada(figs.get("POR-7"))
         .fechaInicio(LocalDateTime.of(2026, 1, 15, 10, 0))
-        .fechaCierre(LocalDateTime.now().plusDays(7))
+        .fechaCierre(LocalDateTime.of(2026, 12, 31, 23, 59))
         .build();
     reservar(sofia, "POR-7");
     subastas.guardar(s2);
@@ -508,7 +524,7 @@ private void reservar(Perfil perfil, String figuritaId) {
         .figuritaSubastada(figs.get("CRO-10"))
         .figuritasSolicitadas(List.of(figs.get("ARG-10")))
         .fechaInicio(LocalDateTime.of(2026, 1, 15, 10, 0))
-        .fechaCierre(LocalDateTime.now().plusDays(7))
+        .fechaCierre(LocalDateTime.of(2026, 12, 31, 23, 59))
         .build();
     reservar(valentina, "CRO-10");
     subastas.guardar(s3);

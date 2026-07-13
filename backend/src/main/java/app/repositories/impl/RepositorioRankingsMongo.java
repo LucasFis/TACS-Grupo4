@@ -138,20 +138,37 @@ public class RepositorioRankingsMongo implements RepositorioRankings {
    * @param detalle expresión opcional para el campo detalle (puede ser {@code null})
    */
   private List<AggregationOperation> lookupPerfilYProyectar(Document detalle) {
-    ProjectionOperation proyectar = Aggregation.project()
-        .andExclude("_id")
-        .and(ctx -> new Document("$toString", "$_id")).as("perfilId")
-        .and("perfil.nombre").as("nombre")
-        .and("valor").as("valor");
-
-    if (detalle != null) {
-      proyectar = proyectar.and(ctx -> detalle).as("detalle");
-    }
-
     List<AggregationOperation> ops = new ArrayList<>();
-    ops.add(Aggregation.lookup("perfiles", "_id", "_id", "perfil"));
-    ops.add(Aggregation.unwind("perfil"));
-    ops.add(proyectar);
+
+    // Normaliza ambos lados a String para tolerar IDs almacenados como ObjectId o String.
+    // Usamos lambdas raw en todas las etapas siguientes para evitar que Spring Data
+    // intente resolver "perfil" en el contexto de campo (lo que causaría "Invalid reference").
+    ops.add(context -> new Document("$lookup",
+        new Document("from", "perfiles")
+            .append("let", new Document("pid", new Document("$toString", "$_id")))
+            .append("pipeline", List.of(
+                new Document("$match", new Document("$expr",
+                    new Document("$eq", List.of(
+                        new Document("$toString", "$_id"),
+                        "$$pid"
+                    ))
+                ))
+            ))
+            .append("as", "perfil")
+    ));
+    ops.add(context -> new Document("$unwind", "$perfil"));
+
+    ops.add(context -> {
+      Document project = new Document()
+          .append("_id", 0)
+          .append("perfilId", new Document("$toString", "$_id"))
+          .append("nombre", "$perfil.nombre")
+          .append("valor", "$valor");
+      if (detalle != null) {
+        project.append("detalle", detalle);
+      }
+      return new Document("$project", project);
+    });
 
     return ops;
   }
