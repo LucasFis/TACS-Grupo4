@@ -36,7 +36,7 @@ const Navbar = () => {
       setIniciales(data.iniciales)
     } catch (error) {
       showToast(
-        handleError(error, (m) => {}),
+        handleError(error, () => {}),
         'error',
       )
     }
@@ -54,11 +54,15 @@ const Navbar = () => {
   useEffect(() => {
     const handleClickFuera = async (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        if (abierto) {
-          await marcarTodasLeidas()
-          setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+        try {
+          if (abierto) {
+            await marcarTodasLeidas()
+            setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+          }
+        } catch {
+        } finally {
+          setAbierto(false)
         }
-        setAbierto(false)
       }
     }
     document.addEventListener('mousedown', handleClickFuera)
@@ -67,9 +71,13 @@ const Navbar = () => {
 
   const toggleNotificaciones = async () => {
     if (abierto) {
-      await marcarTodasLeidas()
-      setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
-      setAbierto(false)
+      try {
+        await marcarTodasLeidas()
+        setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+      } catch {
+      } finally {
+        setAbierto(false)
+      }
     } else {
       const data = await obtenerNotificaciones()
       setNotificaciones(Array.isArray(data) ? data : [])
