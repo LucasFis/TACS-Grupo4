@@ -214,51 +214,33 @@ Usado por: `patch/notificaciones`, `post/recalcular`
 
 ## 6. Resultados de ejecución
 
-### Formato esperado de la salida de k6
-
-```
-     data_received.............: ...
-     data_sent.................: ...
-     http_req_blocked..........: ...
-     http_req_connecting.......: ...
-     http_req_duration.........: avg=...ms  min=...ms  med=...ms  max=...ms  p(90)=...ms  p(95)=...ms  p(99)=...ms
-     http_req_failed...........: ...% 
-     http_reqs.................: ...
-     iteration_duration........: ...
-     iterations................: ...
-     vus_max...................: ...
-     vus.......................: ...
-```
-
 ### Tabla resumen de resultados
 
 | Método | Endpoint | VUs max | p95 (ms) | p99 (ms) | http_req_failed (%) | checks (%) | Throughput (req/s) |
 |--------|----------|---------|----------|----------|---------------------|------------|-------------------|
-| GET | `/subastas` | 250 | 1401.08 | N/A | 0.00 | 100.00 | 150.56 |
-| GET | `/figuritas` | 250 | 159.62 | N/A | 0.00 | 100.00 | 265.26 |
-| GET | `/propuestas` | 250 | 2150.83 | N/A | 0.00 | 100.00 | 125.73 |
-| GET | `/sugerencias` | 250 | 415.51 | N/A | 0.00 | 97.00 | 240.82 |
-| GET | `/colecciones/faltantes` | 250 | 233.43 | N/A | 0.00 | 100.00 | 260.65 |
-| HEAD | `/usuarios/{nombre}` | 250 | 3.00 | N/A | 0.00 | 100.00 | 148.68 |
-| POST | `/login` | 100 | 91.27 | N/A | 0.00 | 100.00 | 57.55 |
-| POST | `/usuarios` | 100 | 102.74 | N/A | 0.00 | 100.00 | 56.93 |
-| POST | `/administradores` | 100 | 116.08 | N/A | 0.00 | 100.00 | 104.63 |
-| POST | `/subastas` | 100 | 111.41 | N/A | 0.00 | 100.00 | 166.02 |
-| POST | `/subastas/{id}/ofertas` | 100 | 89.70 | N/A | 0.00 | 100.00 | 169.92 |
-| POST | `/propuestas` | 100 | 86.93 | N/A | 0.00 | 100.00 | 170.50 |
-| POST | `/colecciones/repetidas` | 50 | 104.82 | N/A | 0.00 | 100.00 | 80.18 |
-| POST | `/perfil/calificaciones` | 50 | 86.75 | N/A | 0.00 | 100.00 | 54.26 |
-| POST | `/sugerencias/recalcular` | 25 | 8993.89 | N/A | 0.00 | 100.00 | 3.47 |
-| PATCH | `/subastas/{id}/ofertas/{id}` | 50 | 86.86 | N/A | 0.00 | 100.00 | 77.44 |
-| PATCH | `/subastas/{id}/cancelar\|cerrar` | 50 | 89.48 | N/A | 0.00 | 100.00 | 77.65 |
-| PATCH | `/propuestas/{id}/...` | 50 | 120.00 | N/A | 0.00 | 100.00 | 74.19 |
-| PATCH | `/colecciones/repetidas/{id}` | 50 | 86.41 | N/A | 0.00 | 100.00 | 54.97 |
-| PATCH | `/sugerencias/{id}/favorito` | 50 | 86.34 | N/A | 0.00 | 100.00 | 72.50 |
-| PATCH | `/perfil/notificaciones/leidas` | 25 | 87.72 | N/A | 0.00 | 100.00 | 27.85 |
-| PUT | `/perfil` | 100 | 117.26 | N/A | 0.00 | 100.00 | 109.28 |
-| DELETE | `/sesion` | 50 | 89.79 | N/A | 0.00 | 100.00 | 55.26 |
-
-> **Nota sobre p99:** k6 no exporta p99 en el `--summary-export` por defecto. Para obtenerlo, agregar `p(99)` a `options.summaryTrendStats` o configurar un threshold con `http_req_duration{p(99)}`. Todos los scripts mostraron 0% de `http_req_failed` a nivel HTTP.
+| GET | `/subastas` | 250 | 1401.08 | 5256.24 | 0.00 | 100.00 | 150.56 |
+| GET | `/figuritas` | 250 | 159.62 | 1003.36 | 0.00 | 100.00 | 265.26 |
+| GET | `/propuestas` | 250 | 2150.83 | 8206.70 | 0.00 | 100.00 | 125.73 |
+| GET | `/sugerencias` | 250 | 415.51 | 4879.52 | 0.00 | 97.00 | 240.82 |
+| GET | `/colecciones/faltantes` | 250 | 233.43 | 1178.63 | 0.00 | 100.00 | 260.65 |
+| HEAD | `/usuarios/{nombre}` | 250 | 3.00 | 2.57 | 0.00 | 100.00 | 148.68 |
+| POST | `/login` | 100 | 91.27 | 113.60 | 0.00 | 100.00 | 57.55 |
+| POST | `/usuarios` | 100 | 102.74 | 89.26 | 0.00 | 100.00 | 56.93 |
+| POST | `/administradores` | 100 | 116.08 | 93.70 | 0.00 | 100.00 | 104.63 |
+| POST | `/subastas` | 100 | 111.41 | 114.79 | 0.00 | 100.00 | 166.02 |
+| POST | `/subastas/{id}/ofertas` | 100 | 89.70 | 120.26 | 0.00 | 100.00 | 169.92 |
+| POST | `/propuestas` | 100 | 86.93 | 113.10 | 0.00 | 100.00 | 170.50 |
+| POST | `/colecciones/repetidas` | 50 | 104.82 | 106.40 | 0.00 | 100.00 | 80.18 |
+| POST | `/perfil/calificaciones` | 50 | 86.75 | 109.08 | 0.00 | 100.00 | 54.26 |
+| POST | `/sugerencias/recalcular` | 25 | 8993.89 | 47739.72 | 0.00 | 100.00 | 3.47 |
+| PATCH | `/subastas/{id}/ofertas/{id}` | 50 | 86.86 | 355.66 | 0.00 | 100.00 | 77.44 |
+| PATCH | `/subastas/{id}/cancelar\|cerrar` | 50 | 89.48 | 340.29 | 0.00 | 100.00 | 77.65 |
+| PATCH | `/propuestas/{id}/...` | 50 | 120.00 | 697.39 | 0.00 | 100.00 | 74.19 |
+| PATCH | `/colecciones/repetidas/{id}` | 50 | 86.41 | 105.69 | 0.00 | 100.00 | 54.97 |
+| PATCH | `/sugerencias/{id}/favorito` | 50 | 86.34 | 336.13 | 0.00 | 100.00 | 72.50 |
+| PATCH | `/perfil/notificaciones/leidas` | 25 | 87.72 | 21561.86 | 0.00 | 100.00 | 27.85 |
+| PUT | `/perfil` | 100 | 117.26 | 117.54 | 0.00 | 100.00 | 109.28 |
+| DELETE | `/sesion` | 50 | 89.79 | 109.31 | 0.00 | 100.00 | 55.26 |
 
 ---
 

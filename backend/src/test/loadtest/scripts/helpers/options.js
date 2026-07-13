@@ -1,6 +1,9 @@
+const SUMMARY_TREND_STATS = ['avg', 'min', 'med', 'max', 'p(90)', 'p(95)', 'p(99)'];
+
 // ─── Perfil LECTURA ────────────────────────────────────────────────────────
 // GET / HEAD — sin efectos secundarios, aguanta carga alta.
 export const optionsLectura = {
+    summaryTrendStats: SUMMARY_TREND_STATS,
     stages: [
         { duration: '10s', target: 100 },
         { duration: '15s', target: 250 },
@@ -18,6 +21,7 @@ export const optionsLectura = {
 // POST / PUT que crean recursos nuevos o modifican datos simples.
 // VUs moderados, thresholds un poco más relajados.
 export const optionsEscritura = {
+    summaryTrendStats: SUMMARY_TREND_STATS,
     stages: [
         { duration: '10s', target: 50 },
         { duration: '15s', target: 100 },
@@ -35,6 +39,7 @@ export const optionsEscritura = {
 // PATCH / DELETE que modifican estado existente (propuestas, subastas,
 // colecciones, etc.). Menos VUs para reducir competencia por locks.
 export const optionsEscrituraConEfectos = {
+    summaryTrendStats: SUMMARY_TREND_STATS,
     stages: [
         { duration: '10s', target: 20 },
         { duration: '15s', target: 50 },
@@ -52,6 +57,7 @@ export const optionsEscrituraConEfectos = {
 // Endpoints con race conditions conocidas (notificaciones) o CPU-intensive
 // (recalcular). VUs muy bajos, thresholds más permisivos.
 export const optionsProblematico = {
+    summaryTrendStats: SUMMARY_TREND_STATS,
     stages: [
         { duration: '10s', target: 10 },
         { duration: '15s', target: 25 },
