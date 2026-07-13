@@ -26,6 +26,7 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
 
   @Override
   public void guardar(List<Notificacion> notificaciones) {
+    if (notificaciones.isEmpty()) return;
     BulkOperations bulk = mongoTemplate.bulkOps(
         BulkOperations.BulkMode.UNORDERED,
         Notificacion.class

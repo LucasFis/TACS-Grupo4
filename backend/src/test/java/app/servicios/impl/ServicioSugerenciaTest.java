@@ -234,4 +234,28 @@ public class ServicioSugerenciaTest extends MongoTestBase {
     assertEquals(5, resultado.cantidadDeElementos());
     assertEquals(3, resultado.cantidadDePaginas());
   }
+
+  @Test
+  void recalcularSugerencias_eliminaNoFavoritasYGeneraNuevas() {
+    Sugerencia existente = Sugerencia.builder()
+        .id("sug-recalc-1")
+        .autor(usuario)
+        .sugerido(otro)
+        .figuritasSugeridas(List.of(messi))
+        .figuritasNecesarias(List.of(messi))
+        .build();
+    repositorioSugerencias.guardar(existente);
+
+    service.recalcularSugerencias(usuario.getId());
+
+    Sugerencia resultado = repositorioSugerencias.buscarPorId("sug-recalc-1");
+    assertEquals(null, resultado);
+  }
+
+  @Test
+  void recalcularSugerencias_perfilInexistente_lanzaExcepcion() {
+    assertThrows(NotFoundException.class, () ->
+        service.recalcularSugerencias("no-existe")
+    );
+  }
 }

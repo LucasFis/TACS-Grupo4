@@ -62,4 +62,11 @@ public class ControladorSugerencia {
     this.sugerenciaService.alternarFavorito(sugerenciaId, perfilId);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/recalcular")
+  public ResponseEntity<Void> recalcularSugerencias(@CookieValue String token) {
+    String perfilId = this.servicioJwt.getPerfilId(token);
+    this.sugerenciaService.recalcularSugerencias(perfilId);
+    return ResponseEntity.noContent().build();
+  }
 }

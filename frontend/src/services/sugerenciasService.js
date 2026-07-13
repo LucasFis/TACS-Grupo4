@@ -21,3 +21,11 @@ export const alternarFavorito = async ({sugerenciaId}) => {
     handleAxiosError(error)
   }
 }
+
+export const recalcularSugerencias = async () => {
+  try {
+    await api.post(`${SUGERENCIAS_URL}/recalcular`)
+  } catch (error) {
+    handleAxiosError(error)
+  }
+}

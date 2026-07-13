@@ -118,16 +118,6 @@ public class InicializadorDeDatosTest implements CommandLineRunner {
     cargarSubastas(figs, perfs.get("lucas"), perfs.get("sofia"), perfs.get("matias"), perfs.get("valentina"));
   }
 
-//  private void limpiarBaseDeDatos() {
-//    calificaciones.eliminarTodos();
-//    propuestas.eliminarTodos();
-//    subastas.eliminarTodos();
-//    colecciones.eliminarTodos();
-//    perfiles.eliminarTodos();
-//    usuarios.eliminarTodos();
-//    figuritas.eliminarTodos();
-//  }
-
   // ─── FIGURITAS ────────────────────────────────────────────────────────────
 
   private Map<String, Figurita> cargarFiguritas() {
