@@ -15,7 +15,14 @@ const NotificationsPopover = () => {
 
   useEffect(() => {
     if (tieneSesion) {
-      obtenerNotificaciones().then((data) => setNotificaciones(Array.isArray(data) ? data : []))
+      const cargarNotificaciones = async () => {
+        try {
+          const data = await obtenerNotificaciones()
+          setNotificaciones(Array.isArray(data) ? data : data?.contenido ?? [])
+        } catch (error) {
+        }
+      }
+      cargarNotificaciones()
     }
   }, [tieneSesion])
 
@@ -28,7 +35,6 @@ const NotificationsPopover = () => {
             setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
           }
         } catch (error) {
-          console.error('Error al marcar notificaciones como leídas (click fuera):', error)
         } finally {
           setAbierto(false)
         }
@@ -45,7 +51,6 @@ const NotificationsPopover = () => {
           await marcarTodasLeidas()
           setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
         } catch (error) {
-          console.error('Error al marcar notificaciones como leídas (toggle):', error)
         } finally {
           setAbierto(false)
         }
@@ -53,8 +58,11 @@ const NotificationsPopover = () => {
         setAbierto(false)
       }
     } else {
-      const data = await obtenerNotificaciones()
-      setNotificaciones(Array.isArray(data) ? data : [])
+      try {
+        const data = await obtenerNotificaciones()
+        setNotificaciones(Array.isArray(data) ? data : data?.contenido ?? [])
+      } catch (error) {
+      }
       setAbierto(true)
     }
   }
@@ -72,8 +80,11 @@ const NotificationsPopover = () => {
   const handleClickNotificacion = async (n) => {
     if (n.link) {
       if (notificaciones.length > 0) {
-        await marcarTodasLeidas()
-        setNotificaciones((prev) => prev.map((x) => ({ ...x, leida: true })))
+        try {
+          await marcarTodasLeidas()
+          setNotificaciones((prev) => prev.map((x) => ({ ...x, leida: true })))
+        } catch (error) {
+        }
       }
       setAbierto(false)
       navigate(n.link)
@@ -106,6 +117,14 @@ const NotificationsPopover = () => {
 
       {abierto && (
         <div className="navbar-notifications-popover">
+          <button
+            className="navbar-notifications-ver-todas"
+            onClick={() => { setAbierto(false); navigate('/notificaciones'); }}
+            type="button"
+          >
+            Ver todas
+          </button>
+
           <div className="navbar-notifications-header">Notificaciones</div>
 
           {notificaciones.length === 0 ? (
@@ -114,12 +133,13 @@ const NotificationsPopover = () => {
             notificaciones.map((n) => (
               <div
                 key={n.id}
-                className={`navbar-notification-item ${!n.leida ? 'navbar-notification-item--no-leida' : ''}
+                className={`navbar-notification-item ${n.leida ? 'navbar-notification-item--leida' : 'navbar-notification-item--no-leida'}
                                 ${n.link ? 'navbar-notification-item--clickeable' : ''}`}
                 onClick={() => handleClickNotificacion(n)}
               >
                 <div className="navbar-notification-texto">{n.cuerpo}</div>
                 <div className="navbar-notification-fecha">{formatearFecha(n.fecha)}</div>
+                {n.leida && <span className="navbar-notification-leida-badge">leída</span>}
               </div>
             ))
           )}

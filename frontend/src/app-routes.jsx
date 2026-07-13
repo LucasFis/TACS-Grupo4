@@ -11,6 +11,7 @@ import VerSubasta from './views/public/ver-subasta/ver-subasta.jsx'
 import Explorar from './views/public/explorar/explorar.jsx'
 import Perfil from './views/public/perfil/perfil.jsx'
 import Intercambios from './views/public/intercambios/intercambios.jsx'
+import Notificaciones from './views/public/notificaciones/notificaciones.jsx'
 import Login from '@/views/public/login/login.jsx'
 import Registrar from '@/views/public/registrar/registrar.jsx'
 import { AuthProvider } from '@/contexts/userContext.jsx'
@@ -56,6 +57,7 @@ const privadas = [
   { path: '/subastas/:subId/crear-oferta', element: <CrearOferta /> },
   { path: '/subastas/:subId/ofertas/:ofertaId/editar', element: <EditarOferta /> },
   { path: '/perfil/:perfilId', element: <Perfil /> },
+  { path: '/notificaciones', element: <Notificaciones /> },
 ]
 
 const privilegiadas = [
