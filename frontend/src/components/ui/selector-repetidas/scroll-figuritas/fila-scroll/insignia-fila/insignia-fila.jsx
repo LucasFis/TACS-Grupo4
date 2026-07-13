@@ -1,9 +1,6 @@
 import styles from './insignia-fila.module.css'
 
 const InsigniaFila = ({ fig, bloqueada, bloqueadaSinStock, seleccionada, sinStock, disponibles }) => {
-  // Si el item está seleccionado y disponibles llegó a 0, es porque el usuario usó su último
-  // ejemplar — no es "sin stock", sino "0 restantes". Solo mostramos "Sin stock" cuando el
-  // item NO está seleccionado y realmente no hay copias libres para elegir.
   const sinStockReal = sinStock && !seleccionada
 
   return (
