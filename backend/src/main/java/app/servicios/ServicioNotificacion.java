@@ -1,5 +1,7 @@
 package app.servicios;
 
+import app.dto.filtros.NotificacionesFiltro;
+import app.dto.paginacion.PaginaResultado;
 import app.model.entities.Perfil;
 import app.model.notificador.Mensaje;
 import app.model.notificador.Notificacion;
@@ -53,6 +55,17 @@ public class ServicioNotificacion {
    */
   public List<Notificacion> obtenerPorPerfil(String perfilId) {
       return repositorioNotificaciones.buscarPorPerfilFechaDesc(perfilId);
+  }
+
+  /**
+   * Obtiene notificaciones de un perfil con paginación y filtro por estado de lectura.
+   *
+   * @param perfilId identificador del perfil del cual se obtendrán las notificaciones
+   * @param filtro   filtros y parámetros de paginación
+   * @return página de resultados con notificaciones ordenadas por fecha descendente
+   */
+  public PaginaResultado<Notificacion> obtenerPorPerfilPaginado(String perfilId, NotificacionesFiltro filtro) {
+      return repositorioNotificaciones.buscarPorPerfilPaginado(perfilId, filtro);
   }
 
   /**

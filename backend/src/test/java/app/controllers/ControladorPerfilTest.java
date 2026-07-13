@@ -1,11 +1,13 @@
 package app.controllers;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import app.dto.*;
+import app.dto.filtros.NotificacionesFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.model.entities.MetodoIntercambio;
 import app.model.entities.Perfil;
@@ -80,8 +82,8 @@ class ControladorPerfilTest {
   @Test
   void obtenerNotificaciones_retorna200() throws Exception {
 
-    when(perfilService.obtenerNotificaciones("1000"))
-        .thenReturn(List.of());
+    when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
+        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
 
     mockMvc.perform(
             get("/perfil/notificaciones")
@@ -90,7 +92,7 @@ class ControladorPerfilTest {
         .andExpect(status().isOk());
 
     verify(perfilService)
-        .obtenerNotificaciones("1000");
+        .obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class));
   }
 
   @Test

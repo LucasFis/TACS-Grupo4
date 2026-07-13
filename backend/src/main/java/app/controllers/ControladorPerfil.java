@@ -5,6 +5,7 @@ import app.dto.ContadorDto;
 import app.dto.NotificacionDto;
 import app.dto.PerfilDto;
 import app.dto.SugerenciaDto;
+import app.dto.filtros.NotificacionesFiltro;
 import app.dto.filtros.SugerenciasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.dto.request.CalificacionRequest;
@@ -94,17 +95,19 @@ public class ControladorPerfil {
     }
 
     /**
-     * Obtiene las notificaciones del perfil autenticado.
+     * Obtiene las notificaciones del perfil autenticado, con paginación y filtro por estado.
      *
-     * @param token token JWT del que se extrae el identificador del perfil
-     * @return 200 OK con la lista de notificaciones del perfil
+     * @param token  token JWT del que se extrae el identificador del perfil
+     * @param filtros filtros y parámetros de paginación (pagina, limite, leida)
+     * @return 200 OK con la página de notificaciones del perfil
      */
     @GetMapping("/notificaciones")
-    public ResponseEntity<List<NotificacionDto>> obtenerNotificaciones(
-        @CookieValue String token
+    public ResponseEntity<PaginaResultado<NotificacionDto>> obtenerNotificaciones(
+        @CookieValue String token,
+        @ModelAttribute NotificacionesFiltro filtros
     ) {
         String perfilId = this.servicioJwt.getPerfilId(token);
-        return ResponseEntity.ok(this.perfilService.obtenerNotificaciones(perfilId));
+        return ResponseEntity.ok(this.perfilService.obtenerNotificaciones(perfilId, filtros));
     }
 
     /**

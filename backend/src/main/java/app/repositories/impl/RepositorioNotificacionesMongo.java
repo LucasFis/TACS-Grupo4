@@ -1,5 +1,7 @@
 package app.repositories.impl;
 
+import app.dto.filtros.NotificacionesFiltro;
+import app.dto.paginacion.PaginaResultado;
 import app.model.entities.Perfil;
 import app.model.notificador.Notificacion;
 import app.repositories.RepositorioNotificaciones;
@@ -66,5 +68,32 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
     query.with(Sort.by(Sort.Direction.DESC, "mensaje.fecha"));
 
     return this.mongoTemplate.find(query, Notificacion.class);
+  }
+
+  @Override
+  public PaginaResultado<Notificacion> buscarPorPerfilPaginado(String perfilId, NotificacionesFiltro filtro) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("perfil").is(perfilId)
+    );
+
+    if (filtro.leida() != null) {
+      query.addCriteria(
+          Criteria.where("leida").is(filtro.leida())
+      );
+    }
+
+    query.with(Sort.by(Sort.Direction.DESC, "mensaje.fecha"));
+
+    long total = this.mongoTemplate.count(query, Notificacion.class);
+
+    int pagina = filtro.pagina();
+    int limite = filtro.limite();
+    query.skip((long) (pagina - 1) * limite).limit(limite);
+
+    List<Notificacion> contenido = this.mongoTemplate.find(query, Notificacion.class);
+    int cantidadDePaginas = (int) Math.ceil((double) total / limite);
+
+    return new PaginaResultado<>(contenido, total, cantidadDePaginas, pagina);
   }
 }
