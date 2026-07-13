@@ -374,6 +374,25 @@ class ControladorSubastaTest {
     }
 
     @Test
+    void crearSubastaFalla_figuritasDeseadasIdsContieneNull() throws Exception {
+
+        mockMvc.perform(
+                post("/subastas")
+                    .cookie(cookie)
+                    .contentType("application/json")
+                    .content("""
+                {
+                    "figurita_id":"ARG-10",
+                    "duracion_en_horas":30,
+                    "figuritas_deseadas_ids":["ARG-1", null],
+                    "calificacion_minima":2
+                }
+                """)
+            )
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void crearSubastaFalla_calificacionMinimaNull() throws Exception {
 
         mockMvc.perform(
