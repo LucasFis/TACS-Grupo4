@@ -384,7 +384,7 @@ private void cargarPropuestas(Map<String, Figurita> figs,
   reservar(sofia, "GER-6");
 
   // P09 FINALIZADA — Valentina → Lucas : ofrece Sergio Rochet (URU-1 INTERCAMBIO), busca Guillermo Varela (URU-2 INTERCAMBIO ✅)
-  EstadoPropuesta aceptado = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.ACEPTADO);
+  EstadoPropuesta aceptado = new EstadoPropuesta(LocalDateTime.of(2026, 1, 15, 12, 0), EstadoProceso.ACEPTADO);
   Propuesta p09 = Propuesta.builder()
       .autor(valentina).destinatario(lucas).estado(List.of(aceptado)).estadoActual(aceptado)
       .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("URU-1"))))
@@ -449,7 +449,7 @@ private void reservar(Perfil perfil, String figuritaId) {
     Subasta s1 = Subasta.builder()
         .autor(lucas)
         .figuritaSubastada(figs.get("FRA-7"))
-        .fechaInicio(LocalDateTime.now().minusDays(1))
+        .fechaInicio(LocalDateTime.of(2026, 1, 15, 10, 0))
         .fechaCierre(LocalDateTime.now().plusDays(7))
         .build();
     reservar(lucas, "FRA-7");
@@ -483,7 +483,7 @@ private void reservar(Perfil perfil, String figuritaId) {
     Subasta s2 = Subasta.builder()
         .autor(sofia)
         .figuritaSubastada(figs.get("POR-7"))
-        .fechaInicio(LocalDateTime.now().minusDays(1))
+        .fechaInicio(LocalDateTime.of(2026, 1, 15, 10, 0))
         .fechaCierre(LocalDateTime.now().plusDays(7))
         .build();
     reservar(sofia, "POR-7");
@@ -507,7 +507,7 @@ private void reservar(Perfil perfil, String figuritaId) {
         .autor(valentina)
         .figuritaSubastada(figs.get("CRO-10"))
         .figuritasSolicitadas(List.of(figs.get("ARG-10")))
-        .fechaInicio(LocalDateTime.now().minusDays(1))
+        .fechaInicio(LocalDateTime.of(2026, 1, 15, 10, 0))
         .fechaCierre(LocalDateTime.now().plusDays(7))
         .build();
     reservar(valentina, "CRO-10");
@@ -518,8 +518,8 @@ private void reservar(Perfil perfil, String figuritaId) {
         .autor(lucas)
         .figuritaSubastada(figs.get("KOR-1"))
         .figuritasSolicitadas(List.of(figs.get("KOR-2")))
-        .fechaInicio(LocalDateTime.now().minusDays(3))
-        .fechaCierre(LocalDateTime.now().minusDays(1))
+        .fechaInicio(LocalDateTime.of(2026, 1, 12, 10, 0))
+        .fechaCierre(LocalDateTime.of(2026, 1, 14, 10, 0))
         .build();
     subastas.guardar(s4);
 
@@ -530,7 +530,7 @@ private void reservar(Perfil perfil, String figuritaId) {
         .destinatario(lucas)
         .figuritasOfrecidas(new ArrayList<>(List.of(figs.get("KOR-2"), figs.get("KOR-3"))))
         .figuritaBuscada(figs.get("KOR-1"))
-        .estado(List.of(new EstadoPropuesta(LocalDateTime.now().minusDays(2), EstadoProceso.ACEPTADO)))
+        .estado(List.of(new EstadoPropuesta(LocalDateTime.of(2026, 1, 13, 10, 0), EstadoProceso.ACEPTADO)))
         .build();
     s4.getOfertas().add(ofertaValentina);
     subastas.guardar(s4, new CamposSubasta(true, false));
