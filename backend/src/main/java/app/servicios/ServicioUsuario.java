@@ -33,12 +33,13 @@ public class ServicioUsuario {
    * una colección vacía y un perfil asociado.
    *
    * @param request datos del usuario a registrar (nombre, contraseña)
+   * @return el perfil recién creado
    * @throws app.exceptions.BadRequestException si el nombre de usuario ya está en uso
    */
-  public void registrarUsuario(UsuarioRequest request) {
+  public Perfil registrarUsuario(UsuarioRequest request) {
     request.setRol(Rol.USUARIO);
 
-    this.registrar(request);
+    return this.registrar(request);
   }
 
     /**
@@ -57,6 +58,7 @@ public class ServicioUsuario {
             throw new ForbiddenException("Acceso denegado por rol invalido");
         }
     }
+
 
   /**
    * Cambia la contraseña de un usuario. Valida que la contraseña actual sea correcta
@@ -85,9 +87,10 @@ public class ServicioUsuario {
    * crea el usuario, la colección vacía y el perfil asociado.
    *
    * @param request datos del usuario a registrar
+   * @return el perfil recién creado
    * @throws app.exceptions.BadRequestException si el nombre de usuario ya está en uso
    */
-  private void registrar(UsuarioRequest request) {
+  private Perfil registrar(UsuarioRequest request) {
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     Usuario usuarioNuevo;
@@ -116,6 +119,8 @@ public class ServicioUsuario {
         .build();
 
     this.repositorioPerfiles.guardar(perfil);
+
+    return perfil;
   }
   /**
    * Verifica si un nombre de usuario ya está registrado en el sistema.

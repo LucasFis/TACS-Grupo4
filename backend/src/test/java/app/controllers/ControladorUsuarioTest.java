@@ -1,13 +1,15 @@
 package app.controllers;
 
+import app.dto.SesionDto;
 import app.dto.request.UsuarioRequest;
+import app.model.entities.Coleccion;
+import app.model.entities.Perfil;
 import app.model.entities.Rol;
-import app.repositories.RepositorioColecciones;
-import app.repositories.RepositorioPerfiles;
-import app.repositories.RepositorioUsuarios;
+import app.model.entities.Usuario;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioUsuario;
 import jakarta.servlet.http.Cookie;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,6 +18,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import app.exceptions.BadRequestException;
+import app.exceptions.ForbiddenException;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -35,13 +40,7 @@ public class ControladorUsuarioTest {
   ServicioJwt servicioJwt;
 
   @MockBean
-  RepositorioUsuarios repositorioUsuarios;
-
-  @MockBean
-  RepositorioPerfiles repositorioPerfiles;
-
-  @MockBean
-  RepositorioColecciones repositorioColecciones;
+  ServicioUsuario servicioUsuario;
 
   @Test
   void editarContraseniaDevuelve400SiBodyVacio() throws Exception {
@@ -55,19 +54,36 @@ public class ControladorUsuarioTest {
   }
 
   @Test
-  void crearUsuarioNoFalla() throws Exception {
-    String json = """
-        {
-            "nombre": "lucas",
-            "contrasenia": "Gordo123!",
-            "rol": "USUARIO"
-        }
-        """;
+  void crearUsuarioDevuelve200ConCookie() throws Exception {
+    String perfilId = new ObjectId().toString();
+    String usuarioId = new ObjectId().toString();
+    String colId = new ObjectId().toString();
+
+    Coleccion coleccion = new Coleccion();
+    coleccion.setId(colId);
+    Usuario usuario = new Usuario(usuarioId, Rol.USUARIO, "lucas", "hash");
+    Perfil perfil = Perfil.builder()
+        .usuario(usuario)
+        .nombre("lucas")
+        .coleccion(coleccion)
+        .build();
+    perfil.setId(perfilId);
+
+    when(servicioUsuario.registrarUsuario(any())).thenReturn(perfil);
+    when(servicioJwt.generarToken(any(), any())).thenReturn("jwt-generado");
+    when(servicioJwt.obtenerSesion("jwt-generado"))
+        .thenReturn(new SesionDto(usuarioId, "USUARIO", perfilId, colId));
 
     mockMvc.perform(post("/usuarios")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
-        .andExpect(status().is(204));
+            .content("""
+                {
+                    "nombre": "lucas",
+                    "contrasenia": "Gordo123!",
+                    "rol": "USUARIO"
+                }
+                """))
+        .andExpect(status().isOk());
   }
   @Test
   void crearUsuarioFalla_nombreNull() throws Exception {
@@ -183,29 +199,9 @@ public class ControladorUsuarioTest {
 
   @Test
   void editarContraseniaNoFalla() throws Exception {
-
     when(servicioJwt.getPerfilId(anyString()))
         .thenReturn("perfil-id-test");
-
-    String passwordEncriptada =
-        new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
-            .encode("Vieja123!");
-
-    app.model.entities.Usuario usuario =
-        new app.model.entities.Usuario(
-            "user-id",
-            Rol.USUARIO,
-            "lucas",
-            passwordEncriptada
-        );
-
-    app.model.entities.Perfil perfil =
-        app.model.entities.Perfil.builder()
-            .usuario(usuario)
-            .build();
-
-    when(repositorioPerfiles.buscarPorId(anyString(), any()))
-        .thenReturn(perfil);
+    // servicioUsuario.editarContrasenia devuelve void sin lanzar excepción (mock default)
 
     mockMvc.perform(put("/usuarios/contrasenia")
             .cookie(new Cookie("token", "token-de-prueba"))
@@ -405,7 +401,8 @@ public class ControladorUsuarioTest {
 
   @Test
   void crearUsuarioFalla_nombreYaExiste() throws Exception {
-    when(repositorioUsuarios.existePorNombre("lucas")).thenReturn(true);
+    when(servicioUsuario.registrarUsuario(any()))
+        .thenThrow(new BadRequestException("El nombre de usuario ya está en uso"));
 
     mockMvc.perform(post("/usuarios")
             .contentType(MediaType.APPLICATION_JSON)
@@ -422,6 +419,8 @@ public class ControladorUsuarioTest {
   @Test
   void registrarAdministradorFalla_rolNoAdministrador() throws Exception {
     when(servicioJwt.getRol(anyString())).thenReturn("USUARIO");
+    doThrow(new ForbiddenException("Acceso denegado por rol invalido"))
+        .when(servicioUsuario).registrarAdministrador(any(), any());
 
     mockMvc.perform(post("/administradores")
             .cookie(new Cookie("token", "token-usuario"))
@@ -438,7 +437,7 @@ public class ControladorUsuarioTest {
 
   @Test
   void verificarNombreDevuelve200_siExiste() throws Exception {
-    when(repositorioUsuarios.existePorNombre("lucas")).thenReturn(true);
+    when(servicioUsuario.existeNombre("lucas")).thenReturn(true);
 
     mockMvc.perform(head("/usuarios/lucas"))
         .andExpect(status().isOk());
@@ -446,7 +445,7 @@ public class ControladorUsuarioTest {
 
   @Test
   void verificarNombreDevuelve404_siNoExiste() throws Exception {
-    when(repositorioUsuarios.existePorNombre("lucas")).thenReturn(false);
+    when(servicioUsuario.existeNombre("lucas")).thenReturn(false);
 
     mockMvc.perform(head("/usuarios/lucas"))
         .andExpect(status().isNotFound());
