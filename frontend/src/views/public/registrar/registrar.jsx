@@ -157,9 +157,12 @@ function Registrar() {
         navigate('/')
       } else {
         await crearUsuario(usuario)
-        // Auto-login: el backend ya emitió la cookie; poblar el contexto de sesión
-        await buscarUsuario(asignarUsuario)
-        showToast(`Cuenta creada. ¡Bienvenido!`, 'success')
+        if (!user) {
+          await buscarUsuario(asignarUsuario)
+          showToast(`Cuenta creada. ¡Bienvenido!`, 'success')
+        } else {
+          showToast(`Usuario creado correctamente`)
+        }
         navigate('/')
       }
     } catch (error) {
