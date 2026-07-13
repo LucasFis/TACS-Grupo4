@@ -8,7 +8,8 @@ export const ToastProvider = ({ children }) => {
 
     const showToast = useCallback((message, type = "success") => {
         const id = Date.now();
-        setToasts(prev => [...prev, { id, message, type }]);
+        const texto = message || (type === "error" ? "Ocurrió un error inesperado" : "Operación completada");
+        setToasts(prev => [...prev, { id, message: texto, type }]);
     }, []);
 
     const removeToast = (id) => {

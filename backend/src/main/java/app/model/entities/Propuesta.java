@@ -4,6 +4,8 @@ import app.exceptions.BadRequestException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import app.exceptions.ForbiddenException;
 import lombok.AllArgsConstructor;
@@ -127,14 +129,29 @@ public class Propuesta {
     }
 
     private void ejecutarIntercambio() {
+        // Capturar métodos antes de modificar las colecciones
+        List<MetodoIntercambio> metodosBuscada = this.destinatario.getColeccion()
+            .getMetodosDe(this.getFiguritaBuscada());
+        Map<String, List<MetodoIntercambio>> metodosOfrecidas = this.getFiguritasOfrecidas().stream()
+            .collect(Collectors.toMap(Figurita::getId, f -> this.autor.getColeccion().getMetodosDe(f)));
+
+        // Destinatario entrega figuritaBuscada y recibe figuritasOfrecidas
         this.getFiguritasOfrecidas()
             .forEach(f -> this.destinatario.getColeccion().eliminarFaltante(f));
         this.destinatario.getColeccion()
             .descontarRepetida(this.getFiguritaBuscada());
+        this.getFiguritasOfrecidas()
+            .forEach(f -> this.destinatario.getColeccion().agregarRepetida(
+                new FiguritaIntercambiable(f, 1, metodosOfrecidas.get(f.getId()), this.destinatario.getId())
+            ));
 
+        // Autor entrega figuritasOfrecidas y recibe figuritaBuscada
         this.getFiguritasOfrecidas()
             .forEach(f -> this.autor.getColeccion().descontarRepetida(f));
         this.autor.getColeccion().eliminarFaltante(this.getFiguritaBuscada());
+        this.autor.getColeccion().agregarRepetida(
+            new FiguritaIntercambiable(this.getFiguritaBuscada(), 1, metodosBuscada, this.autor.getId())
+        );
     }
 
     private void ejecutarRechazo() {
