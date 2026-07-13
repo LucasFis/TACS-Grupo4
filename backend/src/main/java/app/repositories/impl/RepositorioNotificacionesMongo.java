@@ -32,7 +32,6 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
     );
 
     for (Notificacion n : notificaciones) {
-
       Query query = new Query(
           Criteria.where("_id").is(n.getId())
       );
@@ -47,15 +46,15 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
     bulk.execute();
   }
 
-    @Override
-    public List<Notificacion> buscarPorPerfil(Perfil perfil) {
-      Query query = new Query();
-      query.addCriteria(
-          Criteria.where("perfil").is(perfil.getId())
-      );
+  @Override
+  public List<Notificacion> buscarPorPerfil(Perfil perfil) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("perfil").is(perfil.getId())
+    );
 
-      return this.mongoTemplate.find(query, Notificacion.class);
-    }
+    return this.mongoTemplate.find(query, Notificacion.class);
+  }
 
   @Override
   public List<Notificacion> buscarPorPerfilFechaDesc(String perfilId) {
