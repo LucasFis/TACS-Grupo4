@@ -3,6 +3,7 @@ package app.controllers;
 import app.dto.CalificacionDto;
 import app.dto.ContadorDto;
 import app.dto.NotificacionDto;
+import app.dto.NotificacionesPaginadasDto;
 import app.dto.PerfilDto;
 import app.dto.SugerenciaDto;
 import app.dto.filtros.NotificacionesFiltro;
@@ -102,7 +103,7 @@ public class ControladorPerfil {
      * @return 200 OK con la página de notificaciones del perfil
      */
     @GetMapping("/notificaciones")
-    public ResponseEntity<PaginaResultado<NotificacionDto>> obtenerNotificaciones(
+    public ResponseEntity<NotificacionesPaginadasDto> obtenerNotificaciones(
         @CookieValue String token,
         @ModelAttribute NotificacionesFiltro filtros
     ) {

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.ArgumentCaptor;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import app.dto.*;
 import app.dto.filtros.NotificacionesFiltro;
@@ -85,7 +86,7 @@ class ControladorPerfilTest {
   void obtenerNotificaciones_retorna200() throws Exception {
 
     when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
-        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+        .thenReturn(new NotificacionesPaginadasDto(List.of(), 0, 0, 1, 0));
 
     mockMvc.perform(
             get("/perfil/notificaciones")
@@ -98,10 +99,24 @@ class ControladorPerfilTest {
   }
 
   @Test
+  void obtenerNotificaciones_retornaNoLeidas() throws Exception {
+
+    when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
+        .thenReturn(new NotificacionesPaginadasDto(List.of(), 0, 0, 1, 5));
+
+    mockMvc.perform(
+            get("/perfil/notificaciones")
+                .cookie(cookie)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.no_leidas").value(5));
+  }
+
+  @Test
   void obtenerNotificaciones_paginaCeroUsaDefault() throws Exception {
 
     when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
-        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+        .thenReturn(new NotificacionesPaginadasDto(List.of(), 0, 0, 1, 0));
 
     ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
 
@@ -125,7 +140,7 @@ class ControladorPerfilTest {
   void obtenerNotificaciones_paginaNegativaUsaDefault() throws Exception {
 
     when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
-        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+        .thenReturn(new NotificacionesPaginadasDto(List.of(), 0, 0, 1, 0));
 
     ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
 
@@ -149,7 +164,7 @@ class ControladorPerfilTest {
   void obtenerNotificaciones_limiteCeroUsaDefault() throws Exception {
 
     when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
-        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+        .thenReturn(new NotificacionesPaginadasDto(List.of(), 0, 0, 1, 0));
 
     ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
 
@@ -173,7 +188,7 @@ class ControladorPerfilTest {
   void obtenerNotificaciones_limiteNegativoUsaDefault() throws Exception {
 
     when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
-        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+        .thenReturn(new NotificacionesPaginadasDto(List.of(), 0, 0, 1, 0));
 
     ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
 
@@ -197,7 +212,7 @@ class ControladorPerfilTest {
   void obtenerNotificaciones_ambosInvalidosUsaDefaults() throws Exception {
 
     when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
-        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+        .thenReturn(new NotificacionesPaginadasDto(List.of(), 0, 0, 1, 0));
 
     ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
 
@@ -221,7 +236,7 @@ class ControladorPerfilTest {
   void obtenerNotificaciones_valoresValidosSeMantienen() throws Exception {
 
     when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
-        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+        .thenReturn(new NotificacionesPaginadasDto(List.of(), 0, 0, 1, 0));
 
     ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
 

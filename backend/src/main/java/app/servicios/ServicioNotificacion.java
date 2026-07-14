@@ -78,4 +78,8 @@ public class ServicioNotificacion {
       notis.forEach(Notificacion::marcarLeida);
       this.repositorioNotificaciones.guardar(notis);
   }
+
+  public long contarNoLeidas(String perfilId) {
+      return repositorioNotificaciones.contarNoLeidas(perfilId);
+  }
 }

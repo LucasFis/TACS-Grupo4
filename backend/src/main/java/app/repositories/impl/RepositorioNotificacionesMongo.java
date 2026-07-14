@@ -96,4 +96,13 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
 
     return new PaginaResultado<>(contenido, total, cantidadDePaginas, pagina);
   }
+
+  @Override
+  public long contarNoLeidas(String perfilId) {
+    Query query = new Query(
+        Criteria.where("perfil").is(perfilId)
+            .and("leida").is(false)
+    );
+    return this.mongoTemplate.count(query, Notificacion.class);
+  }
 }

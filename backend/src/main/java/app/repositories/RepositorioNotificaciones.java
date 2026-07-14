@@ -29,4 +29,6 @@ public interface RepositorioNotificaciones {
     void guardar(List<Notificacion> notificaciones);
 
     List<Notificacion> buscarPorPerfil(Perfil perfil);
+
+    long contarNoLeidas(String perfilId);
 }

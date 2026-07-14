@@ -4,6 +4,7 @@ import app.dto.CalificacionDto;
 import app.dto.ContadorDto;
 import app.dto.FiguritaDto;
 import app.dto.NotificacionDto;
+import app.dto.NotificacionesPaginadasDto;
 import app.dto.PerfilDto;
 import app.dto.SugerenciaDto;
 import app.dto.filtros.NotificacionesFiltro;
@@ -146,9 +147,17 @@ public class ServicioPerfil {
    * @param filtro   filtros y parámetros de paginación
    * @return página de resultados de notificaciones como {@link NotificacionDto}
    */
-  public PaginaResultado<NotificacionDto> obtenerNotificaciones(String perfilId, NotificacionesFiltro filtro) {
-    return this.servicioNotificacion.obtenerPorPerfilPaginado(perfilId, filtro)
+  public NotificacionesPaginadasDto obtenerNotificaciones(String perfilId, NotificacionesFiltro filtro) {
+    PaginaResultado<NotificacionDto> pagina = this.servicioNotificacion.obtenerPorPerfilPaginado(perfilId, filtro)
         .mapearA(NotificacionDto::new);
+    long noLeidas = this.servicioNotificacion.contarNoLeidas(perfilId);
+    return new NotificacionesPaginadasDto(
+        pagina.contenido(),
+        pagina.cantidadDeElementos(),
+        pagina.cantidadDePaginas(),
+        pagina.numero(),
+        noLeidas
+    );
   }
 
   /**

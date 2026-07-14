@@ -117,4 +117,51 @@ public class RepositorioNotificacionesTest extends MongoTestBase {
     assertEquals(2, resultadoTodas.contenido().size());
     assertEquals(2, resultadoTodas.cantidadDeElementos());
   }
+
+  @Test
+  void contarNoLeidas_cuentaCorrectamente() {
+    LocalDateTime fecha = LocalDateTime.now();
+    Mensaje mensaje = new Mensaje("Mensaje1", fecha);
+
+    Usuario user = new Usuario("u-1", Rol.USUARIO, "lucas", "fiscella");
+    Perfil perfil1 = Perfil.builder()
+        .id("1").usuario(user).nombre("Juan")
+        .mediosDeContacto(telegram("@juan"))
+        .build();
+
+    Notificacion leida1 = new Notificacion(mensaje, perfil1);
+    leida1.marcarLeida();
+    Notificacion leida2 = new Notificacion(mensaje, perfil1);
+    leida2.marcarLeida();
+    Notificacion noLeida1 = new Notificacion(mensaje, perfil1);
+    Notificacion noLeida2 = new Notificacion(mensaje, perfil1);
+    Notificacion noLeida3 = new Notificacion(mensaje, perfil1);
+
+    repositorioNotificaciones.guardar(leida1);
+    repositorioNotificaciones.guardar(leida2);
+    repositorioNotificaciones.guardar(noLeida1);
+    repositorioNotificaciones.guardar(noLeida2);
+    repositorioNotificaciones.guardar(noLeida3);
+
+    assertEquals(3, repositorioNotificaciones.contarNoLeidas("1"));
+  }
+
+  @Test
+  void contarNoLeidas_sinNoLeidas_devuelveCero() {
+    LocalDateTime fecha = LocalDateTime.now();
+    Mensaje mensaje = new Mensaje("Mensaje1", fecha);
+
+    Usuario user = new Usuario("u-1", Rol.USUARIO, "lucas", "fiscella");
+    Perfil perfil1 = Perfil.builder()
+        .id("1").usuario(user).nombre("Juan")
+        .mediosDeContacto(telegram("@juan"))
+        .build();
+
+    Notificacion leida = new Notificacion(mensaje, perfil1);
+    leida.marcarLeida();
+
+    repositorioNotificaciones.guardar(leida);
+
+    assertEquals(0, repositorioNotificaciones.contarNoLeidas("1"));
+  }
 }
