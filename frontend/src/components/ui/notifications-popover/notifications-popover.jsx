@@ -13,9 +13,8 @@ const NotificationsPopover = () => {
 
   const [abierto, setAbierto] = useState(false)
   const [notificaciones, setNotificaciones] = useState([])
+  const [noLeidas, setNoLeidas] = useState(0)
   const wrapperRef = useRef(null)
-
-  const noLeidas = Array.isArray(notificaciones) ? notificaciones.filter((n) => !n.leida).length : 0
 
   useEffect(() => {
     if (tieneSesion) {
@@ -23,6 +22,9 @@ const NotificationsPopover = () => {
         try {
           const data = await obtenerNotificaciones()
           setNotificaciones(Array.isArray(data) ? data : data?.contenido ?? [])
+          if (!Array.isArray(data)) {
+            setNoLeidas(data?.no_leidas ?? 0)
+          }
         } catch (error) {
           showToast(handleError(error, () => {}), 'error')
         }
@@ -38,6 +40,7 @@ const NotificationsPopover = () => {
           if (abierto && notificaciones.length > 0) {
             await marcarTodasLeidas()
             setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+            setNoLeidas(0)
           }
         } catch (error) {
           showToast(handleError(error, () => {}), 'error')
@@ -56,6 +59,7 @@ const NotificationsPopover = () => {
         try {
           await marcarTodasLeidas()
           setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+          setNoLeidas(0)
         } catch (error) {
           showToast(handleError(error, () => {}), 'error')
         } finally {
@@ -68,10 +72,14 @@ const NotificationsPopover = () => {
       try {
         const data = await obtenerNotificaciones()
         setNotificaciones(Array.isArray(data) ? data : data?.contenido ?? [])
+        if (!Array.isArray(data)) {
+          setNoLeidas(data?.no_leidas ?? 0)
+        }
       } catch (error) {
         showToast(handleError(error, () => {}), 'error')
+      } finally {
+        setAbierto(true)
       }
-      setAbierto(true)
     }
   }
 
@@ -91,6 +99,7 @@ const NotificationsPopover = () => {
         try {
           await marcarTodasLeidas()
           setNotificaciones((prev) => prev.map((x) => ({ ...x, leida: true })))
+          setNoLeidas(0)
         } catch (error) {
           showToast(handleError(error, () => {}), 'error')
         }
