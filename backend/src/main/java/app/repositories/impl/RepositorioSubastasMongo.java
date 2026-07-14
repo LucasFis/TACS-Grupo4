@@ -244,4 +244,14 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
               .map(this::normalizar)
               .toList();
   }
+
+  @Override
+  public long contarSubastasActivas() {
+      Date ahora = new Date();
+      Query query = new Query(new Criteria().andOperator(
+          Criteria.where("fechaInicio").lte(ahora),
+          Criteria.where("fechaCierre").gt(ahora)
+      ));
+      return mongoTemplate.count(query, Subasta.class);
+  }
 }

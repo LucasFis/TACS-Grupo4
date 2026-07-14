@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -299,7 +300,7 @@ class RepositorioPropuestasTest extends MongoTestBase {
     }
 
     @Test
-    void buscarEstadisticasPorRango_incluyeDentroYExcluyeFuera() {
+    void contarPorEstadoEnRango_incluyeDentroYExcluyeFuera() {
         LocalDateTime dentroDelRango = LocalDateTime.now().minusDays(3);
         LocalDateTime fueraDelRango = LocalDateTime.now().minusDays(10);
 
@@ -318,13 +319,12 @@ class RepositorioPropuestasTest extends MongoTestBase {
         repositorio.guardar(dentro);
         repositorio.guardar(fuera);
 
-        List<Propuesta> resultado = repositorio.buscarEstadisticasPorRango(
+        Map<EstadoProceso, Long> resultado = repositorio.contarPorEstadoEnRango(
             LocalDateTime.now().minusDays(7),
             LocalDateTime.now()
         );
 
-        assertEquals(1, resultado.size());
-        assertEquals(dentro.getId(), resultado.get(0).getId());
+        assertEquals(1L, resultado.getOrDefault(EstadoProceso.PENDIENTE, 0L));
     }
 
     @Test

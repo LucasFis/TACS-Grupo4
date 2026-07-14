@@ -6,13 +6,17 @@ import app.exceptions.NotFoundException;
 import app.model.entities.EstadoProceso;
 import app.model.entities.Propuesta;
 import app.repositories.RepositorioPropuestas;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class RepositorioPropuestasMongo implements RepositorioPropuestas {
@@ -76,16 +80,17 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
     }
 
     @Override
-    public List<Propuesta> buscarTodosEstadisticas() {
-        return mongoTemplate.findAll(Propuesta.class);
-    }
-
-    @Override
-    public List<Propuesta> buscarEstadisticasPorRango(LocalDateTime desde, LocalDateTime hasta) {
-        Query query = new Query(
-            Criteria.where("estado.0.fecha").gte(desde).lte(hasta)
-        );
-        return mongoTemplate.find(query, Propuesta.class);
+    public Map<EstadoProceso, Long> contarPorEstadoEnRango(LocalDateTime desde, LocalDateTime hasta) {
+        return mongoTemplate.aggregate(
+            Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("estado.0.fecha").gte(desde).lte(hasta)),
+                Aggregation.group("$estadoActual.valor").count().as("total")
+            ),
+            "propuestas", Document.class
+        ).getMappedResults().stream().collect(Collectors.toMap(
+            d -> EstadoProceso.valueOf(d.getString("_id")),
+            d -> ((Number) d.get("total")).longValue()
+        ));
     }
 
     @Override
