@@ -1,9 +1,11 @@
 package app.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.ArgumentCaptor;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import app.dto.*;
@@ -93,6 +95,150 @@ class ControladorPerfilTest {
 
     verify(perfilService)
         .obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class));
+  }
+
+  @Test
+  void obtenerNotificaciones_paginaCeroUsaDefault() throws Exception {
+
+    when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
+        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+
+    ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
+
+    mockMvc.perform(
+            get("/perfil/notificaciones")
+                .cookie(cookie)
+                .param("pagina", "0")
+                .param("limite", "10")
+        )
+        .andExpect(status().isOk());
+
+    verify(perfilService)
+        .obtenerNotificaciones(eq("1000"), captor.capture());
+
+    NotificacionesFiltro filtro = captor.getValue();
+    assertEquals(1, filtro.pagina());
+    assertEquals(10, filtro.limite());
+  }
+
+  @Test
+  void obtenerNotificaciones_paginaNegativaUsaDefault() throws Exception {
+
+    when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
+        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+
+    ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
+
+    mockMvc.perform(
+            get("/perfil/notificaciones")
+                .cookie(cookie)
+                .param("pagina", "-5")
+                .param("limite", "10")
+        )
+        .andExpect(status().isOk());
+
+    verify(perfilService)
+        .obtenerNotificaciones(eq("1000"), captor.capture());
+
+    NotificacionesFiltro filtro = captor.getValue();
+    assertEquals(1, filtro.pagina());
+    assertEquals(10, filtro.limite());
+  }
+
+  @Test
+  void obtenerNotificaciones_limiteCeroUsaDefault() throws Exception {
+
+    when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
+        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+
+    ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
+
+    mockMvc.perform(
+            get("/perfil/notificaciones")
+                .cookie(cookie)
+                .param("pagina", "1")
+                .param("limite", "0")
+        )
+        .andExpect(status().isOk());
+
+    verify(perfilService)
+        .obtenerNotificaciones(eq("1000"), captor.capture());
+
+    NotificacionesFiltro filtro = captor.getValue();
+    assertEquals(1, filtro.pagina());
+    assertEquals(10, filtro.limite());
+  }
+
+  @Test
+  void obtenerNotificaciones_limiteNegativoUsaDefault() throws Exception {
+
+    when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
+        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+
+    ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
+
+    mockMvc.perform(
+            get("/perfil/notificaciones")
+                .cookie(cookie)
+                .param("pagina", "1")
+                .param("limite", "-3")
+        )
+        .andExpect(status().isOk());
+
+    verify(perfilService)
+        .obtenerNotificaciones(eq("1000"), captor.capture());
+
+    NotificacionesFiltro filtro = captor.getValue();
+    assertEquals(1, filtro.pagina());
+    assertEquals(10, filtro.limite());
+  }
+
+  @Test
+  void obtenerNotificaciones_ambosInvalidosUsaDefaults() throws Exception {
+
+    when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
+        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+
+    ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
+
+    mockMvc.perform(
+            get("/perfil/notificaciones")
+                .cookie(cookie)
+                .param("pagina", "0")
+                .param("limite", "-1")
+        )
+        .andExpect(status().isOk());
+
+    verify(perfilService)
+        .obtenerNotificaciones(eq("1000"), captor.capture());
+
+    NotificacionesFiltro filtro = captor.getValue();
+    assertEquals(1, filtro.pagina());
+    assertEquals(10, filtro.limite());
+  }
+
+  @Test
+  void obtenerNotificaciones_valoresValidosSeMantienen() throws Exception {
+
+    when(perfilService.obtenerNotificaciones(eq("1000"), any(NotificacionesFiltro.class)))
+        .thenReturn(new PaginaResultado<>(List.of(), 0, 0, 1));
+
+    ArgumentCaptor<NotificacionesFiltro> captor = ArgumentCaptor.forClass(NotificacionesFiltro.class);
+
+    mockMvc.perform(
+            get("/perfil/notificaciones")
+                .cookie(cookie)
+                .param("pagina", "2")
+                .param("limite", "5")
+        )
+        .andExpect(status().isOk());
+
+    verify(perfilService)
+        .obtenerNotificaciones(eq("1000"), captor.capture());
+
+    NotificacionesFiltro filtro = captor.getValue();
+    assertEquals(2, filtro.pagina());
+    assertEquals(5, filtro.limite());
   }
 
   @Test

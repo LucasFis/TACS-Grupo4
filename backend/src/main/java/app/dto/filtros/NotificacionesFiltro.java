@@ -6,7 +6,7 @@ public record NotificacionesFiltro(
     Integer limite
 ) {
     public NotificacionesFiltro {
-        if (pagina == null) pagina = 1;
-        if (limite == null) limite = 10;
+        if (pagina == null || pagina < 1) pagina = 1;
+        if (limite == null || limite < 1) limite = 10;
     }
 }
