@@ -19,6 +19,7 @@ import app.repositories.impl.campos.CamposColeccion;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import app.repositories.impl.campos.CamposPerfil;
@@ -60,9 +61,7 @@ public class ServicioSubasta {
     Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, conColeccion);
     Figurita figuritaSubastada = this.repoFigurita.buscarPorId(figuritaId);
 
-    List<Figurita> figuritasDeseadas = figuritasDeseadasIds.stream()
-        .map(this.repoFigurita::buscarPorId)
-        .toList();
+    List<Figurita> figuritasDeseadas = this.repoFigurita.buscarPorIds(figuritasDeseadasIds);
 
     LocalDateTime fechaInicio = LocalDateTime.now();
     LocalDateTime fechaFin = fechaInicio.plusHours(duracionEnHoras.longValue());
@@ -120,9 +119,10 @@ public class ServicioSubasta {
       throw new BadRequestException("Figuritas ofrecidas repetidas");
     }
 
-    List<Figurita> figuritasOfrecidas = rawFiguritasId.stream()
-        .map(this.repoFigurita::buscarPorId)
-        .toList();
+    List<Figurita> figuritasOfrecidas = this.repoFigurita.buscarPorIds(rawFiguritasId);
+    if (figuritasOfrecidas.size() != rawFiguritasId.size()) {
+      throw new NotFoundException("Una o más figuritas ofrecidas no existen");
+    }
 
     Propuesta nuevaPropuesta = Propuesta.builder()
         .id(UUID.randomUUID().toString())
@@ -323,15 +323,20 @@ public class ServicioSubasta {
       seleccionada.getDestinatario().setColeccion(colAutor); // misma instancia
     }
 
-    // cargar colecciones de los ofertantes rechazados
-    subasta.getOfertas().stream()
+    // cargar colecciones de los ofertantes rechazados en batch
+    List<Propuesta> ofertasARechazar = subasta.getOfertas().stream()
         .filter(o -> o.getEstadoActual().getValor() != EstadoProceso.CANCELADO)
         .filter(o -> seleccionada == null || !o.getId().equals(seleccionada.getId()))
-        .forEach(o -> {
-          Coleccion col = repositorioColecciones.buscarPorId(
-              o.getAutor().getColeccion().getId(), soloRepetidas);
-          o.getAutor().setColeccion(col);
-        });
+        .toList();
+    if (!ofertasARechazar.isEmpty()) {
+      List<String> colIds = ofertasARechazar.stream()
+          .map(o -> o.getAutor().getColeccion().getId())
+          .distinct().toList();
+      Map<String, Coleccion> colecciones = repositorioColecciones.buscarPorIds(colIds, soloRepetidas).stream()
+          .collect(Collectors.toMap(Coleccion::getId, c -> c));
+      ofertasARechazar.forEach(o ->
+          o.getAutor().setColeccion(colecciones.get(o.getAutor().getColeccion().getId())));
+    }
 
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cerrar(perfilId);
@@ -383,35 +388,23 @@ public class ServicioSubasta {
       PaginaResultado<Subasta> resultado = this.repoSubasta.buscarTodos(filtros, new CamposSubasta(true, true));
 
       if (filtros.participanteId() != null) {
-        return resultado.mapearA(s -> {
-          boolean yaCalifico = this.repoCalificacion.yaCalifico(
-              s.getAutor().getId(),
-              perfilId,
-              s.getId(),
-              MetodoIntercambio.SUBASTA
-          );
-          return new SubastaParticipoDto(s, obtenerOferta(perfilId, s), yaCalifico);
-        });
+        Set<String> ids = resultado.contenido().stream().map(Subasta::getId).collect(Collectors.toSet());
+        Set<String> yaCalificadas = this.repoCalificacion
+            .obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.SUBASTA, ids);
+        return resultado.mapearA(s ->
+            new SubastaParticipoDto(s, obtenerOferta(perfilId, s), yaCalificadas.contains(s.getId())));
 
       } else if ("ACTIVA".equals(filtros.estado())) {
         return resultado.mapearA(MiSubastaActivaDto::new);
 
       } else {
+        Set<String> ids = resultado.contenido().stream().map(Subasta::getId).collect(Collectors.toSet());
+        Set<String> yaCalificadas = this.repoCalificacion
+            .obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.SUBASTA, ids);
         return resultado.mapearA(s -> {
-          String ganadorId = s.getOfertas().stream()
-              .filter(o -> o.getEstadoActual().getValor() == EstadoProceso.ACEPTADO)
-              .findFirst()
-              .map(o -> o.getAutor().getId())
-              .orElse(null);
-
-          boolean yaCalifico = ganadorId != null && this.repoCalificacion.yaCalifico(
-              ganadorId,
-              perfilId,
-              s.getId(),
-              MetodoIntercambio.SUBASTA
-          );
-
-          return new MiSubastaFinalizadaDto(s, yaCalifico);
+          boolean tieneGanador = s.getOfertas().stream()
+              .anyMatch(o -> o.getEstadoActual().getValor() == EstadoProceso.ACEPTADO);
+          return new MiSubastaFinalizadaDto(s, tieneGanador && yaCalificadas.contains(s.getId()));
         });
       }
     }

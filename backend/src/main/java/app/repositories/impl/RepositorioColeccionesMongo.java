@@ -367,18 +367,15 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
 
   @Override
   public List<FiguritaIntercambiable> buscarIntercambiablesPorPerfilId(String perfilId) {
-    Query query = new Query(Criteria.where("_id").is(perfilId));
-    query.fields().include("coleccion");
-
-    Document doc = mongoTemplate.findOne(query, Document.class, "perfiles");
-    if (doc == null) {
-      return new ArrayList<>();
-    }
-    DBRef ref = (DBRef) doc.get("coleccion");
-    String colId = ref.getId().toString();
-
-    AggregationResults<Document> figuritas = this.buscarCampoEnColeccion(colId, "repetidas", new ArrayList<>(), 1,100);
-    return this.mapearADominio(figuritas);
+    Aggregation agg = Aggregation.newAggregation(
+        Aggregation.match(Criteria.where("_id").is(perfilId)),
+        Aggregation.lookup("colecciones", "coleccion.$id", "_id", "col"),
+        Aggregation.unwind("col", true),
+        Aggregation.unwind("col.repetidas", true),
+        Aggregation.replaceRoot("col.repetidas")
+    );
+    AggregationResults<Document> resultado = mongoTemplate.aggregate(agg, "perfiles", Document.class);
+    return this.mapearADominio(resultado);
   }
 
   /**
@@ -733,5 +730,31 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     Number total = doc != null ? doc.get("total", Number.class) : 0L;
 
     return total.longValue();
+  }
+
+  @Override
+  public List<Coleccion> buscarPorIds(List<String> ids, CamposColeccion campos) {
+    if (ids.isEmpty()) return List.of();
+    Query query = new Query(Criteria.where("_id").in(ids));
+    this.conCamposCargados(query, campos);
+    return mongoTemplate.find(query, Coleccion.class).stream()
+        .map(this::normalizar)
+        .toList();
+  }
+
+  @Override
+  public List<Figurita> buscarTodosFaltantes(String colId) {
+    Aggregation agg = Aggregation.newAggregation(
+        Aggregation.match(Criteria.where("_id").is(colId)),
+        Aggregation.unwind("faltantes", true),
+        Aggregation.lookup("figuritas", "faltantes.$id", "_id", "figurita"),
+        Aggregation.unwind("figurita", true),
+        Aggregation.replaceRoot("figurita")
+    );
+    AggregationResults<Document> resultado = mongoTemplate.aggregate(agg, "colecciones", Document.class);
+    MongoConverter converter = mongoTemplate.getConverter();
+    return resultado.getMappedResults().stream()
+        .map(doc -> converter.read(Figurita.class, doc))
+        .toList();
   }
 }

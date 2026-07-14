@@ -5,6 +5,8 @@ import app.model.entities.Calificacion;
 import app.model.entities.MetodoIntercambio;
 import app.repositories.RepositorioCalificacion;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -78,12 +80,26 @@ public class RepositorioCalificacionesMongo implements RepositorioCalificacion {
     return mongoTemplate.exists(query, Calificacion.class);
   }
 
-    private Criteria criterioDbRefId(String campo, String id) {
-        try {
-            return Criteria.where(campo)
-                    .in(Arrays.asList(id, new ObjectId(id)));
-        } catch (IllegalArgumentException e) {
-            return Criteria.where(campo).is(id);
-        }
+  @Override
+  public Set<String> obtenerTransaccionesCalificadas(String autorId, MetodoIntercambio tipo, Set<String> transaccionIds) {
+    if (transaccionIds.isEmpty()) return Set.of();
+
+    Query query = new Query();
+    query.addCriteria(Criteria.where("autor.$id").is(autorId));
+    query.addCriteria(Criteria.where("tipoTransaccion").is(tipo.name()));
+    query.addCriteria(Criteria.where("transaccionId").in(transaccionIds));
+    query.fields().include("transaccionId");
+
+    return mongoTemplate.find(query, Calificacion.class).stream()
+        .map(Calificacion::getTransaccionId)
+        .collect(Collectors.toSet());
+  }
+
+  private Criteria criterioDbRefId(String campo, String id) {
+    try {
+      return Criteria.where(campo).in(Arrays.asList(id, new ObjectId(id)));
+    } catch (IllegalArgumentException e) {
+      return Criteria.where(campo).is(id);
     }
+  }
 }

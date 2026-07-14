@@ -18,7 +18,7 @@ public class Coleccion {
   @Id
   private String id;
 
-  @DBRef
+  @DBRef(lazy = true)
   private List<Figurita> faltantes = new ArrayList<Figurita>();
 
   private List<FiguritaIntercambiable> repetidas = new ArrayList<FiguritaIntercambiable>();
