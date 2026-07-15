@@ -368,7 +368,7 @@ public class SubastaHandler implements BotHandler {
 
       // ── Crear subasta ──
       case "subasta:esperando_figurita" -> {
-        datosPendientes.get(chatId).put("figuritaId", texto);
+        datosPendientes.get(chatId).put("figuritaId", texto.trim().toUpperCase());
         estadoPendiente.put(chatId, "subasta:esperando_duracion");
         yield BotResponse.texto("Paso 2/4 — ¿Cuántas horas durará la subasta? (ej: `24`):");
       }
@@ -389,7 +389,7 @@ public class SubastaHandler implements BotHandler {
 
       case "subasta:esperando_figuritas_deseadas" -> {
         List<String> ids = Arrays.stream(texto.split(","))
-            .map(String::trim).filter(s -> !s.isBlank()).toList();
+            .map(s -> s.trim().toUpperCase()).filter(s -> !s.isBlank()).toList();
         if (ids.isEmpty()) {
           yield BotResponse.texto("❌ Ingresá al menos un ID de figurita:");
         }
@@ -529,7 +529,7 @@ public class SubastaHandler implements BotHandler {
 
       case "oferta:esperando_figuritas" -> {
         List<String> ids = Arrays.stream(texto.split(","))
-            .map(String::trim).filter(s -> !s.isBlank()).toList();
+            .map(s -> s.trim().toUpperCase()).filter(s -> !s.isBlank()).toList();
         if (ids.isEmpty()) {
           yield BotResponse.texto("❌ Ingresá al menos un ID de figurita:");
         }
