@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { obtenerEstadisticas } from '@/services/administradorService.js'
+import { useError } from '@/contexts/errorContext.jsx'
+import { useToast } from '@/contexts/toastContext.jsx'
 
 const formatDate = (date) => date.toLocaleDateString('en-CA')
 
@@ -16,28 +19,19 @@ const useEstadisticasAdmin = () => {
   const [hasta, setHasta] = useState(defaultRange.hasta)
   const [pendingDesde, setPendingDesde] = useState(defaultRange.desde)
   const [pendingHasta, setPendingHasta] = useState(defaultRange.hasta)
-  const [stats, setStats] = useState(null)
-  const [cargando, setCargando] = useState(true)
-  const [recargando, setRecargando] = useState(false)
-  const [error, setError] = useState(null)
 
-  useEffect(() => {
-    if (!desde || !hasta || desde > hasta) return
+  const { handleError } = useError()
+  const { showToast } = useToast()
 
-    if (stats) {
-      setRecargando(true)
-    } else {
-      setCargando(true)
-    }
-    setError(null)
-    obtenerEstadisticas(desde, hasta)
-      .then(setStats)
-      .catch((err) => setError(err?.message ?? 'Error al cargar estadísticas'))
-      .finally(() => {
-        setCargando(false)
-        setRecargando(false)
-      })
-  }, [desde, hasta])
+  const { data: stats, isLoading, isFetching, error } = useQuery({
+    queryKey: ['estadisticas', { desde, hasta }],
+    queryFn: ({ signal }) => obtenerEstadisticas(desde, hasta, signal),
+    enabled: !!desde && !!hasta && desde <= hasta,
+    onError: (error) => {
+      if (error.code === 'ERR_CANCELED') return
+      showToast(handleError(error, () => {}), 'error')
+    },
+  })
 
   const aplicar = () => {
     if (!pendingDesde || !pendingHasta || pendingDesde > pendingHasta) return
@@ -47,9 +41,9 @@ const useEstadisticasAdmin = () => {
 
   return {
     stats,
-    cargando,
-    recargando,
-    error,
+    cargando: isLoading,
+    recargando: isFetching && !isLoading,
+    error: error?.message ?? null,
     desde: pendingDesde,
     setDesde: setPendingDesde,
     hasta: pendingHasta,

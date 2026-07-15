@@ -1,47 +1,29 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { buscarFaltantes } from "@/services/coleccionService.js";
 import FaltanteCard from "../../../../../components/ui/faltante-card/faltante-card.jsx";
 import Paginacion from "../../../../../components/ui/paginacion/paginacion.jsx";
 import { useNavigate } from "react-router";
 import Button from "../../../../../components/ui/button/button.jsx";
-import {useError} from "@/contexts/errorContext.jsx";
-import { useToast } from '@/contexts/toastContext.jsx'
+import { useError } from "@/contexts/errorContext.jsx";
+import { useToast } from '@/contexts/toastContext.jsx';
 import SugerenciasBanner from './../../sugerencias-banner/sugerencias-banner.jsx'
 
 const Faltantes = () => {
-
-    const {handleError} = useError()
-
-    const [faltantes, setFaltantes] = useState([]);
+    const { handleError } = useError();
+    const { showToast } = useToast();
     const [filtros, setFiltros] = useState({});
-    const [loading, setLoading] = useState(true);
     const [pagina, setPagina] = useState(1);
-
-    const {showToast} = useToast()
-
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const cargarFaltantes = async () => {
-            try {
-                setLoading(true);
-
-                const faltantesApi = await buscarFaltantes({
-                    ...filtros,
-                    pagina,
-                    limite: 10,
-                });
-
-                setFaltantes(faltantesApi);
-            } catch (err) {
-                showToast(handleError(err, (m) => {}),'error')
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        cargarFaltantes();
-    }, [filtros, pagina]);
+    const { data: faltantes, isLoading } = useQuery({
+        queryKey: ['faltantes', { ...filtros, pagina, limite: 10 }],
+        queryFn: ({ signal }) => buscarFaltantes({ ...filtros, pagina, limite: 10 }, signal),
+        onError: (error) => {
+            if (error.code === 'ERR_CANCELED') return;
+            showToast(handleError(error, () => {}), 'error');
+        },
+    })
 
     return (
         <div className="container-fluid px-0 d-flex flex-column gap-4">
@@ -55,7 +37,7 @@ const Faltantes = () => {
                         style={{ backgroundColor: "var(--color-primary)" }}
                     >
                         <p className="mb-1 fw-bold fs-2">
-                            {faltantes.cantidad_de_elementos ?? 0}
+                            {faltantes?.cantidad_de_elementos ?? 0}
                         </p>
                         <p className="mb-0 text-muted">Me Faltan</p>
                     </div>
@@ -64,7 +46,7 @@ const Faltantes = () => {
 
             <div className="d-flex justify-content-between align-items-center gap-3 flex-nowrap">
                 <p className="mb-0">
-                    {faltantes.cantidad_de_elementos ?? 0} resultados encontrados
+                    {faltantes?.cantidad_de_elementos ?? 0} resultados encontrados
                 </p>
 
                 <div className="flex-shrink-0">
@@ -76,7 +58,7 @@ const Faltantes = () => {
                 </div>
             </div>
 
-            {loading ? (
+            {isLoading ? (
                 <div className="row g-4">
                     {[...Array(10)].map((_, i) => (
                         <div key={i} className="col-12 col-md-6 col-lg-4">
@@ -111,7 +93,7 @@ const Faltantes = () => {
 
                     <Paginacion
                         page={pagina}
-                        totalPages={faltantes.cantidad_de_paginas ?? 1}
+                        totalPages={faltantes?.cantidad_de_paginas ?? 1}
                         onChange={setPagina}
                     />
                 </>

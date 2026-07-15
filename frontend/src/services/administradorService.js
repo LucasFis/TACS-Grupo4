@@ -8,10 +8,11 @@ const mapearRanking = (lista) =>
     detalle: u.detalle ?? null,
   }))
 
-export const obtenerEstadisticas = async (desde, hasta) => {
+export const obtenerEstadisticas = async (desde, hasta, signal) => {
   try {
     const { data } = await api.get('/administrador/estadisticas', {
       params: { desde, hasta },
+      signal,
     })
     return {
       totalUsuarios: data.total_usuarios,

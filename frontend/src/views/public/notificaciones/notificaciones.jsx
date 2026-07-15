@@ -1,40 +1,34 @@
 import SectionTitle from "@/components/ui/section-title/section-title.jsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from '@tanstack/react-query';
 import { obtenerNotificaciones } from "@/services/notificacionesService.js";
-import { useToast } from '@/contexts/toastContext.jsx';
-import { useError } from '@/contexts/errorContext.jsx';
+import { useError } from "@/contexts/errorContext.jsx";
+import { useToast } from "@/contexts/toastContext.jsx";
 import Paginacion from '@/components/ui/paginacion/paginacion.jsx';
 import FiltroNotificacion from './filtro-notificacion/filtro-notificacion.jsx';
 import styles from './notificaciones.module.css';
 
 const Notificaciones = () => {
-  const { showToast } = useToast();
-  const { handleError } = useError();
   const navigate = useNavigate();
+  const { handleError } = useError();
+  const { showToast } = useToast();
 
-  const [cargando, setCargando] = useState(true);
-  const [notificaciones, setNotificaciones] = useState([]);
   const [pagina, setPagina] = useState(1);
   const [leida, setLeida] = useState(null);
 
-  const cargarNotificaciones = async () => {
-    try {
-      setCargando(true);
+  const { data: notificaciones, isLoading } = useQuery({
+    queryKey: ['notificaciones', { pagina, limite: 10, leida }],
+    queryFn: ({ signal }) => {
       const filtros = { pagina, limite: 10 };
       if (leida !== null) filtros.leida = leida;
-      const data = await obtenerNotificaciones(filtros);
-      setNotificaciones(data);
-    } catch (err) {
-      showToast(handleError(err, () => {}), 'error');
-    } finally {
-      setCargando(false);
-    }
-  };
-
-  useEffect(() => {
-    cargarNotificaciones();
-  }, [pagina, leida]);
+      return obtenerNotificaciones(filtros, signal);
+    },
+    onError: (error) => {
+      if (error.code === 'ERR_CANCELED') return;
+      showToast(handleError(error, () => {}), 'error');
+    },
+  })
 
   const cambiarFiltro = (nuevoLeida) => {
     setLeida((prev) => prev === nuevoLeida ? prev : nuevoLeida);
@@ -68,7 +62,7 @@ const Notificaciones = () => {
 
           <FiltroNotificacion leida={leida} onChangeLeida={cambiarFiltro} />
 
-          {cargando ? (
+          {isLoading ? (
             <div className="d-flex flex-column gap-3">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="rounded-3 placeholder-glow border" style={{ height: '80px' }}>

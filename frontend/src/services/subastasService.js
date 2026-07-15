@@ -19,10 +19,11 @@ export const buscarSubasta = async ({ subId }) => {
   }
 }
 
-export const buscarSubastas = async (filtros) => {
+export const buscarSubastas = async (filtros, signal) => {
   try {
     const { data } = await api.get(SUBASTAS_URL, {
       params: { ...filtros },
+      signal,
     })
     return data
   } catch (error) {
