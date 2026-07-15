@@ -4,6 +4,7 @@ import { obtenerNotificaciones, marcarTodasLeidas } from '@/services/notificacio
 import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 
 const NotificationsPopover = () => {
   const { tieneSesion } = useAuth()
@@ -12,6 +13,7 @@ const NotificationsPopover = () => {
   const navigate = useNavigate()
 
   const [abierto, setAbierto] = useState(false)
+  const [cargando, setCargando] = useState(false)
   const [notificaciones, setNotificaciones] = useState([])
   const [noLeidas, setNoLeidas] = useState(0)
   const wrapperRef = useRef(null)
@@ -19,6 +21,7 @@ const NotificationsPopover = () => {
   useEffect(() => {
     if (tieneSesion) {
       const cargarNotificaciones = async () => {
+        setCargando(true)
         try {
           const data = await obtenerNotificaciones()
           setNotificaciones(Array.isArray(data) ? data : data?.contenido ?? [])
@@ -27,6 +30,8 @@ const NotificationsPopover = () => {
           }
         } catch (error) {
           showToast(handleError(error, () => {}), 'error')
+        } finally {
+          setCargando(false)
         }
       }
       cargarNotificaciones()
@@ -69,6 +74,7 @@ const NotificationsPopover = () => {
         setAbierto(false)
       }
     } else {
+      setCargando(true)
       try {
         const data = await obtenerNotificaciones()
         setNotificaciones(Array.isArray(data) ? data : data?.contenido ?? [])
@@ -78,6 +84,7 @@ const NotificationsPopover = () => {
       } catch (error) {
         showToast(handleError(error, () => {}), 'error')
       } finally {
+        setCargando(false)
         setAbierto(true)
       }
     }
@@ -157,7 +164,9 @@ const NotificationsPopover = () => {
 
           <div className="navbar-notifications-header">Notificaciones</div>
 
-          {notificaciones.length === 0 ? (
+          {cargando ? (
+            <Spinner />
+          ) : notificaciones.length === 0 ? (
             <div className="navbar-notifications-empty">No tenés notificaciones</div>
           ) : (
             notificaciones.map((n) => (
