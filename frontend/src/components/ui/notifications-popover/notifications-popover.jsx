@@ -137,7 +137,19 @@ const NotificationsPopover = () => {
         <div className="navbar-notifications-popover">
           <button
             className="navbar-notifications-ver-todas"
-            onClick={() => { setAbierto(false); navigate('/notificaciones'); }}
+            onClick={async () => {
+              if (notificaciones.length > 0) {
+                try {
+                  await marcarTodasLeidas()
+                  setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+                  setNoLeidas(0)
+                } catch (error) {
+                  showToast(handleError(error, () => {}), 'error')
+                }
+              }
+              setAbierto(false)
+              navigate('/notificaciones')
+            }}
             type="button"
           >
             Ver todas
