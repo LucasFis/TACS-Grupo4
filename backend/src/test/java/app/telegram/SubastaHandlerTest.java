@@ -341,12 +341,12 @@ class SubastaHandlerTest {
   }
 
   @Test
-  void crearSubasta_figuritasDeseadasVacias_pideDenuevo() {
+  void crearSubasta_figuritasDeseadasVacias_avanzaACalificacion() {
     handler.handle(updateConTexto(CHAT_ID, "/crearsubasta"));
     handler.handlePendiente(updateConTexto(CHAT_ID, "ARG-10"));
     handler.handlePendiente(updateConTexto(CHAT_ID, "24"));
     BotResponse r = handler.handlePendiente(updateConTexto(CHAT_ID, " , , ")); // vacías
-    assertTrue(r.texto().contains("❌"));
+    assertTrue(r.texto().contains("Calificación"));
     assertTrue(handler.tienePendiente(CHAT_ID));
   }
 
