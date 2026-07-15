@@ -572,3 +572,53 @@ El email ya existe
 - Navegación automática para errores críticos.
 - Manejo centralizado de sesiones expiradas.
 - Facilita agregar nuevos tipos de errores.
+
+---
+
+# TanStack Query y manejo de errores
+
+Desde la migración a TanStack Query v5, el manejo de errores en componentes que usan `useQuery` sigue el mismo flujo pero se ejecuta vía callback `onError`:
+
+```js
+const { handleError } = useError()
+const { showToast } = useToast()
+
+const { data } = useQuery({
+  queryKey: ['recurso', params],
+  queryFn: ({ signal }) => fetchRecurso(params, signal),
+  onError: (error) => {
+    if (error.code === 'ERR_CANCELED') return
+    showToast(handleError(error, () => {}), 'error')
+  },
+})
+```
+
+## Abort silencioso
+
+Cuando el usuario cambia de tab o filtro rápidamente, TanStack Query aborta la petición anterior via `AbortController`. Axios lanza un error con `code: 'ERR_CANCELED'`. Este error **no es un error real** y se descarta silenciosamente:
+
+```js
+if (error.code === 'ERR_CANCELED') return
+```
+
+Ver [circuit-breaker.md](circuit-breaker.md) para más detalles sobre el patrón de race conditions.
+
+## Flujo completo actualizado
+
+```text
+Backend lanza excepción
+        ↓
+ErrorHandler captura la excepción
+        ↓
+Devuelve ErrorResponse uniforme
+        ↓
+Axios recibe la respuesta
+        ↓
+handleAxiosError transforma el error HTTP
+        ↓
+TanStack Query captura el error en onError
+        ↓
+handleError decide navegación o formateo
+        ↓
+showToast muestra el mensaje (excepto si es ERR_CANCELED)
+```
