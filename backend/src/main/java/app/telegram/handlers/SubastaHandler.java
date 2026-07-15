@@ -383,16 +383,16 @@ public class SubastaHandler implements BotHandler {
         estadoPendiente.put(chatId, "subasta:esperando_figuritas_deseadas");
         yield BotResponse.texto("""
                     Paso 3/4 — ¿Qué figuritas aceptarías como oferta?
-                    Ingresá los IDs separados por coma (ej: `BRA-10, ESP-7`):
+                    Ingresá los IDs separados por coma (ej: `BRA-10, ESP-7`)
+                    o escribí *0* para aceptar cualquier figurita:
                     """);
       }
 
       case "subasta:esperando_figuritas_deseadas" -> {
-        List<String> ids = Arrays.stream(texto.split(","))
-            .map(s -> s.trim().toUpperCase()).filter(s -> !s.isBlank()).toList();
-        if (ids.isEmpty()) {
-          yield BotResponse.texto("❌ Ingresá al menos un ID de figurita:");
-        }
+        List<String> ids = texto.trim().equals("0")
+            ? List.of()
+            : Arrays.stream(texto.split(","))
+                .map(s -> s.trim().toUpperCase()).filter(s -> !s.isBlank()).toList();
         datosPendientes.get(chatId).put("figuritasDeseadas", String.join(",", ids));
         estadoPendiente.put(chatId, "subasta:esperando_calificacion");
         yield BotResponse.texto("Paso 4/4 — Calificación mínima requerida del ofertante (0 a 5):");
@@ -699,7 +699,7 @@ public class SubastaHandler implements BotHandler {
       Map<String, String> datos = datosPendientes.get(chatId);
 
       List<String> deseadas = Arrays.stream(datos.get("figuritasDeseadas").split(","))
-          .map(String::trim).toList();
+          .map(String::trim).filter(s -> !s.isBlank()).toList();
 
       subastaService.crearSubasta(
           perfilId,
