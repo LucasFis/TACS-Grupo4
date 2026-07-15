@@ -111,6 +111,22 @@
   background-color: rgba(0, 0, 0, 0.04);
 }
 
+.navbar-notification-item--leida {
+  border-left: 3px solid var(--color-terciary);
+  opacity: 0.65;
+  position: relative;
+}
+
+.navbar-notification-leida-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  font-size: 0.65rem;
+  opacity: 0.5;
+  font-style: italic;
+  pointer-events: none;
+}
+
 .navbar-notification-item:hover {
   background-color: rgba(0, 0, 0, 0.06);
 }
@@ -136,4 +152,22 @@
 /*Para las que no tienen link*/
 .navbar-notification-item--clickeable {
   cursor: pointer;
+}
+
+.navbar-notifications-ver-todas {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: var(--color-terciary);
+  color: var(--color-primary);
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 10px 10px 0 0;
+}
+
+.navbar-notifications-ver-todas:hover {
+  background-color: var(--color-terciary-dark);
 }

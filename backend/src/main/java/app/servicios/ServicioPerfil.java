@@ -4,8 +4,10 @@ import app.dto.CalificacionDto;
 import app.dto.ContadorDto;
 import app.dto.FiguritaDto;
 import app.dto.NotificacionDto;
+import app.dto.NotificacionesPaginadasDto;
 import app.dto.PerfilDto;
 import app.dto.SugerenciaDto;
+import app.dto.filtros.NotificacionesFiltro;
 import app.dto.filtros.SugerenciasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.dto.request.MedioDeContactoRequest;
@@ -139,16 +141,23 @@ public class ServicioPerfil {
   }
 
   /**
-   * Obtiene las notificaciones de un perfil convertidas a DTO.
+   * Obtiene las notificaciones de un perfil convertidas a DTO, con paginación y filtro por estado.
    *
    * @param perfilId identificador del perfil del cual se obtendrán las notificaciones
-   * @return lista de notificaciones del perfil como {@link NotificacionDto}
+   * @param filtro   filtros y parámetros de paginación
+   * @return página de resultados de notificaciones como {@link NotificacionDto}
    */
-  public List<NotificacionDto> obtenerNotificaciones(String perfilId) {
-    return this.servicioNotificacion.obtenerPorPerfil(perfilId)
-        .stream()
-        .map(NotificacionDto::new)
-        .toList();
+  public NotificacionesPaginadasDto obtenerNotificaciones(String perfilId, NotificacionesFiltro filtro) {
+    PaginaResultado<NotificacionDto> pagina = this.servicioNotificacion.obtenerPorPerfilPaginado(perfilId, filtro)
+        .mapearA(NotificacionDto::new);
+    long noLeidas = this.servicioNotificacion.contarNoLeidas(perfilId);
+    return new NotificacionesPaginadasDto(
+        pagina.contenido(),
+        pagina.cantidadDeElementos(),
+        pagina.cantidadDePaginas(),
+        pagina.numero(),
+        noLeidas
+    );
   }
 
   /**

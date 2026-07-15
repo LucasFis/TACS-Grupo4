@@ -1,8 +1,11 @@
 import { api, handleAxiosError } from "@/services/api.js";
 
-export const obtenerNotificaciones = async () => {
+export const obtenerNotificaciones = async (filtros = {}) => {
     try {
-        const { data } = await api.get("/perfil/notificaciones");
+        const filtrosLimpios = Object.fromEntries(
+            Object.entries(filtros).filter(([_, value]) => value !== "" && value != null)
+        );
+        const { data } = await api.get("/perfil/notificaciones", { params: filtrosLimpios });
         return data;
     } catch (error) {
         handleAxiosError(error);
