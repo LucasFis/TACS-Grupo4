@@ -374,10 +374,14 @@ public class SubastaHandler implements BotHandler {
       }
 
       case "subasta:esperando_duracion" -> {
+        int duracion;
         try {
-          Integer.parseInt(texto);
+          duracion = Integer.parseInt(texto);
         } catch (NumberFormatException e) {
-          yield BotResponse.texto("❌ Ingresá un número entero de horas (ej: `24`):");
+          yield BotResponse.texto("❌ Ingresá un número entero positivo de horas (ej: `24`):");
+        }
+        if (duracion <= 0) {
+          yield BotResponse.texto("❌ La duración debe ser un número entero positivo de horas (ej: `24`):");
         }
         datosPendientes.get(chatId).put("duracion", texto);
         estadoPendiente.put(chatId, "subasta:esperando_figuritas_deseadas");
