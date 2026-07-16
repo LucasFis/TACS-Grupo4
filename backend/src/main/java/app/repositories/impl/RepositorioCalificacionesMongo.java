@@ -94,7 +94,7 @@ public class RepositorioCalificacionesMongo implements RepositorioCalificacion {
     if (transaccionIds.isEmpty()) return Set.of();
 
     Query query = new Query();
-    query.addCriteria(Criteria.where("autor.$id").is(autorId));
+    query.addCriteria(criterioDbRefId("autor.$id", autorId));
     query.addCriteria(Criteria.where("tipoTransaccion").is(tipo.name()));
     query.addCriteria(Criteria.where("transaccionId").in(transaccionIds));
     query.fields().include("transaccionId");

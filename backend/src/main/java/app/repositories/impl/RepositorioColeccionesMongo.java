@@ -372,6 +372,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
         Aggregation.lookup("colecciones", "coleccion.$id", "_id", "col"),
         Aggregation.unwind("col", true),
         Aggregation.unwind("col.repetidas", true),
+        Aggregation.match(Criteria.where("col.repetidas").exists(true)),
         Aggregation.replaceRoot("col.repetidas")
     );
     AggregationResults<Document> resultado = mongoTemplate.aggregate(agg, "perfiles", Document.class);
