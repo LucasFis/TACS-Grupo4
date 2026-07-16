@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { obtenerNotificaciones, marcarTodasLeidas } from '@/services/notificacionesService.js'
 import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const NotificationsPopover = () => {
   const { tieneSesion } = useAuth()
   const { handleError } = useError()
   const { showToast } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [abierto, setAbierto] = useState(false)
   const [cargando, setCargando] = useState(false)
+  const [redirigiendo, setRedirigiendo] = useState(false)
   const [notificaciones, setNotificaciones] = useState([])
   const [noLeidas, setNoLeidas] = useState(0)
   const wrapperRef = useRef(null)
@@ -47,6 +50,10 @@ const NotificationsPopover = () => {
     document.addEventListener('mousedown', handleClickFuera)
     return () => document.removeEventListener('mousedown', handleClickFuera)
   }, [abierto])
+
+  useEffect(() => {
+    setRedirigiendo(false)
+  }, [location.pathname])
 
   const toggleNotificaciones = async () => {
     if (abierto) {
@@ -90,6 +97,7 @@ const NotificationsPopover = () => {
 
   const handleClickNotificacion = async (n) => {
     if (n.link) {
+      setRedirigiendo(true)
       if (notificaciones.length > 0) {
         try {
           await marcarTodasLeidas()
@@ -105,6 +113,7 @@ const NotificationsPopover = () => {
   }
 
   return (
+    <>
     <div className="navbar-notifications-wrapper" ref={wrapperRef}>
       <button
         className="btn btn-link p-0 position-relative navbar-notification-btn"
@@ -175,6 +184,8 @@ const NotificationsPopover = () => {
         </div>
       )}
     </div>
+    <ModalInformativo open={redirigiendo} />
+    </>
   )
 }
 
