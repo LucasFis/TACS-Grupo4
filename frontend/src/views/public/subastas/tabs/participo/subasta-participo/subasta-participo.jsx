@@ -6,12 +6,14 @@ import BarraTiempo from '../../../../../../components/ui/barra-tiempo/barra-tiem
 import EtiquetaFiguritasOfrecidas from '../../../../../../components/ui/etiqueta-figuritas-propuesta/etiqueta-figuritas-propuesta.jsx'
 import Etiqueta from '../../../../../../components/ui/etiqueta/etiqueta.jsx'
 import Button from '../../../../../../components/ui/button/button.jsx'
+import ModalInformativo from '../../../../../../components/ui/modales/modal-informativo/modal-informativo.jsx'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
 const SubastaParticipo = ({ subasta, finalizada, finalizadaHace, onRefresh }) => {
   const { id, autor, figurita_subastada, fecha_cierre, tu_oferta, ya_calificado } = subasta
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
+  const [procesando, setProcesando] = useState(false)
   const navigate = useNavigate()
 
   const [tiempoRestante, setTiempoRestante] = useState(subasta.tiempo_restante)
@@ -24,15 +26,21 @@ const SubastaParticipo = ({ subasta, finalizada, finalizadaHace, onRefresh }) =>
       : { label: 'Activa', variante: 'exito' }
 
   const handleCalificar = async ({ valor, descripcion }) => {
-    await calificarPerfil({
-      destinatarioId: autor.id,
-      valor,
-      descripcion,
-      transactionId: id,
-      tipoTransaccion: 'SUBASTA',
-    })
-    setMostrarCalificar(false)
-    onRefresh()
+    try {
+      setProcesando(true)
+      await calificarPerfil({
+        destinatarioId: autor.id,
+        valor,
+        descripcion,
+        transactionId: id,
+        tipoTransaccion: 'SUBASTA',
+      })
+      setMostrarCalificar(false)
+      onRefresh()
+    } catch (error) {
+    } finally {
+      setProcesando(false)
+    }
   }
 
     useEffect(() => {
@@ -116,6 +124,11 @@ const SubastaParticipo = ({ subasta, finalizada, finalizadaHace, onRefresh }) =>
         onConfirmar={handleCalificar}
         onCancelar={() => setMostrarCalificar(false)}
       />
+
+      <ModalInformativo open={procesando}>
+        <h3>Calificando usuario...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </div>
   )
 }

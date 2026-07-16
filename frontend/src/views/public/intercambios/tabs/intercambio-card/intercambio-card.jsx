@@ -128,6 +128,8 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
 
   const handleCalificar = async ({ valor, descripcion }) => {
     try {
+      setProcesando(true)
+      setAccionProcesando('Calificando usuario...')
       await calificarPerfil({
         destinatarioId: perfilCalificado,
         valor,
@@ -140,6 +142,8 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
       onActualizado?.()
     } catch (error) {
       showToast(handleError(error, (m) => {}),'error')
+    } finally {
+      setProcesando(false)
     }
   }
 

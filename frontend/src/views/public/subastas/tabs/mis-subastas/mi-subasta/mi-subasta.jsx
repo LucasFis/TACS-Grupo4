@@ -16,6 +16,7 @@ import { derivarTiempo } from '../../../../../../utils/subastasTiempo.js'
 import { useNavigate } from 'react-router'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
+import ModalInformativo from '../../../../../../components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './mi-subasta.module.css'
 
 const BADGE_ESTADO = {
@@ -66,6 +67,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const [modal, setModal] = useState(null)
   const [loadingModal, setLoadingModal] = useState(false)
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
+  const [procesando, setProcesando] = useState(false)
 
   const finalizaPronto = tiempoRestante > 0 && tiempoRestante <= 3600;
 
@@ -91,15 +93,21 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   }
 
   const handleCalificar = async ({ valor, descripcion }) => {
-    await calificarPerfil({
-      destinatarioId: oferta_ganadora.autor.id,
-      valor,
-      descripcion,
-      transactionId: subastaId,
-      tipoTransaccion: 'SUBASTA',
-    })
-    setMostrarCalificar(false)
-    onRefresh()
+    try {
+      setProcesando(true)
+      await calificarPerfil({
+        destinatarioId: oferta_ganadora.autor.id,
+        valor,
+        descripcion,
+        transactionId: subastaId,
+        tipoTransaccion: 'SUBASTA',
+      })
+      setMostrarCalificar(false)
+      onRefresh()
+    } catch (error) {
+    } finally {
+      setProcesando(false)
+    }
   }
 
     useEffect(() => {
@@ -236,6 +244,11 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
           onCancelar={() => setMostrarCalificar(false)}
         />
       )}
+
+      <ModalInformativo open={procesando}>
+        <h3>Calificando usuario...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </>
   )
 }

@@ -49,8 +49,8 @@ const ProponerIntercambioModal = ({
     if (e.target === backdropRef.current) onCerrar()
   }
 
-  const handleProponer = () => {
-    onProponer?.({ repetidas, faltantes })
+  const handleProponer = async () => {
+    await onProponer?.({ repetidas, faltantes })
     onCerrar()
   }
 
