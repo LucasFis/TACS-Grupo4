@@ -7,6 +7,7 @@ import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repetidas.jsx'
 import Button from '@/components/ui/button/button.jsx'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import styles from './editar-oferta.module.css'
@@ -34,8 +35,8 @@ const EditarOferta = () => {
   const [subasta, setSubasta] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [figuritasExtra, setFiguritasExtra] = useState([])
-  const [loadingEnviar, setLoadingEnviar] = useState(false)
-  const [loadingEliminar, setLoadingEliminar] = useState(false)
+  const [procesando, setProcesando] = useState(false)
+  const [accionProcesando, setAccionProcesando] = useState('')
   const [showEliminar, setShowEliminar] = useState(false)
 
   useEffect(() => {
@@ -80,7 +81,8 @@ const EditarOferta = () => {
       return
     }
     try {
-      setLoadingEnviar(true)
+      setProcesando(true)
+      setAccionProcesando('Guardando oferta...')
       await editarOferta(
         subasta.id,
         oferta.id,
@@ -91,19 +93,21 @@ const EditarOferta = () => {
     } catch (e) {
       handleError(e, (err) => showToast(err.mensaje, 'error'))
     } finally {
-      setLoadingEnviar(false)
+      setProcesando(false)
     }
   }
 
   const onEliminar = async () => {
     try {
-      setLoadingEliminar(true)
+      setShowEliminar(false)
+      setProcesando(true)
+      setAccionProcesando('Eliminando oferta...')
       await cancelarOferta(subasta.id, oferta.id)
       navigate('/subastas')
     } catch (e) {
       handleError(e, (err) => showToast(err.mensaje, 'error'))
     } finally {
-      setLoadingEliminar(false)
+      setProcesando(false)
     }
   }
 
@@ -200,14 +204,15 @@ const EditarOferta = () => {
           <div className="d-flex gap-2 justify-content-between">
             <Button label="Cancelar" variante="secundarioBorde" onClick={() => navigate(-1)} />
             <Button
-              label={loadingEnviar ? 'Guardando...' : 'Guardar cambios ↗'}
-              disabled={loadingEnviar}
+              label="Guardar cambios ↗"
+              disabled={procesando}
               onClick={onEnviar}
             />
           </div>
           <Button
-            label={loadingEliminar ? 'Eliminando...' : 'Eliminar oferta'}
+            label="Eliminar oferta"
             variante="peligroBorde"
+            disabled={procesando}
             onClick={() => setShowEliminar(true)}
           />
         </div>
@@ -216,10 +221,15 @@ const EditarOferta = () => {
           show={showEliminar}
           titulo="¿Eliminar oferta?"
           mensaje="Esta acción no se puede deshacer. Tu oferta será cancelada y la subasta continuará sin tu participación."
-          labelConfirmar={loadingEliminar ? 'Eliminando...' : 'Sí, eliminar'}
+          labelConfirmar="Sí, eliminar"
           onConfirmar={onEliminar}
           onCancelar={() => setShowEliminar(false)}
         />
+
+        <ModalInformativo open={procesando}>
+          <h3>{accionProcesando}</h3>
+          <p>Esto puede tardar unos segundos</p>
+        </ModalInformativo>
       </div>
     </div>
   )

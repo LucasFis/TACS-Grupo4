@@ -65,9 +65,9 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const { showToast } = useToast()
   const { handleError } = useError()
   const [modal, setModal] = useState(null)
-  const [loadingModal, setLoadingModal] = useState(false)
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
   const [procesando, setProcesando] = useState(false)
+  const [accionProcesando, setAccionProcesando] = useState('')
 
   const finalizaPronto = tiempoRestante > 0 && tiempoRestante <= 3600;
 
@@ -76,19 +76,27 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const haySeleccionada = ofertas?.some((o) => o.seleccionada)
   const config = modal ? MODAL_CONFIG[modal.tipo] : null
 
+  const ACCION_LABELS = {
+    adjudicar: 'Adjudicando oferta...',
+    rechazar: 'Rechazando oferta...',
+    cancelar: 'Cancelando subasta...',
+    cerrar: 'Cerrando subasta...',
+  }
+
   const handleConfirmar = async () => {
     try {
-      setLoadingModal(true)
+      setModal(null)
+      setProcesando(true)
+      setAccionProcesando(ACCION_LABELS[modal.tipo] ?? 'Procesando...')
       if (modal.tipo === 'adjudicar') await seleccionarOferta(subastaId, modal.ofertaId)
       else if (modal.tipo === 'rechazar') await rechazarOferta(subastaId, modal.ofertaId)
       else if (modal.tipo === 'cancelar') await cancelarSubasta(subastaId)
       else if (modal.tipo === 'cerrar') await cerrarSubasta(subastaId)
-      setModal(null)
       onRefresh()
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
     } finally {
-      setLoadingModal(false)
+      setProcesando(false)
     }
   }
 
@@ -231,7 +239,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
         show={modal !== null}
         titulo={config?.titulo}
         mensaje={config?.mensaje}
-        labelConfirmar={loadingModal ? 'Cargando...' : config?.labelConfirmar}
+        labelConfirmar={config?.labelConfirmar}
         onConfirmar={handleConfirmar}
         onCancelar={() => setModal(null)}
       />
@@ -246,7 +254,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
       )}
 
       <ModalInformativo open={procesando}>
-        <h3>Calificando usuario...</h3>
+        <h3>{accionProcesando}</h3>
         <p>Esto puede tardar unos segundos</p>
       </ModalInformativo>
     </>
