@@ -52,6 +52,7 @@ const NotificationsPopover = () => {
     if (abierto) {
       setAbierto(false)
     } else {
+      setAbierto(true)
       setCargando(true)
       try {
         const data = await obtenerNotificaciones()
@@ -63,7 +64,6 @@ const NotificationsPopover = () => {
         showToast(handleError(error, () => {}), 'error')
       } finally {
         setCargando(false)
-        setAbierto(true)
       }
     }
   }
