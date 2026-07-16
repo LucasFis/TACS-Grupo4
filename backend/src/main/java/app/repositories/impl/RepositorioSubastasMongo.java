@@ -8,8 +8,12 @@ import app.model.entities.Perfil;
 import app.model.entities.Subasta;
 import app.repositories.RepositorioSubastas;
 import app.repositories.impl.campos.CamposSubasta;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -77,66 +81,78 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
 
   @Override
   public PaginaResultado<Subasta> buscarTodos(SubastasFiltro filtros, CamposSubasta campos) {
-    Query query = new Query();
-
-    this.conCamposCargados(query, campos);
-
-    if (filtros.autorId() != null) {
-      query.addCriteria(
-          Criteria.where("autor.id").is(filtros.autorId())
-      );
+    List<AggregationOperation> ops = new ArrayList<>();
+    List<Criteria> criterios = buildCriterios(filtros);
+    if (!criterios.isEmpty()) {
+      ops.add(Aggregation.match(new Criteria().andOperator(criterios.toArray(Criteria[]::new))));
     }
 
-    if ("ACTIVA".equals(filtros.estado())) {
-      Date ahora = new Date();
-      query.addCriteria(
-          new Criteria().andOperator(
-              Criteria.where("fechaInicio").lte(ahora),
-              Criteria.where("fechaCierre").gt(ahora)
-          )
-      );
+    long skip = (long) (filtros.pagina() - 1) * filtros.limite();
+    List<AggregationOperation> paginaOps = new ArrayList<>();
+    paginaOps.add(Aggregation.skip(skip));
+    paginaOps.add(Aggregation.limit(filtros.limite()));
+    if (!campos.getOfertas()) {
+      paginaOps.add(ctx -> new Document("$unset", "ofertas"));
+    }
+    if (!campos.getFiguritasSolicitadas()) {
+      paginaOps.add(ctx -> new Document("$unset", "figuritasSolicitadas"));
     }
 
-    if ("FINALIZADA".equals(filtros.estado())) {
-      Date ahora = new Date();
-      query.addCriteria(
-          Criteria.where("fechaCierre").lte(ahora)
-      );
-    }
-    if (filtros.participanteId() != null) {
-      query.addCriteria(
-          Criteria.where("ofertas").elemMatch(
-              Criteria.where("autor.id").is(filtros.participanteId())
-                  .and("estadoActual.valor").ne(EstadoProceso.CANCELADO)
-          )
-      );
-    }
+    ops.add(Aggregation.facet()
+        .and(Aggregation.count().as("n")).as("total")
+        .and(paginaOps.toArray(AggregationOperation[]::new)).as("pagina")
+    );
 
-    if (filtros.idFiguritaSubastada() != null) {
-      query.addCriteria(
-          Criteria.where("figuritaSubastada.$id").is(filtros.idFiguritaSubastada())
-      );
-    }
+    Document result = mongoTemplate.aggregate(
+        Aggregation.newAggregation(ops), Subasta.class, Document.class
+    ).getMappedResults().stream().findFirst().orElse(new Document());
 
-    if (filtros.idFiguritaOfertada() != null) {
-      query.addCriteria(
-          Criteria.where("ofertas.figuritasOfrecidas.$id").is(filtros.idFiguritaOfertada())
-      );
-    }
+    List<Document> totalDocs = result.getList("total", Document.class);
+    long count = totalDocs != null && !totalDocs.isEmpty()
+        ? ((Number) totalDocs.get(0).get("n")).longValue()
+        : 0L;
 
-    long count = mongoTemplate.count(query, Subasta.class);
-
-    query.skip((long) (filtros.pagina() - 1) * filtros.limite());
-    query.limit(filtros.limite());
-
-    List<Subasta> contenido = mongoTemplate.find(query, Subasta.class).stream().map(this::normalizar).toList();
+    MongoConverter converter = mongoTemplate.getConverter();
+    List<Document> paginaDocs = result.getList("pagina", Document.class);
+    List<Subasta> contenido = paginaDocs != null
+        ? paginaDocs.stream().map(d -> normalizar(converter.read(Subasta.class, d))).toList()
+        : List.of();
 
     return new PaginaResultado<>(
-        contenido,
-        count,
+        contenido, count,
         (int) Math.ceil((double) count / filtros.limite()),
         filtros.pagina()
     );
+  }
+
+  private List<Criteria> buildCriterios(SubastasFiltro filtros) {
+    List<Criteria> criterios = new ArrayList<>();
+    if (filtros.autorId() != null) {
+      criterios.add(Criteria.where("autor.id").is(filtros.autorId()));
+    }
+    if ("ACTIVA".equals(filtros.estado())) {
+      Date ahora = new Date();
+      criterios.add(new Criteria().andOperator(
+          Criteria.where("fechaInicio").lte(ahora),
+          Criteria.where("fechaCierre").gt(ahora)
+      ));
+    }
+    if ("FINALIZADA".equals(filtros.estado())) {
+      criterios.add(Criteria.where("fechaCierre").lte(new Date()));
+    }
+    if (filtros.participanteId() != null) {
+      criterios.add(Criteria.where("ofertas").elemMatch(
+          Criteria.where("autor.id").is(filtros.participanteId())
+              .and("estadoActual.valor").ne(EstadoProceso.CANCELADO)
+      ));
+    }
+    if (filtros.idFiguritaSubastada() != null) {
+      criterios.add(Criteria.where("figuritaSubastada.$id").is(filtros.idFiguritaSubastada()));
+    }
+    if (filtros.idFiguritaOfertada() != null) {
+      criterios.add(Criteria.where("ofertas.figuritasOfrecidas.$id").is(filtros.idFiguritaOfertada()));
+    }
+    return criterios;
   }
 
   @Override

@@ -141,6 +141,41 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
         )
     ));
 
+    // Lookup batch de figuritas sugeridas
+    ops.add(context -> new Document("$lookup", new Document()
+        .append("from", "figuritas")
+        .append("let", new Document("ids", new Document("$map", new Document()
+            .append("input", "$sugeridas")
+            .append("as", "s")
+            .append("in", "$$s.figurita.$id")
+        )))
+        .append("pipeline", List.of(
+            new Document("$match", new Document("$expr",
+                new Document("$in", List.of("$_id", "$$ids"))
+            ))
+        ))
+        .append("as", "figuritasSugeridasDocs")
+    ));
+
+    // Lookup batch de figuritas necesarias
+    ops.add(context -> new Document("$lookup", new Document()
+        .append("from", "figuritas")
+        .append("let", new Document("ids", new Document("$map", new Document()
+            .append("input", "$necesarias")
+            .append("as", "n")
+            .append("in", new Document("$getField", new Document()
+                .append("field", "$id")
+                .append("input", "$$n")
+            ))
+        )))
+        .append("pipeline", List.of(
+            new Document("$match", new Document("$expr",
+                new Document("$in", List.of("$_id", "$$ids"))
+            ))
+        ))
+        .append("as", "figuritasNecesariasDocs")
+    ));
+
     AggregationResults<Document> resultados = mongoTemplate.aggregate(
         Aggregation.newAggregation(ops), "colecciones", Document.class
     );
@@ -150,29 +185,15 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
         .map(doc -> {
           Perfil perfil = converter.read(Perfil.class, (Document) doc.get("perfil"));
 
-          List<Figurita> sugeridas = ((List<Document>) doc.get("sugeridas")).stream()
-              .map(d -> {
-                Object figuritaRef = d.get("figurita");
-                if (figuritaRef instanceof com.mongodb.DBRef ref) {
-                  return mongoTemplate.findById(ref.getId().toString(), Figurita.class);
-                }
-                if (figuritaRef instanceof Document figDoc) {
-                  return converter.read(Figurita.class, figDoc);
-                }
-                return null;
-              })
-              .filter(Objects::nonNull)
-              .toList();
+          List<Document> sugDocs = doc.getList("figuritasSugeridasDocs", Document.class);
+          List<Figurita> sugeridas = sugDocs != null
+              ? sugDocs.stream().map(d -> converter.read(Figurita.class, d)).filter(Objects::nonNull).toList()
+              : List.of();
 
-          List<Figurita> necesarias = ((List<Object>) doc.get("necesarias")).stream()
-              .map(item -> {
-                if (item instanceof com.mongodb.DBRef ref) {
-                  return mongoTemplate.findById(ref.getId().toString(), Figurita.class);
-                }
-                return converter.read(Figurita.class, (Document) item);
-              })
-              .filter(Objects::nonNull)
-              .toList();
+          List<Document> necDocs = doc.getList("figuritasNecesariasDocs", Document.class);
+          List<Figurita> necesarias = necDocs != null
+              ? necDocs.stream().map(d -> converter.read(Figurita.class, d)).filter(Objects::nonNull).toList()
+              : List.of();
 
           return Sugerencia.builder().autor(autor).sugerido(perfil).figuritasSugeridas(sugeridas).figuritasNecesarias(necesarias).build();
         })
@@ -182,15 +203,26 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
   }
 
   public PaginaResultado<Sugerencia> buscarPorPerfil(Perfil perfil, SugerenciasFiltro filtros) {
-    Query query = new Query();
-    query.addCriteria(
-        Criteria.where("autor").is(perfil)
+    long skip = (long) (filtros.pagina() - 1) * filtros.limite();
+    Aggregation agg = Aggregation.newAggregation(
+        Aggregation.match(Criteria.where("autor").is(perfil)),
+        Aggregation.facet()
+            .and(Aggregation.count().as("n")).as("total")
+            .and(Aggregation.skip(skip), Aggregation.limit(filtros.limite())).as("pagina")
     );
+    Document result = mongoTemplate.aggregate(agg, Sugerencia.class, Document.class)
+        .getMappedResults().stream().findFirst().orElse(new Document());
 
-    long count = mongoTemplate.count(query, Sugerencia.class);
+    List<Document> totalDocs = result.getList("total", Document.class);
+    long count = totalDocs != null && !totalDocs.isEmpty()
+        ? ((Number) totalDocs.get(0).get("n")).longValue()
+        : 0L;
 
-    query.skip((long) (filtros.pagina()-1) * filtros.limite()).limit(filtros.limite());
-    List<Sugerencia> sugerencias = mongoTemplate.find(query, Sugerencia.class);
+    MongoConverter converter = mongoTemplate.getConverter();
+    List<Document> paginaDocs = result.getList("pagina", Document.class);
+    List<Sugerencia> sugerencias = paginaDocs != null
+        ? paginaDocs.stream().map(d -> converter.read(Sugerencia.class, d)).toList()
+        : List.of();
 
     return new PaginaResultado<>(sugerencias, count, (int) Math.ceil((double) count / filtros.limite()), filtros.pagina());
   }

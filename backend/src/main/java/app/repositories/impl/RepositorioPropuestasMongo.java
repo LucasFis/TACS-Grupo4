@@ -41,45 +41,42 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
 
     @Override
     public PaginaResultado<Propuesta> buscarTodos(String perfilId, PropuestasFiltro filtros) {
-        List<AggregationOperation> matchOps = buildMatchCriterios(perfilId, filtros);
-
-        // Count con los mismos filtros
-        List<AggregationOperation> countPipeline = new ArrayList<>(matchOps);
-        countPipeline.add(Aggregation.count().as("n"));
-        long count = mongoTemplate.aggregate(
-            Aggregation.newAggregation(countPipeline), "propuestas", Document.class)
-            .getMappedResults().stream().findFirst()
-            .map(d -> ((Number) d.get("n")).longValue()).orElse(0L);
-
-        // Contenido: paginar y después  hacer lookups
-        List<AggregationOperation> pipeline = new ArrayList<>(matchOps);
+        List<AggregationOperation> pipeline = new ArrayList<>(buildMatchCriterios(perfilId, filtros));
         long skip = Math.max(0L, (long) (filtros.pagina() - 1) * filtros.limite());
-        pipeline.add(Aggregation.skip(skip));
-        pipeline.add(Aggregation.limit(filtros.limite()));
 
-        // Lookup autor y su Usuario
-        pipeline.add(Aggregation.lookup("perfiles", "autor.$id", "_id", "autorDoc"));
-        pipeline.add(Aggregation.unwind("autorDoc", true));
-        pipeline.add(Aggregation.lookup("usuarios", "autorDoc.usuario.$id", "_id", "autorUsuDoc"));
-        pipeline.add(Aggregation.unwind("autorUsuDoc", true));
+        pipeline.add(Aggregation.facet()
+            .and(Aggregation.count().as("n")).as("total")
+            .and(
+                Aggregation.skip(skip),
+                Aggregation.limit(filtros.limite()),
+                Aggregation.lookup("perfiles", "autor.$id", "_id", "autorDoc"),
+                Aggregation.unwind("autorDoc", true),
+                Aggregation.lookup("usuarios", "autorDoc.usuario.$id", "_id", "autorUsuDoc"),
+                Aggregation.unwind("autorUsuDoc", true),
+                Aggregation.lookup("perfiles", "destinatario.$id", "_id", "destDoc"),
+                Aggregation.unwind("destDoc", true),
+                Aggregation.lookup("usuarios", "destDoc.usuario.$id", "_id", "destUsuDoc"),
+                Aggregation.unwind("destUsuDoc", true),
+                Aggregation.lookup("figuritas", "figuritaBuscada.$id", "_id", "figBuscadaDoc"),
+                Aggregation.unwind("figBuscadaDoc", true),
+                Aggregation.lookup("figuritas", "figuritasOfrecidas.$id", "_id", "figsOfrecidasDocs")
+            ).as("pagina")
+        );
 
-        // Lookup destinatario y su Usuario
-        pipeline.add(Aggregation.lookup("perfiles", "destinatario.$id", "_id", "destDoc"));
-        pipeline.add(Aggregation.unwind("destDoc", true));
-        pipeline.add(Aggregation.lookup("usuarios", "destDoc.usuario.$id", "_id", "destUsuDoc"));
-        pipeline.add(Aggregation.unwind("destUsuDoc", true));
+        Document result = mongoTemplate.aggregate(
+            Aggregation.newAggregation(pipeline), "propuestas", Document.class)
+            .getMappedResults().stream().findFirst().orElse(new Document());
 
-        // Lookup figuritas
-        pipeline.add(Aggregation.lookup("figuritas", "figuritaBuscada.$id", "_id", "figBuscadaDoc"));
-        pipeline.add(Aggregation.unwind("figBuscadaDoc", true));
-        pipeline.add(Aggregation.lookup("figuritas", "figuritasOfrecidas.$id", "_id", "figsOfrecidasDocs"));
+        List<Document> totalDocs = result.getList("total", Document.class);
+        long count = totalDocs != null && !totalDocs.isEmpty()
+            ? ((Number) totalDocs.get(0).get("n")).longValue()
+            : 0L;
 
         MongoConverter converter = mongoTemplate.getConverter();
-        List<Propuesta> contenido = mongoTemplate.aggregate(
-            Aggregation.newAggregation(pipeline), "propuestas", Document.class)
-            .getMappedResults().stream()
-            .map(doc -> hydratePropuesta(doc, converter))
-            .toList();
+        List<Document> paginaDocs = result.getList("pagina", Document.class);
+        List<Propuesta> contenido = paginaDocs != null
+            ? paginaDocs.stream().map(doc -> hydratePropuesta(doc, converter)).toList()
+            : List.of();
 
         int cantidadPaginas = (int) Math.ceil((double) count / filtros.limite());
         return new PaginaResultado<>(contenido, count, cantidadPaginas, filtros.pagina());
