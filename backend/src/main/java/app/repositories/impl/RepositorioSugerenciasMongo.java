@@ -4,9 +4,11 @@ import app.dto.filtros.SugerenciasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.exceptions.NotFoundException;
 import app.model.entities.Figurita;
+import app.model.entities.MedioDeContacto;
 import app.model.entities.MetodoIntercambio;
 import app.model.entities.Perfil;
 import app.model.entities.Sugerencia;
+import app.model.entities.Usuario;
 import app.repositories.RepositorioSugerencias;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
@@ -208,7 +210,32 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
         Aggregation.match(Criteria.where("autor").is(perfil)),
         Aggregation.facet()
             .and(Aggregation.count().as("n")).as("total")
-            .and(Aggregation.skip(skip), Aggregation.limit(filtros.limite())).as("pagina")
+            .and(
+                Aggregation.skip(skip),
+                Aggregation.limit(filtros.limite()),
+                Aggregation.lookup("perfiles", "sugerido.$id", "_id", "_sugeridoDoc"),
+                Aggregation.unwind("_sugeridoDoc", true),
+                Aggregation.lookup("usuarios", "_sugeridoDoc.usuario.$id", "_id", "_sugeridoUsuDoc"),
+                Aggregation.unwind("_sugeridoUsuDoc", true),
+                (AggregationOperation) ctx -> new Document("$lookup", new Document()
+                    .append("from", "figuritas")
+                    .append("let", new Document("ids", new Document("$map",
+                        new Document("input", "$figuritasSugeridas").append("as", "f")
+                            .append("in", new Document("$getField",
+                                new Document("field", new Document("$literal", "$id")).append("input", "$$f"))))))
+                    .append("pipeline", List.of(new Document("$match",
+                        new Document("$expr", new Document("$in", List.of("$_id", "$$ids"))))))
+                    .append("as", "_figSugeridasDocs")),
+                (AggregationOperation) ctx -> new Document("$lookup", new Document()
+                    .append("from", "figuritas")
+                    .append("let", new Document("ids", new Document("$map",
+                        new Document("input", "$figuritasNecesarias").append("as", "f")
+                            .append("in", new Document("$getField",
+                                new Document("field", new Document("$literal", "$id")).append("input", "$$f"))))))
+                    .append("pipeline", List.of(new Document("$match",
+                        new Document("$expr", new Document("$in", List.of("$_id", "$$ids"))))))
+                    .append("as", "_figNecesariasDocs"))
+            ).as("pagina")
     );
     Document result = mongoTemplate.aggregate(agg, Sugerencia.class, Document.class)
         .getMappedResults().stream().findFirst().orElse(new Document());
@@ -221,10 +248,43 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
     MongoConverter converter = mongoTemplate.getConverter();
     List<Document> paginaDocs = result.getList("pagina", Document.class);
     List<Sugerencia> sugerencias = paginaDocs != null
-        ? paginaDocs.stream().map(d -> converter.read(Sugerencia.class, d)).toList()
+        ? paginaDocs.stream().map(d -> hydrateSugerencia(d, perfil, converter)).toList()
         : List.of();
 
     return new PaginaResultado<>(sugerencias, count, (int) Math.ceil((double) count / filtros.limite()), filtros.pagina());
+  }
+
+  private Sugerencia hydrateSugerencia(Document doc, Perfil autor, MongoConverter converter) {
+    String id = doc.get("_id") != null ? doc.get("_id").toString() : null;
+    Boolean favorito = doc.getBoolean("favorito", false);
+    Perfil sugerido = hydratePerfil(
+        doc.get("_sugeridoDoc", Document.class),
+        doc.get("_sugeridoUsuDoc", Document.class),
+        converter);
+    List<Document> sugDocs = doc.getList("_figSugeridasDocs", Document.class);
+    List<Figurita> sugeridas = sugDocs != null
+        ? sugDocs.stream().map(d -> converter.read(Figurita.class, d)).toList()
+        : List.of();
+    List<Document> necDocs = doc.getList("_figNecesariasDocs", Document.class);
+    List<Figurita> necesarias = necDocs != null
+        ? necDocs.stream().map(d -> converter.read(Figurita.class, d)).toList()
+        : List.of();
+    return new Sugerencia(id, sugerido, autor, sugeridas, necesarias, favorito);
+  }
+
+  private Perfil hydratePerfil(Document perfilDoc, Document usuarioDoc, MongoConverter converter) {
+    if (perfilDoc == null) return null;
+    String id = perfilDoc.get("_id") != null ? perfilDoc.get("_id").toString() : null;
+    String nombre = perfilDoc.getString("nombre");
+    Number calMed = perfilDoc.get("calificacionMedia", Number.class);
+    double calificacionMedia = calMed != null ? calMed.doubleValue() : 0.0;
+    int cantidadCalificaciones = perfilDoc.getInteger("cantidadCalificaciones", 0);
+    List<Document> mediosDocs = perfilDoc.getList("mediosDeContacto", Document.class);
+    List<MedioDeContacto> medios = mediosDocs != null
+        ? mediosDocs.stream().map(d -> converter.read(MedioDeContacto.class, d)).toList()
+        : List.of();
+    Usuario usuario = usuarioDoc != null ? converter.read(Usuario.class, usuarioDoc) : null;
+    return new Perfil(id, usuario, nombre, null, medios, calificacionMedia, cantidadCalificaciones);
   }
 
   public void eliminacionProgramada() {

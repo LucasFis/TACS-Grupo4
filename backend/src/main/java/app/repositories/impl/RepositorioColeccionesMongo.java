@@ -191,7 +191,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
 
     int cantidadResultadosCrudo = this.contarCampoEnColeccion(colId, "repetidas", filtrado);
     int cantidadResultadosDisponibles = this.sumarDisponibles(colId, "repetidas", filtrado);
-    AggregationResults<Document> resultado = this.buscarCampoEnColeccion(colId, "repetidas", filtrado, pagina, limite);
+    AggregationResults<Document> resultado = this.buscarRepetidasConFiguritas(colId, filtrado, pagina, limite);
 
 
     List<FiguritaIntercambiable> figuritas = this.mapearADominio(resultado);
@@ -453,6 +453,29 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
    * @param limite cantidad máxima de resultados
    * @return resultados crudos de la agregación como documentos
    */
+  private AggregationResults<Document> buscarRepetidasConFiguritas(
+      String colId, List<AggregationOperation> filtros, int pagina, int limite) {
+    List<AggregationOperation> ops = new ArrayList<>();
+    ops.add(Aggregation.match(Criteria.where("_id").is(colId)));
+    ops.add(Aggregation.unwind("repetidas"));
+    ops.addAll(filtros);
+    ops.add(Aggregation.skip(Math.max(0L, (long) (pagina - 1) * limite)));
+    ops.add(Aggregation.limit(limite));
+    ops.add(Aggregation.replaceRoot("repetidas"));
+    ops.add(ctx -> new Document("$addFields", new Document("_figId",
+        new Document("$getField",
+            new Document("field", new Document("$literal", "$id")).append("input", "$figurita")))));
+    ops.add(ctx -> new Document("$lookup", new Document()
+        .append("from", "figuritas")
+        .append("localField", "_figId")
+        .append("foreignField", "_id")
+        .append("as", "_figDoc")));
+    ops.add(ctx -> new Document("$set",
+        new Document("figurita", new Document("$first", "$_figDoc"))));
+    ops.add(ctx -> new Document("$unset", List.of("_figId", "_figDoc")));
+    return mongoTemplate.aggregate(Aggregation.newAggregation(ops), "colecciones", Document.class);
+  }
+
   private AggregationResults<Document> buscarCampoEnColeccion(String colId, String campo, List<AggregationOperation> ops, int pagina, int limite) {
     List<AggregationOperation> operaciones = new ArrayList<>();
     if(colId != null) {
