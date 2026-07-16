@@ -30,6 +30,7 @@ const ProponerIntercambioModal = ({
   const backdropRef = useRef(null)
   const [repetidas, setRepetidas] = useState([])
   const [faltantes, setFaltantes] = useState([])
+  const [enviando, setEnviando] = useState(false)
 
   // Cerrar con Escape
   useEffect(() => {
@@ -50,8 +51,13 @@ const ProponerIntercambioModal = ({
   }
 
   const handleProponer = async () => {
-    await onProponer?.({ repetidas, faltantes })
-    onCerrar()
+    setEnviando(true)
+    try {
+      await onProponer?.({ repetidas, faltantes })
+      onCerrar()
+    } catch {
+      setEnviando(false)
+    }
   }
 
   if (!abierto) return null
@@ -97,8 +103,8 @@ const ProponerIntercambioModal = ({
 
         {/* FOOTER */}
         <div className={styles.footer}>
-          <button className={styles.cancelar} onClick={onCerrar}>Cancelar</button>
-          <Button onClick={handleProponer}>Confirmar intercambio</Button>
+          <button className={styles.cancelar} onClick={onCerrar} disabled={enviando}>Cancelar</button>
+          <Button onClick={handleProponer} disabled={enviando}>Confirmar intercambio</Button>
         </div>
       </div>
     </div>
