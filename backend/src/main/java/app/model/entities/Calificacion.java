@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +15,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Builder
 @Document(collection = "calificaciones")
+@CompoundIndex(name = "calificacion_destinatario", def = "{'destinatario.$id': 1}")
+@CompoundIndex(name = "calificacion_autor_tipo_tx", def = "{'autor.$id': 1, 'tipoTransaccion': 1, 'transaccionId': 1}")
 public class Calificacion {
   @Id
   private String id;
