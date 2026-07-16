@@ -11,6 +11,7 @@ export const useEditarPerfil = (perfil, columnaContraseniaRef) => {
   const [contraseniaNueva, setContraseniaNueva] = useState('')
   const [mediosEditando, setMediosEditando] = useState([...(perfil.medios_de_contacto ?? [])])
   const [guardado, setGuardado] = useState(null)
+  const [procesando, setProcesando] = useState(false)
 
   const { showToast } = useToast()
   const { handleError } = useError()
@@ -25,6 +26,7 @@ export const useEditarPerfil = (perfil, columnaContraseniaRef) => {
     }
 
     try {
+      setProcesando(true)
       await editarPerfil({
         nombre: nombreEditando,
         nombreUsuario: nombreUsuarioEditando,
@@ -41,6 +43,8 @@ export const useEditarPerfil = (perfil, columnaContraseniaRef) => {
       showToast('Perfil actualizado correctamente', 'success')
     } catch (error) {
       showToast(handleError(error, (m) => {}), 'error')
+    } finally {
+      setProcesando(false)
     }
   }
 
@@ -57,5 +61,6 @@ export const useEditarPerfil = (perfil, columnaContraseniaRef) => {
     setMediosEditando,
     guardarCambios,
     guardado,
+    procesando,
   }
 }

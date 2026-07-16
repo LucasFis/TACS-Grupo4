@@ -23,7 +23,7 @@ const EditarRepetidaModal = ({ figurita, onClose, onGuardar }) => {
     }
   };
 
-  const handleGuardar = () => {
+  const handleGuardar = async () => {
     const metodosFinales = [...metodosActuales, ...nuevosMetodos];
     const cantidadNueva = Number(cantidadExistente);
 
@@ -37,7 +37,7 @@ const EditarRepetidaModal = ({ figurita, onClose, onGuardar }) => {
       return;
     }
 
-    onGuardar({
+    await onGuardar({
       cantidadNueva,
       metodos: metodosFinales,
     });

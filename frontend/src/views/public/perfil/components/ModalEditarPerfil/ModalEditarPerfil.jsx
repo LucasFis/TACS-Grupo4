@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/userContext.jsx'
 import { useEditarPerfil } from '../../hooks/useEditarPerfil.js'
 import ColumnaDatosPerfil from './ColumnaDatosPerfil.jsx'
 import ColumnaContrasenia from './ColumnaContrasenia.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './ModalEditarPerfil.module.css'
 
 const ModalEditarPerfil = ({ perfil, reviews, promedio, onGuardar, onCerrar }) => {
@@ -24,6 +25,7 @@ const ModalEditarPerfil = ({ perfil, reviews, promedio, onGuardar, onCerrar }) =
     setMediosEditando,
     guardarCambios,
     guardado,
+    procesando,
   } = useEditarPerfil(perfil, columnaContraseniaRef)
 
   useEffect(() => {
@@ -85,12 +87,21 @@ const ModalEditarPerfil = ({ perfil, reviews, promedio, onGuardar, onCerrar }) =
           </div>
           <div className="d-flex gap-2">
             <button className="btn btn-outline-secondary px-4" onClick={onCerrar}>Cancelar</button>
-            <button className={`btn px-4 ${styles['btn-guardar']}`} onClick={guardarCambios}>
+            <button
+              className={`btn px-4 ${styles['btn-guardar']}`}
+              onClick={guardarCambios}
+              disabled={procesando}
+            >
               Guardar cambios
             </button>
           </div>
         </div>
       </div>
+
+      <ModalInformativo open={procesando}>
+        <h3>Guardando perfil...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </div>
   )
 }
