@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
+import styles from './notifications-popover.module.css'
 
 const NotificationsPopover = () => {
   const { tieneSesion } = useAuth()
@@ -105,7 +106,7 @@ const NotificationsPopover = () => {
   }
 
   return (
-    <div className="navbar-notifications-wrapper" ref={wrapperRef}>
+    <div className={styles.wrapper} ref={wrapperRef}>
       <button
         className="btn btn-link p-0 position-relative navbar-notification-btn"
         onClick={toggleNotificaciones}
@@ -129,10 +130,10 @@ const NotificationsPopover = () => {
       </button>
 
       {abierto && (
-        <div className="navbar-notifications-popover">
-          <div className="navbar-notifications-actions">
+        <div className={styles.popover}>
+          <div className={styles.actions}>
             <button
-              className="navbar-notifications-ver-todas"
+              className={styles.verTodas}
               onClick={() => {
                 setAbierto(false)
                 navigate('/notificaciones')
@@ -143,7 +144,7 @@ const NotificationsPopover = () => {
             </button>
             {noLeidas > 0 && (
               <button
-                className="navbar-notifications-marcar-leidas"
+                className={styles.marcarLeidas}
                 onClick={handleMarcarTodasLeidas}
                 type="button"
               >
@@ -152,26 +153,28 @@ const NotificationsPopover = () => {
             )}
           </div>
 
-          <div className="navbar-notifications-header">Notificaciones</div>
+          <div className={styles.header}>Notificaciones</div>
 
-          {cargando ? (
-            <Spinner />
-          ) : notificaciones.length === 0 ? (
-            <div className="navbar-notifications-empty">No tenés notificaciones</div>
-          ) : (
-            notificaciones.map((n) => (
-              <div
-                key={n.id}
-                className={`navbar-notification-item ${n.leida ? 'navbar-notification-item--leida' : 'navbar-notification-item--no-leida'}
-                                ${n.link ? 'navbar-notification-item--clickeable' : ''}`}
-                onClick={() => handleClickNotificacion(n)}
-              >
-                <div className="navbar-notification-texto">{n.cuerpo}</div>
-                <div className="navbar-notification-fecha">{formatearFecha(n.fecha)}</div>
-                {n.leida && <span className="navbar-notification-leida-badge">leída</span>}
-              </div>
-            ))
-          )}
+          <div className={styles.lista}>
+            {cargando ? (
+              <div className={styles.cargando}><Spinner /></div>
+            ) : notificaciones.length === 0 ? (
+              <div className={styles.empty}>No tenés notificaciones</div>
+            ) : (
+              notificaciones.map((n) => (
+                <div
+                  key={n.id}
+                  className={`${n.leida ? styles.itemLeida : styles.itemNoLeida}
+                                  ${n.link ? styles.itemClickeable : ''} ${styles.item}`}
+                  onClick={() => handleClickNotificacion(n)}
+                >
+                  <div className={styles.texto}>{n.cuerpo}</div>
+                  <div className={styles.fecha}>{formatearFecha(n.fecha)}</div>
+                  {n.leida && <span className={styles.leidaBadge}>leída</span>}
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>
