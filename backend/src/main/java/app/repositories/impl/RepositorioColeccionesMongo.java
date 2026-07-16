@@ -460,7 +460,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     }
     operaciones.add(Aggregation.unwind(campo));
     operaciones.addAll(ops);
-    operaciones.add(Aggregation.skip((long) (pagina - 1) * limite));
+    operaciones.add(Aggregation.skip(Math.max(0L, (long) (pagina - 1) * limite)));
     operaciones.add(Aggregation.limit(limite));
     operaciones.add(Aggregation.replaceRoot(campo));
 
@@ -488,7 +488,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     List<AggregationOperation> operaciones = new ArrayList<>();
     operaciones.add(Aggregation.unwind("repetidas"));
     operaciones.addAll(ops);
-    operaciones.add(Aggregation.skip((long) (pagina - 1) * limite));
+    operaciones.add(Aggregation.skip(Math.max(0L, (long) (pagina - 1) * limite)));
     operaciones.add(Aggregation.limit(limite));
 
     operaciones.addAll(obtenerLookupPerfilCompatible());
