@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { editarOferta, cancelarOferta } from '@/services/subastasService.js'
 import { buscarSubasta } from '@/services/subastasService.js'
 import SectionTitle from '@/components/ui/section-title/section-title.jsx'
@@ -31,26 +32,19 @@ const EditarOferta = () => {
   const { handleError } = useError()
   const { showToast } = useToast()
 
-  const [subasta, setSubasta] = useState(null)
-  const [cargando, setCargando] = useState(true)
   const [figuritasExtra, setFiguritasExtra] = useState([])
   const [loadingEnviar, setLoadingEnviar] = useState(false)
   const [loadingEliminar, setLoadingEliminar] = useState(false)
   const [showEliminar, setShowEliminar] = useState(false)
 
-  useEffect(() => {
-    const cargar = async () => {
-      try {
-        const res = await buscarSubasta({ subId })
-        setSubasta(res)
-      } catch (e) {
-        handleError(e, () => {})
-      } finally {
-        setCargando(false)
-      }
-    }
-    cargar()
-  }, [])
+  const { data: subasta, isLoading: cargando } = useQuery({
+    queryKey: ['subasta', subId],
+    queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
+    onError: (err) => {
+      if (err.code === 'ERR_CANCELED') return
+      handleError(err, () => {})
+    },
+  })
 
   if (cargando) return <h2>Cargando...</h2>
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>

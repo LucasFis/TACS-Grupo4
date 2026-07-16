@@ -10,9 +10,9 @@ export const crearSubasta = async (body) => {
   }
 }
 
-export const buscarSubasta = async ({ subId }) => {
+export const buscarSubasta = async ({ subId }, signal) => {
   try {
-    const { data } = await api.get(`${SUBASTAS_URL}/${subId}`, {})
+    const { data } = await api.get(`${SUBASTAS_URL}/${subId}`, { signal })
     return data
   } catch (error) {
     handleAxiosError(error)

@@ -1,6 +1,7 @@
 import styles from './ver-subasta.module.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { buscarSubasta, seleccionarOferta } from '@/services/subastasService.js'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
@@ -18,14 +19,24 @@ const VerSubasta = () => {
   const { subId } = useParams()
   const { user } = useAuth()
   const { showToast } = useToast()
-  const { handleError, errorTemplate } = useError()
+  const { handleError } = useError()
 
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState(errorTemplate())
-  const [subasta, setSubasta] = useState(undefined)
   const [tiempo, setTiempo] = useState(0)
   const [subastaAbierta, setSubastaAbierta] = useState(false)
   const navigate = useNavigate()
+
+  const { data: subasta, isLoading: cargando, error, refetch } = useQuery({
+    queryKey: ['subasta', subId],
+    queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
+    onSuccess: (data) => {
+      setSubastaAbierta(data.tiempo_restante > 0)
+      setTiempo(data.tiempo_restante)
+    },
+    onError: (err) => {
+      if (err.code === 'ERR_CANCELED') return
+      showToast(handleError(err, () => {}), 'error')
+    },
+  })
 
   const procesarDuracion = () => {
     const horas = Math.floor(tiempo / 3600)
@@ -50,32 +61,14 @@ const VerSubasta = () => {
     return `${dia} ${mes}, ${horas}:${minutos}`
   }
 
-  const cargarSubasta = async () => {
-    try {
-      setCargando(true)
-      const payload = await buscarSubasta({ subId })
-      setSubasta(payload)
-      setSubastaAbierta(payload.tiempo_restante > 0)
-      setTiempo(payload.tiempo_restante)
-    } catch (err) {
-      showToast(handleError(err, setError), 'error')
-    } finally {
-      setCargando(false)
-    }
-  }
-
     const adjudicarOferta = async (ofertaId) => {
       try {
         await seleccionarOferta(subId, ofertaId)
-        await cargarSubasta()
+        refetch()
       } catch (err) {
         showToast(handleError(err), 'error')
       }
     }
-
-  useEffect(() => {
-    cargarSubasta()
-  }, [])
 
   useEffect(() => {
     if (tiempo <= 0) {
@@ -117,7 +110,7 @@ const VerSubasta = () => {
 
         {cargando ? (
           <h2>Cargando subasta...</h2>
-        ) : error.codigo ? (
+        ) : error ? (
           <h2 className="text-center text-secondary">No se pudo cargar la información</h2>
         ) : (
           <>

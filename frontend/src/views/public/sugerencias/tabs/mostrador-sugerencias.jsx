@@ -1,5 +1,6 @@
 import SugerenciaCard from "@/views/public/sugerencias/sugerencia-card.jsx";
-import {useCallback, useEffect, useState} from "react";
+import {useState} from "react";
+import { useQuery } from '@tanstack/react-query'
 import Paginacion from "@/components/ui/paginacion/paginacion.jsx";
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
@@ -7,52 +8,46 @@ import { buscarSugerencias } from '@/services/sugerenciasService.js'
 
 const MostradorSugerencias = () => {
 
-    const {handleError, errorTemplate} = useError()
+    const {handleError} = useError()
     const {showToast} = useToast()
 
-    const [cargando, setCargando] = useState(true)
-    const [error, setError] = useState(errorTemplate());
-    const [sugerencias, setSugerencias] = useState([])
     const [pagina, setPagina] = useState(1)
-    const [paginasTotales, setPaginasTotales] = useState(1)
 
-    const cargarSugerencias = useCallback(async () => {
-        try {
-            setCargando(true)
-            const payload = await buscarSugerencias({ pagina: pagina, limite:10})
-            setPaginasTotales(payload.cantidad_de_paginas)
-
-            setSugerencias(payload.contenido)
-        } catch (error) {
-          showToast(handleError(error, setError),'error')
-        } finally {
-            setCargando(false)
-        }
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['sugerencias', { pagina, limite: 10 }],
+        queryFn: ({ signal }) => buscarSugerencias({ pagina, limite: 10 }, signal),
+        onError: (err) => {
+            if (err.code === 'ERR_CANCELED') return
+            showToast(handleError(err, () => {}), 'error')
+        },
     })
 
-    useEffect(() => {
-        cargarSugerencias()
-    }, []);
+    if (error) return <h2 className="text-center text-secondary">No se pudo cargar la información</h2>
 
-    const mostrarSugerencias = () => {
-        if (error.codigo != null) return <h2 className="text-center text-secondary">No se pudo cargar la información</h2>
-        return (
-            <>
-                {
-                    sugerencias.length > 0 ?
-                        sugerencias.map(s => <SugerenciaCard key={s.sugerido.id} id={s.id} perfil={s.sugerido}
-                                                     figuritasNecesarias = {s.figuritas_necesarias}
-                                                     figuritasRecomendadas = {s.figuritas_recomendadas} favorito = {s.favorito}/>
-                        ) : <h2 className="text-center text-muted py-4 fw-light">No pudimos encontrar sugerencias!</h2>
-                }
-                <Paginacion page={pagina} totalPages={paginasTotales} onChange={setPagina}/>
-            </>
-        )
-    }
+    const sugerencias = data?.contenido ?? []
+    const paginasTotales = data?.cantidad_de_paginas ?? 1
 
     return (
         <div className="d-flex flex-column gap-3">
-            {cargando ? <h2>Cargando sugerencias...</h2> : mostrarSugerencias()}
+            {isLoading ? (
+                <h2>Cargando sugerencias...</h2>
+            ) : sugerencias.length > 0 ? (
+                <>
+                    {sugerencias.map(s => (
+                        <SugerenciaCard
+                            key={s.sugerido.id}
+                            id={s.id}
+                            perfil={s.sugerido}
+                            figuritasNecesarias={s.figuritas_necesarias}
+                            figuritasRecomendadas={s.figuritas_recomendadas}
+                            favorito={s.favorito}
+                        />
+                    ))}
+                    <Paginacion page={pagina} totalPages={paginasTotales} onChange={setPagina} />
+                </>
+            ) : (
+                <h2 className="text-center text-muted py-4 fw-light">No pudimos encontrar sugerencias!</h2>
+            )}
         </div>
     )
 }

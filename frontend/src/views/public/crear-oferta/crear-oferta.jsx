@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { buscarSubasta, crearOferta } from '@/services/subastasService.js'
 import { buscarPerfil } from '@/services/perfilService.js'
 import { buscarRepetidas } from '@/services/coleccionService.js'
@@ -29,37 +30,44 @@ const CrearOferta = () => {
   const { subId } = useParams()
   const navigate = useNavigate()
 
-  const [subasta, setSubasta] = useState(null)
-  const [repetidas, setRepetidas] = useState([])
-  const [calificacionUsuario, setCalificacion] = useState(null)
-  const [cargando, setCargando] = useState(true)
   const [figuritasExtra, setFiguritasExtra] = useState([])
   const { handleError } = useError()
   const { showToast } = useToast()
 
-  useEffect(() => {
-    const cargar = async () => {
-      try {
-        setCargando(true)
-        const [payloadSubasta, payloadRepetidas, payloadPerfil] = await Promise.all([
-          buscarSubasta({ subId }),
-          buscarRepetidas({ pagina: 1, limite: 10 }),
-          buscarPerfil(),
-        ])
-        setSubasta(payloadSubasta)
-        setRepetidas(payloadRepetidas?.contenido ?? [])
-        setCalificacion(payloadPerfil?.calificacion_media ?? null)
-      } catch (e) {
-        handleError(e, (err) => showToast(err.mensaje, 'error'))
-      } finally {
-        setCargando(false)
-      }
-    }
-    cargar()
-  }, [subId])
+  const { data: subasta, isLoading: cargandoSubasta } = useQuery({
+    queryKey: ['subasta', subId],
+    queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
+    onError: (err) => {
+      if (err.code === 'ERR_CANCELED') return
+      handleError(err, (err) => showToast(err.mensaje, 'error'))
+    },
+  })
+
+  const { data: repetidasData, isLoading: cargandoRepetidas } = useQuery({
+    queryKey: ['repetidas', { pagina: 1, limite: 10 }],
+    queryFn: ({ signal }) => buscarRepetidas({ pagina: 1, limite: 10 }, signal),
+    onError: (err) => {
+      if (err.code === 'ERR_CANCELED') return
+      handleError(err, (err) => showToast(err.mensaje, 'error'))
+    },
+  })
+
+  const { data: perfil, isLoading: cargandoPerfil } = useQuery({
+    queryKey: ['perfil'],
+    queryFn: ({ signal }) => buscarPerfil(undefined, signal),
+    onError: (err) => {
+      if (err.code === 'ERR_CANCELED') return
+      handleError(err, (err) => showToast(err.mensaje, 'error'))
+    },
+  })
+
+  const cargando = cargandoSubasta || cargandoRepetidas || cargandoPerfil
 
   if (cargando) return <h2>Cargando...</h2>
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>
+
+  const repetidas = repetidasData?.contenido ?? []
+  const calificacionUsuario = perfil?.calificacion_media ?? null
 
   // ── Validaciones ───────────────────────────────────────────────────────────
   const calMinima = subasta.calificacion_minima_solicitada ?? 0

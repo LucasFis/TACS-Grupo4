@@ -2,9 +2,9 @@ import { api, handleAxiosError } from './api.js'
 
 const PERFIL_URL = '/perfil'
 
-export const buscarContadoresSugerencias = async () => {
+export const buscarContadoresSugerencias = async (signal) => {
   try {
-    const { data } = await api.get(`${PERFIL_URL}/contadores`, {})
+    const { data } = await api.get(`${PERFIL_URL}/contadores`, { signal })
     return data
   } catch (error) {
     handleAxiosError(error)
