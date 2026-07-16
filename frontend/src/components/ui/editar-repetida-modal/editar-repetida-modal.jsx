@@ -14,6 +14,7 @@ const EditarRepetidaModal = ({ figurita, onClose, onGuardar }) => {
   );
 
   const [nuevosMetodos, setNuevosMetodos] = useState([]);
+  const [guardando, setGuardando] = useState(false);
 
   const toggleNuevoMetodo = (metodo) => {
     if (nuevosMetodos.includes(metodo)) {
@@ -37,12 +38,16 @@ const EditarRepetidaModal = ({ figurita, onClose, onGuardar }) => {
       return;
     }
 
-    await onGuardar({
-      cantidadNueva,
-      metodos: metodosFinales,
-    });
-
-    onClose();
+    setGuardando(true);
+    try {
+      await onGuardar({
+        cantidadNueva,
+        metodos: metodosFinales,
+      });
+      onClose();
+    } catch {
+      setGuardando(false);
+    }
   };
 
   return (
@@ -140,6 +145,7 @@ const EditarRepetidaModal = ({ figurita, onClose, onGuardar }) => {
               className="btn btn-outline-secondary"
               style={{ fontSize: "0.85rem" }}
               onClick={onClose}
+              disabled={guardando}
             >
               Cancelar
             </button>
@@ -148,6 +154,7 @@ const EditarRepetidaModal = ({ figurita, onClose, onGuardar }) => {
               className="btn btn-success"
               style={{ fontSize: "0.85rem" }}
               onClick={handleGuardar}
+              disabled={guardando}
             >
               Guardar
             </button>
