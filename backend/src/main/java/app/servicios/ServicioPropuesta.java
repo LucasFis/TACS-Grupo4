@@ -260,7 +260,12 @@ public class ServicioPropuesta {
   public PaginaResultado<IntercambioDto> buscarPropuestas(String perfilId, PropuestasFiltro filtros) {
     PaginaResultado<Propuesta> resultado = this.repositorioPropuestas.buscarTodos(perfilId, filtros);
 
-    Set<String> ids = resultado.contenido().stream().map(Propuesta::getId).collect(Collectors.toSet());
+    Set<String> ids = resultado
+        .contenido()
+        .stream()
+        .map(Propuesta::getId)
+        .collect(Collectors.toSet());
+
     Set<String> yaCalificadas = this.repositorioCalificacion
         .obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.INTERCAMBIO, ids);
 

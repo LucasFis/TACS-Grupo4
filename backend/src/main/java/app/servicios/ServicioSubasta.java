@@ -328,14 +328,23 @@ public class ServicioSubasta {
         .filter(o -> o.getEstadoActual().getValor() != EstadoProceso.CANCELADO)
         .filter(o -> seleccionada == null || !o.getId().equals(seleccionada.getId()))
         .toList();
+
     if (!ofertasARechazar.isEmpty()) {
-      List<String> colIds = ofertasARechazar.stream()
+      List<String> colIds = ofertasARechazar
+          .stream()
           .map(o -> o.getAutor().getColeccion().getId())
-          .distinct().toList();
-      Map<String, Coleccion> colecciones = repositorioColecciones.buscarPorIds(colIds, soloRepetidas).stream()
+          .distinct()
+          .toList();
+
+      Map<String, Coleccion> colecciones = repositorioColecciones
+          .buscarPorIds(colIds, soloRepetidas)
+          .stream()
           .collect(Collectors.toMap(Coleccion::getId, c -> c));
-      ofertasARechazar.forEach(o ->
-          o.getAutor().setColeccion(colecciones.get(o.getAutor().getColeccion().getId())));
+
+      ofertasARechazar.forEach(oferta -> {
+        Coleccion coleccion = colecciones.get(oferta.getAutor().getColeccion().getId());
+        oferta.getAutor().setColeccion(coleccion);
+      });
     }
 
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
@@ -388,15 +397,20 @@ public class ServicioSubasta {
       PaginaResultado<Subasta> resultado = this.repoSubasta.buscarTodos(filtros, new CamposSubasta(true, true));
 
       if (filtros.participanteId() != null) {
-        Set<String> ids = resultado.contenido().stream().map(Subasta::getId).collect(Collectors.toSet());
+        Set<String> ids = resultado
+            .contenido()
+            .stream()
+            .map(Subasta::getId)
+            .collect(Collectors.toSet());
+
         Set<String> yaCalificadas = this.repoCalificacion
             .obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.SUBASTA, ids);
-        return resultado.mapearA(s ->
-            new SubastaParticipoDto(s, obtenerOferta(perfilId, s), yaCalificadas.contains(s.getId())));
 
+        return resultado.mapearA(s ->
+            new SubastaParticipoDto(s, obtenerOferta(perfilId, s), yaCalificadas.contains(s.getId()))
+        );
       } else if ("ACTIVA".equals(filtros.estado())) {
         return resultado.mapearA(MiSubastaActivaDto::new);
-
       } else {
         Set<String> ids = resultado.contenido().stream().map(Subasta::getId).collect(Collectors.toSet());
         Set<String> yaCalificadas = this.repoCalificacion

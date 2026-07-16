@@ -174,11 +174,19 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
   @Override
   public String obtenerColIdPorUsuarioId(String usuarioId) {
     Object idValue;
-    try { idValue = new ObjectId(usuarioId); } catch (IllegalArgumentException e) { idValue = usuarioId; }
+    try {
+      idValue = new ObjectId(usuarioId);
+    } catch (IllegalArgumentException e) {
+      idValue = usuarioId;
+    }
+
     Query query = new Query(Criteria.where("usuario.$id").is(idValue));
     query.fields().include("coleccion");
     Document doc = mongoTemplate.findOne(query, Document.class, "perfiles");
-    if (doc == null) throw new NotFoundException("Perfil no encontrado con usuario de id: " + usuarioId);
+
+    if (doc == null)
+      throw new NotFoundException("Perfil no encontrado con usuario de id: " + usuarioId);
+
     DBRef ref = (DBRef) doc.get("coleccion");
     return ref.getId().toString();
   }
@@ -194,11 +202,13 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
         .append("faltantes", new Document("$size", new Document("$ifNull", List.of("$col.faltantes", List.of()))))
     ));
 
-    Document doc = mongoTemplate.aggregate(
-        Aggregation.newAggregation(ops), "perfiles", Document.class
-    ).getUniqueMappedResult();
+    Document doc = mongoTemplate
+        .aggregate(Aggregation.newAggregation(ops), "perfiles", Document.class)
+        .getUniqueMappedResult();
 
-    if (doc == null) return Map.of("repetidas", 0, "faltantes", 0);
+    if (doc == null)
+      return Map.of("repetidas", 0, "faltantes", 0);
+
     return Map.of(
         "repetidas", doc.getInteger("repetidas", 0),
         "faltantes", doc.getInteger("faltantes", 0)

@@ -80,6 +80,15 @@ public class RepositorioCalificacionesMongo implements RepositorioCalificacion {
     return mongoTemplate.exists(query, Calificacion.class);
   }
 
+    private Criteria criterioDbRefId(String campo, String id) {
+        try {
+            return Criteria.where(campo)
+                    .in(Arrays.asList(id, new ObjectId(id)));
+        } catch (IllegalArgumentException e) {
+            return Criteria.where(campo).is(id);
+        }
+    }
+
   @Override
   public Set<String> obtenerTransaccionesCalificadas(String autorId, MetodoIntercambio tipo, Set<String> transaccionIds) {
     if (transaccionIds.isEmpty()) return Set.of();
@@ -93,13 +102,5 @@ public class RepositorioCalificacionesMongo implements RepositorioCalificacion {
     return mongoTemplate.find(query, Calificacion.class).stream()
         .map(Calificacion::getTransaccionId)
         .collect(Collectors.toSet());
-  }
-
-  private Criteria criterioDbRefId(String campo, String id) {
-    try {
-      return Criteria.where(campo).in(Arrays.asList(id, new ObjectId(id)));
-    } catch (IllegalArgumentException e) {
-      return Criteria.where(campo).is(id);
-    }
   }
 }

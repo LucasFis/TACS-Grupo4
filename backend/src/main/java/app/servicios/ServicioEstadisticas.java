@@ -57,12 +57,16 @@ public class ServicioEstadisticas {
 
         long totalFiguritasPublicadas = this.repositorioColecciones.contarRepetidas(new ArrayList<>());
 
-        Map<EstadoProceso, Long> propuestasPeriodo =
-            repositorioPropuestas.contarPorEstadoEnRango(desdeDateTime, hastaDateTime);
+        Map<EstadoProceso, Long> propuestasPeriodo = repositorioPropuestas
+            .contarPorEstadoEnRango(desdeDateTime, hastaDateTime);
 
-        int totalPropuestas = (int) propuestasPeriodo.values().stream().mapToLong(Long::longValue).sum();
+        int totalPropuestas = (int) propuestasPeriodo
+            .values()
+            .stream()
+            .mapToLong(Long::longValue)
+            .sum();
 
-        long totalSubastasActivas = repositorioSubastas.contarSubastasActivas();
+        int totalSubastasActivas = (int) repositorioSubastas.contarSubastasActivas();
 
         PropuestasPorEstadoDto propuestasPorEstado = new PropuestasPorEstadoDto(
             propuestasPeriodo.getOrDefault(EstadoProceso.PENDIENTE, 0L).intValue(),
@@ -80,7 +84,7 @@ public class ServicioEstadisticas {
             totalUsuarios,
             totalFiguritasPublicadas,
             totalPropuestas,
-            (int) totalSubastasActivas,
+            totalSubastasActivas,
             propuestasPorEstado,
             figuritasPorModalidad,
             rankings

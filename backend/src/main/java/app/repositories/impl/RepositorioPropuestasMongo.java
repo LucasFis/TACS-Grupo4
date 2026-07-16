@@ -51,19 +51,19 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
             .getMappedResults().stream().findFirst()
             .map(d -> ((Number) d.get("n")).longValue()).orElse(0L);
 
-        // Contenido: paginar primero, luego hacer lookups (más eficiente)
+        // Contenido: paginar y después  hacer lookups
         List<AggregationOperation> pipeline = new ArrayList<>(matchOps);
         long skip = Math.max(0L, (long) (filtros.pagina() - 1) * filtros.limite());
         pipeline.add(Aggregation.skip(skip));
         pipeline.add(Aggregation.limit(filtros.limite()));
 
-        // Lookup autor (Perfil) y su Usuario anidado
+        // Lookup autor y su Usuario
         pipeline.add(Aggregation.lookup("perfiles", "autor.$id", "_id", "autorDoc"));
         pipeline.add(Aggregation.unwind("autorDoc", true));
         pipeline.add(Aggregation.lookup("usuarios", "autorDoc.usuario.$id", "_id", "autorUsuDoc"));
         pipeline.add(Aggregation.unwind("autorUsuDoc", true));
 
-        // Lookup destinatario (Perfil) y su Usuario anidado
+        // Lookup destinatario y su Usuario
         pipeline.add(Aggregation.lookup("perfiles", "destinatario.$id", "_id", "destDoc"));
         pipeline.add(Aggregation.unwind("destDoc", true));
         pipeline.add(Aggregation.lookup("usuarios", "destDoc.usuario.$id", "_id", "destUsuDoc"));
@@ -81,16 +81,16 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
             .map(doc -> hydratePropuesta(doc, converter))
             .toList();
 
-        return new PaginaResultado<>(contenido, count,
-            (int) Math.ceil((double) count / filtros.limite()), filtros.pagina());
+        int cantidadPaginas = (int) Math.ceil((double) count / filtros.limite());
+        return new PaginaResultado<>(contenido, count, cantidadPaginas, filtros.pagina());
     }
 
     private List<AggregationOperation> buildMatchCriterios(String perfilId, PropuestasFiltro filtros) {
         List<Criteria> criterios = new ArrayList<>();
 
-        if ("RECIBIDAS".equals(filtros.tipo())) {
+        if("RECIBIDAS".equals(filtros.tipo())) {
             criterios.add(criterioDbRefId("destinatario.$id", perfilId));
-        } else if ("ENVIADAS".equals(filtros.tipo())) {
+        } else if("ENVIADAS".equals(filtros.tipo())) {
             criterios.add(criterioDbRefId("autor.$id", perfilId));
         }
 
@@ -104,9 +104,10 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
             criterios.add(criterioDbRefId("figuritasOfrecidas.$id", filtros.idFiguritaPropuesta()));
         }
 
-        if (criterios.isEmpty()) return List.of();
-        return List.of(Aggregation.match(
-            new Criteria().andOperator(criterios.toArray(Criteria[]::new))));
+        if (criterios.isEmpty())
+            return List.of();
+
+        return List.of(Aggregation.match(new Criteria().andOperator(criterios.toArray(Criteria[]::new))));
     }
 
     private Propuesta hydratePropuesta(Document doc, MongoConverter converter) {
@@ -114,6 +115,7 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
             doc.get("autorDoc", Document.class),
             doc.get("autorUsuDoc", Document.class),
             converter);
+
         Perfil dest = hydratePerfil(
             doc.get("destDoc", Document.class),
             doc.get("destUsuDoc", Document.class),
@@ -121,7 +123,8 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
 
         Document figBuscadaDoc = doc.get("figBuscadaDoc", Document.class);
         Figurita figuritaBuscada = figBuscadaDoc != null
-            ? converter.read(Figurita.class, figBuscadaDoc) : null;
+            ? converter.read(Figurita.class, figBuscadaDoc)
+            : null;
 
         List<Document> figsOfrecidasDocs = doc.getList("figsOfrecidasDocs", Document.class);
         List<Figurita> figuritasOfrecidas = figsOfrecidasDocs != null
@@ -133,23 +136,37 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
             ? estadoDocs.stream().map(d -> converter.read(EstadoPropuesta.class, d)).toList()
             : List.of();
 
-        String id = doc.get("_id") != null ? doc.get("_id").toString() : null;
-        EstadoPropuesta estadoActual = estados.isEmpty() ? null : estados.get(estados.size() - 1);
+        String id = doc.get("_id") != null
+            ? doc.get("_id").toString()
+            : null;
 
-        return new Propuesta(id, autor, dest, figuritasOfrecidas, figuritaBuscada,
-            new ArrayList<>(estados), estadoActual);
+        EstadoPropuesta estadoActual = estados.isEmpty()
+            ? null
+            : estados.get(estados.size() - 1);
+
+        ArrayList<EstadoPropuesta> listaEstados = new ArrayList<>(estados);
+        return new Propuesta(id, autor, dest, figuritasOfrecidas, figuritaBuscada, listaEstados, estadoActual);
     }
 
     private Perfil hydratePerfil(Document perfilDoc, Document usuarioDoc, MongoConverter converter) {
-        if (perfilDoc == null) return null;
+        if (perfilDoc == null)
+            return null;
 
-        String id = perfilDoc.get("_id") != null ? perfilDoc.get("_id").toString() : null;
+        String id = perfilDoc.get("_id") != null
+            ? perfilDoc.get("_id").toString()
+            : null;
+
         String nombre = perfilDoc.getString("nombre");
         Number calMed = perfilDoc.get("calificacionMedia", Number.class);
-        double calificacionMedia = calMed != null ? calMed.doubleValue() : 0.0;
+
+        double calificacionMedia = calMed != null
+            ? calMed.doubleValue()
+            : 0.0;
+
         int cantidadCalificaciones = perfilDoc.getInteger("cantidadCalificaciones", 0);
 
         List<Document> mediosDocs = perfilDoc.getList("mediosDeContacto", Document.class);
+
         List<MedioDeContacto> medios = mediosDocs != null
             ? mediosDocs.stream().map(d -> converter.read(MedioDeContacto.class, d)).toList()
             : List.of();
