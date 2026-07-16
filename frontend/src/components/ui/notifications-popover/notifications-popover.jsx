@@ -39,19 +39,9 @@ const NotificationsPopover = () => {
   }, [tieneSesion])
 
   useEffect(() => {
-    const handleClickFuera = async (e) => {
+    const handleClickFuera = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        try {
-          if (abierto && notificaciones.length > 0) {
-            await marcarTodasLeidas()
-            setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
-            setNoLeidas(0)
-          }
-        } catch (error) {
-          showToast(handleError(error, () => {}), 'error')
-        } finally {
-          setAbierto(false)
-        }
+        setAbierto(false)
       }
     }
     document.addEventListener('mousedown', handleClickFuera)
@@ -60,19 +50,7 @@ const NotificationsPopover = () => {
 
   const toggleNotificaciones = async () => {
     if (abierto) {
-      if (notificaciones.length > 0) {
-        try {
-          await marcarTodasLeidas()
-          setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
-          setNoLeidas(0)
-        } catch (error) {
-          showToast(handleError(error, () => {}), 'error')
-        } finally {
-          setAbierto(false)
-        }
-      } else {
-        setAbierto(false)
-      }
+      setAbierto(false)
     } else {
       setCargando(true)
       try {
@@ -87,6 +65,16 @@ const NotificationsPopover = () => {
         setCargando(false)
         setAbierto(true)
       }
+    }
+  }
+
+  const handleMarcarTodasLeidas = async () => {
+    try {
+      await marcarTodasLeidas()
+      setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+      setNoLeidas(0)
+    } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
     }
   }
 
@@ -142,25 +130,27 @@ const NotificationsPopover = () => {
 
       {abierto && (
         <div className="navbar-notifications-popover">
-          <button
-            className="navbar-notifications-ver-todas"
-            onClick={async () => {
-              if (notificaciones.length > 0) {
-                try {
-                  await marcarTodasLeidas()
-                  setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
-                  setNoLeidas(0)
-                } catch (error) {
-                  showToast(handleError(error, () => {}), 'error')
-                }
-              }
-              setAbierto(false)
-              navigate('/notificaciones')
-            }}
-            type="button"
-          >
-            Ver todas
-          </button>
+          <div className="navbar-notifications-actions">
+            <button
+              className="navbar-notifications-ver-todas"
+              onClick={() => {
+                setAbierto(false)
+                navigate('/notificaciones')
+              }}
+              type="button"
+            >
+              Ver todas
+            </button>
+            {noLeidas > 0 && (
+              <button
+                className="navbar-notifications-marcar-leidas"
+                onClick={handleMarcarTodasLeidas}
+                type="button"
+              >
+                Marcar leídas
+              </button>
+            )}
+          </div>
 
           <div className="navbar-notifications-header">Notificaciones</div>
 

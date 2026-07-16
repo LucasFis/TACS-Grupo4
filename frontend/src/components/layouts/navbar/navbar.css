@@ -154,9 +154,14 @@
   cursor: pointer;
 }
 
+.navbar-notifications-actions {
+  display: flex;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+
 .navbar-notifications-ver-todas {
-  display: block;
-  width: 100%;
+  flex: 1;
   padding: 10px 12px;
   border: none;
   background: var(--color-terciary);
@@ -165,9 +170,25 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  border-radius: 10px 10px 0 0;
 }
 
 .navbar-notifications-ver-todas:hover {
+  background-color: var(--color-terciary-dark);
+}
+
+.navbar-notifications-marcar-leidas {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--color-terciary);
+  color: var(--color-primary);
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navbar-notifications-marcar-leidas:hover {
   background-color: var(--color-terciary-dark);
 }
