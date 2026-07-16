@@ -85,18 +85,17 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
 
   const handleConfirmar = async () => {
     try {
-      setModal(null)
       setProcesando(true)
       setAccionProcesando(ACCION_LABELS[modal.tipo] ?? 'Procesando...')
       if (modal.tipo === 'adjudicar') await seleccionarOferta(subastaId, modal.ofertaId)
       else if (modal.tipo === 'rechazar') await rechazarOferta(subastaId, modal.ofertaId)
       else if (modal.tipo === 'cancelar') await cancelarSubasta(subastaId)
       else if (modal.tipo === 'cerrar') await cerrarSubasta(subastaId)
+      setModal(null)
       onRefresh()
     } catch (error) {
-      showToast(handleError(error, () => {}), 'error')
-    } finally {
       setProcesando(false)
+      showToast(handleError(error, () => {}), 'error')
     }
   }
 
