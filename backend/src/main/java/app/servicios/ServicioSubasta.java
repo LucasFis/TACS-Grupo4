@@ -377,51 +377,43 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
-  /**
-   * Obtiene las subastas del sistema según los filtros aplicados. El tipo de DTO
-   * varía según el contexto:
-   * <ul>
-   *   <li>Si {@code filtros.participanteId()} no es {@code null}, devuelve subastas
-   *       en las que el perfil participó como {@link app.dto.subasta.SubastaParticipoDto}.</li>
-   *   <li>Si el estado es {@code ACTIVA}, devuelve las subastas activas del perfil
-   *       como {@link app.dto.subasta.MiSubastaActivaDto}.</li>
-   *   <li>En caso contrario, devuelve las subastas finalizadas del perfil como
-   *       {@link app.dto.subasta.MiSubastaFinalizadaDto}.</li>
-   * </ul>
-   *
-   * @param perfilId identificador del perfil que solicita las subastas
-   * @param filtros  criterios de filtrado (estado, participante, paginación)
-   * @return página de subastas según el tipo de vista solicitada
-   */
-    public PaginaResultado<?> obtenerSubastas(String perfilId, SubastasFiltro filtros) {
-      PaginaResultado<Subasta> resultado = this.repoSubasta.buscarTodos(filtros, new CamposSubasta(true, true));
+  public PaginaResultado<?> obtenerSubastas(String perfilId, SubastasFiltro filtros) {
+    PaginaResultado<Subasta> resultado = this.repoSubasta.buscarTodos(filtros, new CamposSubasta(true, true));
 
-      if (filtros.participanteId() != null) {
-        Set<String> ids = resultado
-            .contenido()
-            .stream()
-            .map(Subasta::getId)
-            .collect(Collectors.toSet());
-
-        Set<String> yaCalificadas = this.repoCalificacion
-            .obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.SUBASTA, ids);
-
-        return resultado.mapearA(s ->
-            new SubastaParticipoDto(s, obtenerOferta(perfilId, s), yaCalificadas.contains(s.getId()))
-        );
-      } else if ("ACTIVA".equals(filtros.estado())) {
-        return resultado.mapearA(MiSubastaActivaDto::new);
-      } else {
-        Set<String> ids = resultado.contenido().stream().map(Subasta::getId).collect(Collectors.toSet());
-        Set<String> yaCalificadas = this.repoCalificacion
-            .obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.SUBASTA, ids);
-        return resultado.mapearA(s -> {
-          boolean tieneGanador = s.getOfertas().stream()
-              .anyMatch(o -> o.getEstadoActual().getValor() == EstadoProceso.ACEPTADO);
-          return new MiSubastaFinalizadaDto(s, tieneGanador && yaCalificadas.contains(s.getId()));
-        });
-      }
+    if (filtros.participanteId() != null) {
+      return mapearComoParticipante(perfilId, resultado);
     }
+
+    if ("ACTIVA".equals(filtros.estado())) {
+      return resultado.mapearA(MiSubastaActivaDto::new);
+    }
+
+    return mapearComoFinalizadas(perfilId, resultado);
+  }
+
+  private PaginaResultado<SubastaParticipoDto> mapearComoParticipante(String perfilId, PaginaResultado<Subasta> resultado) {
+    Set<String> yaCalificadas = obtenerCalificadas(perfilId, resultado);
+    return resultado.mapearA(s ->
+        new SubastaParticipoDto(s, obtenerOferta(perfilId, s), yaCalificadas.contains(s.getId()))
+    );
+  }
+
+  private PaginaResultado<MiSubastaFinalizadaDto> mapearComoFinalizadas(String perfilId, PaginaResultado<Subasta> resultado) {
+    Set<String> yaCalificadas = obtenerCalificadas(perfilId, resultado);
+    return resultado.mapearA(s -> {
+      boolean tieneGanador = s
+          .getOfertas()
+          .stream()
+          .anyMatch(o -> o.getEstadoActual().getValor() == EstadoProceso.ACEPTADO);
+
+      return new MiSubastaFinalizadaDto(s, tieneGanador && yaCalificadas.contains(s.getId()));
+    });
+  }
+
+  private Set<String> obtenerCalificadas(String perfilId, PaginaResultado<Subasta> resultado) {
+    Set<String> ids = resultado.contenido().stream().map(Subasta::getId).collect(Collectors.toSet());
+    return this.repoCalificacion.obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.SUBASTA, ids);
+  }
 
   /**
    * Busca la oferta realizada por un perfil dentro de una subasta específica.
