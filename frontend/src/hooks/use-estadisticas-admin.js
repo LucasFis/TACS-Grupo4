@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { obtenerEstadisticas } from '@/services/administradorService.js'
-import { useError } from '@/contexts/errorContext.jsx'
-import { useToast } from '@/contexts/toastContext.jsx'
 
 const formatDate = (date) => date.toLocaleDateString('en-CA')
 
@@ -20,17 +18,10 @@ const useEstadisticasAdmin = () => {
   const [pendingDesde, setPendingDesde] = useState(defaultRange.desde)
   const [pendingHasta, setPendingHasta] = useState(defaultRange.hasta)
 
-  const { handleError } = useError()
-  const { showToast } = useToast()
-
   const { data: stats, isLoading, isFetching, error } = useQuery({
     queryKey: ['estadisticas', { desde, hasta }],
     queryFn: ({ signal }) => obtenerEstadisticas(desde, hasta, signal),
     enabled: !!desde && !!hasta && desde <= hasta,
-    onError: (error) => {
-      if (error.code === 'ERR_CANCELED') return
-      showToast(handleError(error, () => {}), 'error')
-    },
   })
 
   const aplicar = () => {
