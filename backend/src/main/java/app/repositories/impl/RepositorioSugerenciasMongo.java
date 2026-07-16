@@ -164,7 +164,7 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
             .append("input", "$necesarias")
             .append("as", "n")
             .append("in", new Document("$getField", new Document()
-                .append("field", "$id")
+                .append("field", new Document("$literal", "$id"))
                 .append("input", "$$n")
             ))
         )))
@@ -203,7 +203,7 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
   }
 
   public PaginaResultado<Sugerencia> buscarPorPerfil(Perfil perfil, SugerenciasFiltro filtros) {
-    long skip = (long) (filtros.pagina() - 1) * filtros.limite();
+    long skip = Math.max(0L, (long) (filtros.pagina() - 1) * filtros.limite());
     Aggregation agg = Aggregation.newAggregation(
         Aggregation.match(Criteria.where("autor").is(perfil)),
         Aggregation.facet()

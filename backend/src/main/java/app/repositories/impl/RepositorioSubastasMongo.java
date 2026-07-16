@@ -87,7 +87,7 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
       ops.add(Aggregation.match(new Criteria().andOperator(criterios.toArray(Criteria[]::new))));
     }
 
-    long skip = (long) (filtros.pagina() - 1) * filtros.limite();
+    long skip = Math.max(0L, (long) (filtros.pagina() - 1) * filtros.limite());
     List<AggregationOperation> paginaOps = new ArrayList<>();
     paginaOps.add(Aggregation.skip(skip));
     paginaOps.add(Aggregation.limit(filtros.limite()));
