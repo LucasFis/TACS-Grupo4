@@ -96,7 +96,7 @@ const Repetidas = () => {
     }
 
     return (
-        <div className="container-fluid px-0 d-flex flex-column gap-4">
+        <div className="container-fluid px-0 d-flex flex-column gap-4" style={showModal ? { pointerEvents: 'none' } : undefined}>
 
             <div className="row g-3 justify-content-center">
                 <div className="col-6 col-md-4">
