@@ -12,6 +12,7 @@ import app.repositories.RepositorioPerfiles;
 import app.repositories.impl.campos.CamposPerfil;
 import com.mongodb.DBRef;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -172,7 +173,9 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
 
   @Override
   public String obtenerColIdPorUsuarioId(String usuarioId) {
-    Query query = new Query(Criteria.where("usuario.id").is(usuarioId));
+    Object idValue;
+    try { idValue = new ObjectId(usuarioId); } catch (IllegalArgumentException e) { idValue = usuarioId; }
+    Query query = new Query(Criteria.where("usuario.$id").is(idValue));
     query.fields().include("coleccion");
     Document doc = mongoTemplate.findOne(query, Document.class, "perfiles");
     if (doc == null) throw new NotFoundException("Perfil no encontrado con usuario de id: " + usuarioId);
