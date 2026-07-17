@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useQueryConError from '@/hooks/useQueryConError'
 import { editarOferta, cancelarOferta } from '@/services/subastasService.js'
 import { buscarSubasta } from '@/services/subastasService.js'
 import SectionTitle from '@/components/ui/section-title/section-title.jsx'
@@ -32,26 +33,16 @@ const EditarOferta = () => {
   const { handleError } = useError()
   const { showToast } = useToast()
 
-  const [subasta, setSubasta] = useState(null)
-  const [cargando, setCargando] = useState(true)
   const [figuritasExtra, setFiguritasExtra] = useState([])
   const [procesando, setProcesando] = useState(false)
   const [accionProcesando, setAccionProcesando] = useState('')
   const [showEliminar, setShowEliminar] = useState(false)
 
-  useEffect(() => {
-    const cargar = async () => {
-      try {
-        const res = await buscarSubasta({ subId })
-        setSubasta(res)
-      } catch (e) {
-        handleError(e, () => {})
-      } finally {
-        setCargando(false)
-      }
-    }
-    cargar()
-  }, [])
+  const { data: subasta, isLoading: cargando } = useQueryConError({
+    queryKey: ['subasta', subId],
+    queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
+    showToastOnError: false,
+  })
 
   if (cargando) return <h2>Cargando...</h2>
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>

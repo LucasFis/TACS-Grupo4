@@ -2,10 +2,11 @@ import { api, handleAxiosError } from './api.js'
 
 const SUGERENCIAS_URL = '/sugerencias'
 
-export const buscarSugerencias = async ({ pagina, limite }) => {
+export const buscarSugerencias = async ({ pagina, limite }, signal) => {
   try {
     const { data } = await api.get(`${SUGERENCIAS_URL}`, {
       params: { pagina, limite },
+      signal,
     })
     return data
   } catch (error) {

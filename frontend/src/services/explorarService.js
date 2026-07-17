@@ -28,10 +28,11 @@ export const explorarFiguritas = async ({
   tipos = [],
   page = 0,
   size = 12,
-} = {}) => {
+} = {}, signal) => {
   try {
     const { data } = await api.get('/figuritas/intercambiables', {
       params: buildParams({ q, jugador, seleccion, numero, tipos, page, size }),
+      signal,
     })
     return {
       contenido: data.contenido,

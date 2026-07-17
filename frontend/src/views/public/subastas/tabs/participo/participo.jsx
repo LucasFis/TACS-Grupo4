@@ -1,46 +1,30 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import { buscarSubastas } from '../../../../../services/subastasService.js'
 import SubastaParticipo from './subasta-participo/subasta-participo.jsx'
 import Paginacion from '../../../../../components/ui/paginacion/paginacion.jsx'
 import FiltroSubasta from '../../filtro-subasta/filtro-subasta.jsx'
 import { useNavigate } from 'react-router'
 import { useAuth } from '@/contexts/userContext.jsx'
-import { useError } from '@/contexts/errorContext.jsx'
-import { useToast } from '@/contexts/toastContext.jsx'
+
 
 const Participo = () => {
-  const [data, setData] = useState({})
-  const [loading, setLoading] = useState(true)
   const [estado, setEstado] = useState('ACTIVA')
   const [pagina, setPagina] = useState(1)
-  const [refresh, setRefresh] = useState(0)
   const [paramsFigurita, setParamsFigurita] = useState({})
 
   const navigate = useNavigate()
-  const { handleError } = useError()
   const { user } = useAuth()
-  const {showToast} = useToast()
+  const queryClient = useQueryClient()
+  const queryKey = ['subastas', 'participo', { participanteId: user.perfil_id, estado, pagina, limite: 5, ...paramsFigurita }]
 
-  useEffect(() => {
-    const cargar = async () => {
-      try {
-        setLoading(true)
-        const res = await buscarSubastas({
-          participanteId: user.perfil_id,
-          estado,
-          pagina,
-          limite: 5,
-          ...paramsFigurita,
-        })
-        setData(res)
-      } catch (error) {
-        showToast(handleError(error, (m) => {}),'error')
-      } finally {
-        setLoading(false)
-      }
-    }
-    cargar()
-  }, [estado, pagina, refresh, paramsFigurita])
+  const { data, isLoading } = useQueryConError({
+    queryKey,
+    queryFn: ({ signal }) => buscarSubastas({ participanteId: user.perfil_id, estado, pagina, limite: 5, ...paramsFigurita }, signal),
+  })
+
+  const onRefresh = () => queryClient.invalidateQueries({ queryKey: ['subastas', 'participo'] })
 
   const cambiarEstado = (nuevoEstado) => {
     if (estado === nuevoEstado) return
@@ -56,7 +40,7 @@ const Participo = () => {
         onAplicarFigurita={(p) => { setParamsFigurita(p); setPagina(1) }}
       />
 
-      {loading ? (
+      {isLoading ? (
         <div className="d-flex flex-column gap-3">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="rounded-3 placeholder-glow border" style={{ height: '140px' }}>
@@ -64,7 +48,7 @@ const Participo = () => {
             </div>
           ))}
         </div>
-      ) : data.contenido?.length > 0 ? (
+      ) : data?.contenido?.length > 0 ? (
         <>
           <div className="d-flex flex-column gap-3">
             {data.contenido.map((sub) => (
@@ -74,14 +58,14 @@ const Participo = () => {
                 finalizada={estado === 'FINALIZADA'}
                 finalizadaHace={sub.finalizada_hace}
                 onVerSubasta={() => navigate(`/subastas/${sub.id}`)}
-                onRefresh={() => setRefresh((r) => r + 1)}
+                onRefresh={onRefresh}
               />
             ))}
           </div>
           <div className="pt-3 d-flex justify-content-center">
             <Paginacion
               page={pagina}
-              totalPages={data.cantidad_de_paginas ?? 1}
+              totalPages={data?.cantidad_de_paginas ?? 1}
               onChange={setPagina}
             />
           </div>
