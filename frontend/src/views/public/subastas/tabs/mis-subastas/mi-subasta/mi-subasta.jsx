@@ -94,8 +94,9 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
       setModal(null)
       onRefresh()
     } catch (error) {
-      setProcesando(false)
       showToast(handleError(error, () => {}), 'error')
+    } finally {
+      setProcesando(false)
     }
   }
 

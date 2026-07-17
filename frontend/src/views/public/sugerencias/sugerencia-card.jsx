@@ -35,6 +35,7 @@ const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias
       showToast('Propuesta enviada correctamente', 'success')
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
+      throw error
     } finally {
       setProcesando(false)
     }
