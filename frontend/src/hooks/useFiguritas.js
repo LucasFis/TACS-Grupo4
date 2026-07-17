@@ -1,19 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import { explorarFiguritas } from '@/services/explorarService'
-import { useError } from '@/contexts/errorContext.jsx'
-import { useToast } from '@/contexts/toastContext.jsx'
 
 const useFiguritas = (q, jugador, seleccion, numero, tipos, page) => {
-  const { handleError } = useError()
-  const { showToast } = useToast()
-
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQueryConError({
     queryKey: ['figuritas', { q, jugador, seleccion, numero, tipos, page }],
     queryFn: ({ signal }) => explorarFiguritas({ q, jugador, seleccion, numero, tipos, page }, signal),
-    onError: (error) => {
-      if (error.code === 'ERR_CANCELED') return
-      showToast(handleError(error, () => {}), 'error')
-    },
   })
 
   return {

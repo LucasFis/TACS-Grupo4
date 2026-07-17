@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import { editarOferta, cancelarOferta } from '@/services/subastasService.js'
 import { buscarSubasta } from '@/services/subastasService.js'
 import SectionTitle from '@/components/ui/section-title/section-title.jsx'
@@ -37,13 +37,10 @@ const EditarOferta = () => {
   const [loadingEliminar, setLoadingEliminar] = useState(false)
   const [showEliminar, setShowEliminar] = useState(false)
 
-  const { data: subasta, isLoading: cargando } = useQuery({
+  const { data: subasta, isLoading: cargando } = useQueryConError({
     queryKey: ['subasta', subId],
     queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
-    onError: (err) => {
-      if (err.code === 'ERR_CANCELED') return
-      handleError(err, () => {})
-    },
+    showToastOnError: false,
   })
 
   if (cargando) return <h2>Cargando...</h2>

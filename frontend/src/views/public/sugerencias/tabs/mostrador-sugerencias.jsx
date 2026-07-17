@@ -1,25 +1,16 @@
 import SugerenciaCard from "@/views/public/sugerencias/sugerencia-card.jsx";
 import {useState} from "react";
-import { useQuery } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import Paginacion from "@/components/ui/paginacion/paginacion.jsx";
-import { useError } from '@/contexts/errorContext.jsx'
-import { useToast } from '@/contexts/toastContext.jsx'
 import { buscarSugerencias } from '@/services/sugerenciasService.js'
 
 const MostradorSugerencias = () => {
 
-    const {handleError} = useError()
-    const {showToast} = useToast()
-
     const [pagina, setPagina] = useState(1)
 
-    const { data, isLoading, error } = useQuery({
+    const { data, isLoading, error } = useQueryConError({
         queryKey: ['sugerencias', { pagina, limite: 10 }],
         queryFn: ({ signal }) => buscarSugerencias({ pagina, limite: 10 }, signal),
-        onError: (err) => {
-            if (err.code === 'ERR_CANCELED') return
-            showToast(handleError(err, () => {}), 'error')
-        },
     })
 
     if (error) return <h2 className="text-center text-secondary">No se pudo cargar la información</h2>

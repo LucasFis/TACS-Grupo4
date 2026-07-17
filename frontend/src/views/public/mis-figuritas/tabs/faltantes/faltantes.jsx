@@ -1,28 +1,21 @@
 import { useState } from "react";
-import { useQuery } from '@tanstack/react-query';
+import useQueryConError from '@/hooks/useQueryConError';
 import { buscarFaltantes } from "@/services/coleccionService.js";
 import FaltanteCard from "../../../../../components/ui/faltante-card/faltante-card.jsx";
 import Paginacion from "../../../../../components/ui/paginacion/paginacion.jsx";
 import { useNavigate } from "react-router";
 import Button from "../../../../../components/ui/button/button.jsx";
-import { useError } from "@/contexts/errorContext.jsx";
-import { useToast } from '@/contexts/toastContext.jsx';
+
 import SugerenciasBanner from './../../sugerencias-banner/sugerencias-banner.jsx'
 
 const Faltantes = () => {
-    const { handleError } = useError();
-    const { showToast } = useToast();
     const [filtros, setFiltros] = useState({});
     const [pagina, setPagina] = useState(1);
     const navigate = useNavigate();
 
-    const { data: faltantes, isLoading } = useQuery({
+    const { data: faltantes, isLoading } = useQueryConError({
         queryKey: ['faltantes', { ...filtros, pagina, limite: 10 }],
         queryFn: ({ signal }) => buscarFaltantes({ ...filtros, pagina, limite: 10 }, signal),
-        onError: (error) => {
-            if (error.code === 'ERR_CANCELED') return;
-            showToast(handleError(error, () => {}), 'error');
-        },
     })
 
     return (

@@ -1,7 +1,7 @@
 import styles from './ver-subasta.module.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import { buscarSubasta, seleccionarOferta } from '@/services/subastasService.js'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
@@ -25,18 +25,17 @@ const VerSubasta = () => {
   const [subastaAbierta, setSubastaAbierta] = useState(false)
   const navigate = useNavigate()
 
-  const { data: subasta, isLoading: cargando, error, refetch } = useQuery({
+  const { data: subasta, isLoading: cargando, error, refetch } = useQueryConError({
     queryKey: ['subasta', subId],
     queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
-    onSuccess: (data) => {
-      setSubastaAbierta(data.tiempo_restante > 0)
-      setTiempo(data.tiempo_restante)
-    },
-    onError: (err) => {
-      if (err.code === 'ERR_CANCELED') return
-      showToast(handleError(err, () => {}), 'error')
-    },
   })
+
+  useEffect(() => {
+    if (subasta) {
+      setSubastaAbierta(subasta.tiempo_restante > 0)
+      setTiempo(subasta.tiempo_restante)
+    }
+  }, [subasta])
 
   const procesarDuracion = () => {
     const horas = Math.floor(tiempo / 3600)

@@ -1,32 +1,21 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import { buscarContadores, buscarPerfil } from '@/services/perfilService.js'
 import { useAuth } from '@/contexts/userContext.jsx'
-import { useError } from '@/contexts/errorContext.jsx'
-import { useToast } from '@/contexts/toastContext.jsx'
 import { truncarADosDecimales } from '@/utils/estandarizar.js'
 
 export const usePerfil = (perfilId) => {
-  const { handleError } = useError()
-  const { showToast } = useToast()
   const { user, cerrarSesion } = useAuth()
   const queryClient = useQueryClient()
 
-  const { data: perfil, isLoading: loading } = useQuery({
+  const { data: perfil, isLoading: loading } = useQueryConError({
     queryKey: ['perfil', perfilId],
     queryFn: ({ signal }) => buscarPerfil(perfilId, signal),
-    onError: (error) => {
-      if (error.code === 'ERR_CANCELED') return
-      showToast(handleError(error, () => {}), 'error')
-    },
   })
 
-  const { data: stats } = useQuery({
+  const { data: stats } = useQueryConError({
     queryKey: ['contadores', perfilId],
     queryFn: ({ signal }) => buscarContadores(perfilId, signal),
-    onError: (error) => {
-      if (error.code === 'ERR_CANCELED') return
-      showToast(handleError(error, () => {}), 'error')
-    },
   })
 
   const manejarCierreDeSesion = async () => {

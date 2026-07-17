@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import { buscarSubastas } from '../../../../../services/subastasService.js'
 import SubastaParticipo from './subasta-participo/subasta-participo.jsx'
 import Paginacion from '../../../../../components/ui/paginacion/paginacion.jsx'
 import FiltroSubasta from '../../filtro-subasta/filtro-subasta.jsx'
 import { useNavigate } from 'react-router'
 import { useAuth } from '@/contexts/userContext.jsx'
-import { useError } from '@/contexts/errorContext.jsx'
-import { useToast } from '@/contexts/toastContext.jsx'
+
 
 const Participo = () => {
   const [estado, setEstado] = useState('ACTIVA')
@@ -17,18 +17,11 @@ const Participo = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const queryClient = useQueryClient()
-  const { handleError } = useError()
-  const { showToast } = useToast()
-
   const queryKey = ['subastas', 'participo', { participanteId: user.perfil_id, estado, pagina, limite: 5, ...paramsFigurita }]
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQueryConError({
     queryKey,
     queryFn: ({ signal }) => buscarSubastas({ participanteId: user.perfil_id, estado, pagina, limite: 5, ...paramsFigurita }, signal),
-    onError: (error) => {
-      if (error.code === 'ERR_CANCELED') return
-      showToast(handleError(error, () => {}), 'error')
-    },
   })
 
   const onRefresh = () => queryClient.invalidateQueries({ queryKey: ['subastas', 'participo'] })

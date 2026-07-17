@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import useQueryConError from '@/hooks/useQueryConError';
 import { buscarRepetidas, editarRepetida } from '@/services/coleccionService.js'
 import RepetidaCard from "../../../../../components/ui/repetida-card/repetida-card.jsx";
 import FilterChip from "../../../../../components/ui/filter-chip/filter-chip.jsx";
@@ -25,13 +26,9 @@ const Repetidas = () => {
     const queryClient = useQueryClient()
     const navigate = useNavigate();
 
-    const { data: repetidas, isLoading, error } = useQuery({
+    const { data: repetidas, isLoading, error } = useQueryConError({
         queryKey: ['repetidas', { ...filtros, pagina, limite: 10 }],
         queryFn: ({ signal }) => buscarRepetidas({ ...filtros, pagina, limite: 10 }, signal),
-        onError: (err) => {
-            if (err.code === 'ERR_CANCELED') return;
-            showToast(handleError(err, () => {}), 'error');
-        },
     })
 
     const cambiarFiltro = (nuevoTipo) => {

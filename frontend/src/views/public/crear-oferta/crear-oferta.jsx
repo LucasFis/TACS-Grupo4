@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import { buscarSubasta, crearOferta } from '@/services/subastasService.js'
 import { buscarPerfil } from '@/services/perfilService.js'
 import { buscarRepetidas } from '@/services/coleccionService.js'
@@ -34,31 +34,19 @@ const CrearOferta = () => {
   const { handleError } = useError()
   const { showToast } = useToast()
 
-  const { data: subasta, isLoading: cargandoSubasta } = useQuery({
+  const { data: subasta, isLoading: cargandoSubasta } = useQueryConError({
     queryKey: ['subasta', subId],
     queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
-    onError: (err) => {
-      if (err.code === 'ERR_CANCELED') return
-      handleError(err, (err) => showToast(err.mensaje, 'error'))
-    },
   })
 
-  const { data: repetidasData, isLoading: cargandoRepetidas } = useQuery({
+  const { data: repetidasData, isLoading: cargandoRepetidas } = useQueryConError({
     queryKey: ['repetidas', { pagina: 1, limite: 10 }],
     queryFn: ({ signal }) => buscarRepetidas({ pagina: 1, limite: 10 }, signal),
-    onError: (err) => {
-      if (err.code === 'ERR_CANCELED') return
-      handleError(err, (err) => showToast(err.mensaje, 'error'))
-    },
   })
 
-  const { data: perfil, isLoading: cargandoPerfil } = useQuery({
+  const { data: perfil, isLoading: cargandoPerfil } = useQueryConError({
     queryKey: ['perfil'],
     queryFn: ({ signal }) => buscarPerfil(undefined, signal),
-    onError: (err) => {
-      if (err.code === 'ERR_CANCELED') return
-      handleError(err, (err) => showToast(err.mensaje, 'error'))
-    },
   })
 
   const cargando = cargandoSubasta || cargandoRepetidas || cargandoPerfil

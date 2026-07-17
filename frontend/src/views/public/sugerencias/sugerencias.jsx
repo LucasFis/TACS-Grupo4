@@ -3,7 +3,8 @@ import ContadorCard from "@/components/ui/contador-card/contador-card.jsx";
 import Button from "@/components/ui/button/button.jsx";
 import styles from './sugerencias.module.css';
 import {useState} from "react";
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import {buscarContadoresSugerencias} from "@/services/perfilService.js";
 import {recalcularSugerencias} from "@/services/sugerenciasService.js";
 import ExtraInfo from "@/components/ui/extra-info/extra-info.jsx";
@@ -20,20 +21,16 @@ const Sugerencias = () => {
     const [recalculando, setRecalculando] = useState(false)
     const [revision, setRevision] = useState(0)
 
-    const { data: contadores, isLoading, error } = useQuery({
+    const { data: contadores, isLoading, error } = useQueryConError({
         queryKey: ['contadoresSugerencias'],
         queryFn: ({ signal }) => buscarContadoresSugerencias(signal),
-        onError: (err) => {
-            if (err.code === 'ERR_CANCELED') return
-            showToast(handleError(err, () => {}), 'error')
-        },
     })
 
     const handleRecalcular = async () => {
         try {
             setRecalculando(true)
             await recalcularSugerencias()
-            queryClient.invalidateQueries(['contadoresSugerencias'])
+            queryClient.invalidateQueries({ queryKey: ['contadoresSugerencias'] })
             setRevision(r => r + 1)
             showToast('Sugerencias recalculadas', 'success')
         } catch (error) {

@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import IntercambioCard from './intercambio-card/intercambio-card.jsx'
 import { buscarPropuestas } from '@/services/propuestasService.js'
 import Paginacion from '@/components/ui/paginacion/paginacion.jsx'
-import { useError } from '@/contexts/errorContext.jsx'
-import { useToast } from '@/contexts/toastContext.jsx'
+
 import FiltroIntercambio from '../filtro-intercambio/filtro-intercambio.jsx'
 
 const TEXTOS_ESTADO = {
@@ -20,18 +20,11 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
   const [estado, setEstado] = useState(estadoInicial)
   const [paramsFigurita, setParamsFigurita] = useState({})
   const queryClient = useQueryClient()
-  const { handleError } = useError()
-  const { showToast } = useToast()
-
   const queryKey = ['propuestas', { pagina, limite: 10, estado, tipo, ...paramsFigurita }]
 
-  const { data: propuestas, isLoading } = useQuery({
+  const { data: propuestas, isLoading } = useQueryConError({
     queryKey,
     queryFn: ({ signal }) => buscarPropuestas({ pagina, limite: 10, estado, tipo, ...paramsFigurita }, signal),
-    onError: (error) => {
-      if (error.code === 'ERR_CANCELED') return
-      showToast(handleError(error, () => {}), 'error')
-    },
   })
 
   const cambiarFiltro = (nuevoEstado) => {

@@ -1,32 +1,24 @@
 import SectionTitle from "@/components/ui/section-title/section-title.jsx";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from '@tanstack/react-query';
+import useQueryConError from '@/hooks/useQueryConError';
 import { obtenerNotificaciones } from "@/services/notificacionesService.js";
-import { useError } from "@/contexts/errorContext.jsx";
-import { useToast } from "@/contexts/toastContext.jsx";
+
 import Paginacion from '@/components/ui/paginacion/paginacion.jsx';
 import FiltroNotificacion from './filtro-notificacion/filtro-notificacion.jsx';
 import styles from './notificaciones.module.css';
 
 const Notificaciones = () => {
   const navigate = useNavigate();
-  const { handleError } = useError();
-  const { showToast } = useToast();
-
   const [pagina, setPagina] = useState(1);
   const [leida, setLeida] = useState(null);
 
-  const { data: notificaciones, isLoading } = useQuery({
+  const { data: notificaciones, isLoading } = useQueryConError({
     queryKey: ['notificaciones', { pagina, limite: 10, leida }],
     queryFn: ({ signal }) => {
       const filtros = { pagina, limite: 10 };
       if (leida !== null) filtros.leida = leida;
       return obtenerNotificaciones(filtros, signal);
-    },
-    onError: (error) => {
-      if (error.code === 'ERR_CANCELED') return;
-      showToast(handleError(error, () => {}), 'error');
     },
   })
 
