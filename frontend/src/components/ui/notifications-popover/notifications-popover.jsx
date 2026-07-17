@@ -4,6 +4,8 @@ import { obtenerNotificaciones, marcarTodasLeidas } from '@/services/notificacio
 import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
+import styles from './notifications-popover.module.css'
 
 const NotificationsPopover = () => {
   const { tieneSesion } = useAuth()
@@ -12,6 +14,7 @@ const NotificationsPopover = () => {
   const navigate = useNavigate()
 
   const [abierto, setAbierto] = useState(false)
+  const [cargando, setCargando] = useState(false)
   const [notificaciones, setNotificaciones] = useState([])
   const [noLeidas, setNoLeidas] = useState(0)
   const wrapperRef = useRef(null)
@@ -19,6 +22,7 @@ const NotificationsPopover = () => {
   useEffect(() => {
     if (tieneSesion) {
       const cargarNotificaciones = async () => {
+        setCargando(true)
         try {
           const data = await obtenerNotificaciones()
           setNotificaciones(Array.isArray(data) ? data : data?.contenido ?? [])
@@ -27,6 +31,8 @@ const NotificationsPopover = () => {
           }
         } catch (error) {
           showToast(handleError(error, () => {}), 'error')
+        } finally {
+          setCargando(false)
         }
       }
       cargarNotificaciones()
@@ -34,19 +40,9 @@ const NotificationsPopover = () => {
   }, [tieneSesion])
 
   useEffect(() => {
-    const handleClickFuera = async (e) => {
+    const handleClickFuera = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        try {
-          if (abierto && notificaciones.length > 0) {
-            await marcarTodasLeidas()
-            setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
-            setNoLeidas(0)
-          }
-        } catch (error) {
-          showToast(handleError(error, () => {}), 'error')
-        } finally {
-          setAbierto(false)
-        }
+        setAbierto(false)
       }
     }
     document.addEventListener('mousedown', handleClickFuera)
@@ -55,20 +51,10 @@ const NotificationsPopover = () => {
 
   const toggleNotificaciones = async () => {
     if (abierto) {
-      if (notificaciones.length > 0) {
-        try {
-          await marcarTodasLeidas()
-          setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
-          setNoLeidas(0)
-        } catch (error) {
-          showToast(handleError(error, () => {}), 'error')
-        } finally {
-          setAbierto(false)
-        }
-      } else {
-        setAbierto(false)
-      }
+      setAbierto(false)
     } else {
+      setAbierto(true)
+      setCargando(true)
       try {
         const data = await obtenerNotificaciones()
         setNotificaciones(Array.isArray(data) ? data : data?.contenido ?? [])
@@ -78,8 +64,18 @@ const NotificationsPopover = () => {
       } catch (error) {
         showToast(handleError(error, () => {}), 'error')
       } finally {
-        setAbierto(true)
+        setCargando(false)
       }
+    }
+  }
+
+  const handleMarcarTodasLeidas = async () => {
+    try {
+      await marcarTodasLeidas()
+      setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+      setNoLeidas(0)
+    } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
     }
   }
 
@@ -95,6 +91,8 @@ const NotificationsPopover = () => {
 
   const handleClickNotificacion = async (n) => {
     if (n.link) {
+      setAbierto(false)
+      navigate(n.link)
       if (notificaciones.length > 0) {
         try {
           await marcarTodasLeidas()
@@ -104,13 +102,11 @@ const NotificationsPopover = () => {
           showToast(handleError(error, () => {}), 'error')
         }
       }
-      setAbierto(false)
-      navigate(n.link)
     }
   }
 
   return (
-    <div className="navbar-notifications-wrapper" ref={wrapperRef}>
+    <div className={styles.wrapper} ref={wrapperRef}>
       <button
         className="btn btn-link p-0 position-relative navbar-notification-btn"
         onClick={toggleNotificaciones}
@@ -134,45 +130,51 @@ const NotificationsPopover = () => {
       </button>
 
       {abierto && (
-        <div className="navbar-notifications-popover">
-          <button
-            className="navbar-notifications-ver-todas"
-            onClick={async () => {
-              if (notificaciones.length > 0) {
-                try {
-                  await marcarTodasLeidas()
-                  setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
-                  setNoLeidas(0)
-                } catch (error) {
-                  showToast(handleError(error, () => {}), 'error')
-                }
-              }
-              setAbierto(false)
-              navigate('/notificaciones')
-            }}
-            type="button"
-          >
-            Ver todas
-          </button>
-
-          <div className="navbar-notifications-header">Notificaciones</div>
-
-          {notificaciones.length === 0 ? (
-            <div className="navbar-notifications-empty">No tenés notificaciones</div>
-          ) : (
-            notificaciones.map((n) => (
-              <div
-                key={n.id}
-                className={`navbar-notification-item ${n.leida ? 'navbar-notification-item--leida' : 'navbar-notification-item--no-leida'}
-                                ${n.link ? 'navbar-notification-item--clickeable' : ''}`}
-                onClick={() => handleClickNotificacion(n)}
+        <div className={styles.popover}>
+          <div className={styles.actions}>
+            <button
+              className={styles.verTodas}
+              onClick={() => {
+                setAbierto(false)
+                navigate('/notificaciones')
+              }}
+              type="button"
+            >
+              Ver todas
+            </button>
+            {noLeidas > 0 && (
+              <button
+                className={styles.marcarLeidas}
+                onClick={handleMarcarTodasLeidas}
+                type="button"
               >
-                <div className="navbar-notification-texto">{n.cuerpo}</div>
-                <div className="navbar-notification-fecha">{formatearFecha(n.fecha)}</div>
-                {n.leida && <span className="navbar-notification-leida-badge">leída</span>}
-              </div>
-            ))
-          )}
+                Marcar leídas
+              </button>
+            )}
+          </div>
+
+          <div className={styles.header}>Notificaciones</div>
+
+          <div className={styles.lista}>
+            {cargando ? (
+              <div className={styles.cargando}><Spinner /></div>
+            ) : notificaciones.length === 0 ? (
+              <div className={styles.empty}>No tenés notificaciones</div>
+            ) : (
+              notificaciones.map((n) => (
+                <div
+                  key={n.id}
+                  className={`${n.leida ? styles.itemLeida : styles.itemNoLeida}
+                                  ${n.link ? styles.itemClickeable : ''} ${styles.item}`}
+                  onClick={() => handleClickNotificacion(n)}
+                >
+                  <div className={styles.texto}>{n.cuerpo}</div>
+                  <div className={styles.fecha}>{formatearFecha(n.fecha)}</div>
+                  {n.leida && <span className={styles.leidaBadge}>leída</span>}
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>

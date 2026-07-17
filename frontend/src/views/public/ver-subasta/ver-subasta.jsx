@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/userContext.jsx'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const VerSubasta = () => {
   const { subId } = useParams()
@@ -25,6 +26,7 @@ const VerSubasta = () => {
   const [subasta, setSubasta] = useState(undefined)
   const [tiempo, setTiempo] = useState(0)
   const [subastaAbierta, setSubastaAbierta] = useState(false)
+  const [procesando, setProcesando] = useState(false)
   const navigate = useNavigate()
 
   const procesarDuracion = () => {
@@ -66,10 +68,13 @@ const VerSubasta = () => {
 
     const adjudicarOferta = async (ofertaId) => {
       try {
+        setProcesando(true)
         await seleccionarOferta(subId, ofertaId)
         await cargarSubasta()
       } catch (err) {
-        showToast(handleError(err), 'error')
+        showToast(handleError(err, () =>{}), 'error')
+      } finally {
+        setProcesando(false)
       }
     }
 
@@ -282,6 +287,11 @@ const VerSubasta = () => {
             </SectionCard>
           </>
         )}
+
+        <ModalInformativo open={procesando}>
+          <h3>Adjudicando oferta...</h3>
+          <p>Esto puede tardar unos segundos</p>
+        </ModalInformativo>
       </div>
     </div>
   )

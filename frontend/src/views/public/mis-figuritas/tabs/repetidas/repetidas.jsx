@@ -8,6 +8,7 @@ import Paginacion from "../../../../../components/ui/paginacion/paginacion.jsx";
 import {useError} from "@/contexts/errorContext.jsx";
 import { useToast } from '@/contexts/toastContext.jsx'
 import EditarRepetidaModal from '@/components/ui/editar-repetida-modal/editar-repetida-modal.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const Repetidas = () => {
     const [repetidas, setRepetidas] = useState({});
@@ -17,6 +18,8 @@ const Repetidas = () => {
 
     const [showModal, setShowModal] = useState(false);
     const [repetidaSeleccionada, setRepetidaSeleccionada] = useState(undefined);
+    const [procesando, setProcesando] = useState(false);
+    const [accionProcesando, setAccionProcesando] = useState('');
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -74,6 +77,8 @@ const Repetidas = () => {
 
   const guardarCambiosRepetida = async (payload) => {
     try {
+      setProcesando(true);
+      setAccionProcesando('Guardando repetida...');
       await editarRepetida(
         repetidaSeleccionada.figurita_id,
         payload
@@ -97,6 +102,8 @@ const Repetidas = () => {
     } catch (err) {
 
       showToast(handleError(err, () => {}), "error");
+    } finally {
+      setProcesando(false);
     }
   };
 
@@ -240,6 +247,11 @@ const Repetidas = () => {
                 onGuardar={guardarCambiosRepetida}
               />
             )}
+
+            <ModalInformativo open={procesando}>
+              <h3>{accionProcesando}</h3>
+              <p>Esto puede tardar unos segundos</p>
+            </ModalInformativo>
         </div>
     );
 };

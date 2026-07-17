@@ -8,10 +8,12 @@ import { crearPropuesta } from '@/services/propuestasService.js'
 import { alternarFavorito } from '@/services/sugerenciasService.js'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias, favorito }) => {
   const [modalAbierto, setModalAbierto] = useState(false)
   const [esFavorito, setEsFavorito] = useState(favorito)
+  const [procesando, setProcesando] = useState(false)
   const { showToast } = useToast()
   const { handleError } = useError()
 
@@ -28,10 +30,14 @@ const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias
 
   const handleProponer = async ({ repetidas, faltantes } = {}) => {
     try {
+      setProcesando(true)
       await crearPropuesta(perfil.id, faltantes[0].id, repetidas.map(re => re.figurita_id))
       showToast('Propuesta enviada correctamente', 'success')
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
+      throw error
+    } finally {
+      setProcesando(false)
     }
   }
 
@@ -83,6 +89,11 @@ const SugerenciaCard = ({ id, perfil, figuritasRecomendadas, figuritasNecesarias
         figuritasRecomendadas={figuritasRecomendadas}
         onProponer={handleProponer}
       />
+
+      <ModalInformativo open={procesando}>
+        <h3>Enviando propuesta...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </>
   )
 }

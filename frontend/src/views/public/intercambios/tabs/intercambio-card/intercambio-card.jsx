@@ -13,6 +13,7 @@ import { calificarPerfil } from '@/services/perfilService.js'
 import CalificarModal from '@/components/ui/calificar-modal/calificar-modal.jsx'
 import { useState } from 'react'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { construirAdvertenciaConflictos } from '@/utils/conflictos.js'
@@ -22,6 +23,8 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
   const [showCalificacion, setShowCalificacion] = useState(false)
   const [confirmAction, setConfirmAction] = useState(null)
   const [conflictosData, setConflictosData] = useState(null)
+  const [procesando, setProcesando] = useState(false)
+  const [accionProcesando, setAccionProcesando] = useState('')
 
   const { handleError } = useError()
   const { showToast } = useToast()
@@ -47,35 +50,47 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
 
   const ejecutarCancelar = async () => {
     try {
-      await cancelarPropuesta(intercambio.id)
       setConfirmAction(null)
+      setProcesando(true)
+      setAccionProcesando('Cancelando intercambio...')
+      await cancelarPropuesta(intercambio.id)
       showToast('Propuesta cancelada correctamente', 'success')
       onActualizado?.()
     } catch (error) {
       showToast(handleError(error, (m) => {}),'error')
+    } finally {
+      setProcesando(false)
     }
   }
 
   const ejecutarAceptar = async () => {
     try {
-      await aceptarPropuesta(intercambio.id)
       setConfirmAction(null)
       setConflictosData(null)
+      setProcesando(true)
+      setAccionProcesando('Aceptando intercambio...')
+      await aceptarPropuesta(intercambio.id)
       showToast('Propuesta aceptada correctamente', 'success')
       onActualizado?.()
     } catch (error) {
       showToast(handleError(error, (m) => {}),'error')
+    } finally {
+      setProcesando(false)
     }
   }
 
   const ejecutarRechazar = async () => {
     try {
-      await rechazarPropuesta(intercambio.id)
       setConfirmAction(null)
+      setProcesando(true)
+      setAccionProcesando('Rechazando intercambio...')
+      await rechazarPropuesta(intercambio.id)
       showToast('Propuesta rechazada correctamente', 'success')
       onActualizado?.()
     } catch (error) {
       showToast(handleError(error, (m) => {}),'error')
+    } finally {
+      setProcesando(false)
     }
   }
 
@@ -113,6 +128,8 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
 
   const handleCalificar = async ({ valor, descripcion }) => {
     try {
+      setProcesando(true)
+      setAccionProcesando('Calificando usuario...')
       await calificarPerfil({
         destinatarioId: perfilCalificado,
         valor,
@@ -125,6 +142,8 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
       onActualizado?.()
     } catch (error) {
       showToast(handleError(error, (m) => {}),'error')
+    } finally {
+      setProcesando(false)
     }
   }
 
@@ -217,6 +236,11 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
         onCancelar={() => { setConfirmAction(null); setConflictosData(null) }}
         advertencia={confirmConfig[confirmAction]?.advertencia}
       />
+
+      <ModalInformativo open={procesando}>
+        <h3>{accionProcesando}</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </>
   )
 }

@@ -4,6 +4,7 @@ import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repet
 import Button from '@/components/ui/button/button.jsx'
 import useCrearPropuesta from './useCrearPropuesta'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-propuesta-intercambio.module.css'
 
 const calcularIniciales = (nombre) => {
@@ -85,6 +86,11 @@ const CrearPropuestaIntercambio = () => {
           disabled={seleccionadas.length === 0 || enviando}
           onClick={enviar}
         />
+
+        <ModalInformativo open={enviando}>
+          <h3>Enviando propuesta...</h3>
+          <p>Esto puede tardar unos segundos</p>
+        </ModalInformativo>
       </div>
     </div>
   )
