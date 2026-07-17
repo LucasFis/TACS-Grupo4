@@ -72,7 +72,7 @@ const VerSubasta = () => {
         await seleccionarOferta(subId, ofertaId)
         await cargarSubasta()
       } catch (err) {
-        showToast(handleError(err), 'error')
+        showToast(handleError(err, () =>{}), 'error')
       } finally {
         setProcesando(false)
       }
