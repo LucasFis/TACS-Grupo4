@@ -83,7 +83,7 @@ const SelectorRepetidas = ({
         onToggle={toggle}
         bloqueadas={bloqueadas}
         titulo="Tus repetidas"
-        placeholder="Buscar en tus repetidas..."
+        placeholder="Buscar en tus repetidas por nombre de jugador..."
         mensajeVacio={mensajeVacio}
       />
 

@@ -10,7 +10,7 @@ public class FaltantesFiltrosTest {
 
   @Test
   void deberiaCrearRecordCorrectamente() {
-    FaltantesFiltro filtro = new FaltantesFiltro(10, 2);
+    FaltantesFiltro filtro = new FaltantesFiltro(10, 2, null);
 
     assertEquals(10, filtro.limite());
     assertEquals(2, filtro.pagina());
@@ -18,8 +18,8 @@ public class FaltantesFiltrosTest {
 
   @Test
   void deberiaSerIgualSiLosValoresSonIguales() {
-    FaltantesFiltro a = new FaltantesFiltro(10, 2);
-    FaltantesFiltro b = new FaltantesFiltro(10, 2);
+    FaltantesFiltro a = new FaltantesFiltro(10, 2, null);
+    FaltantesFiltro b = new FaltantesFiltro(10, 2, null);
 
     assertEquals(a, b);
     assertEquals(a.hashCode(), b.hashCode());
@@ -27,8 +27,8 @@ public class FaltantesFiltrosTest {
 
   @Test
   void deberiaSerDistintoSiCambianValores() {
-    FaltantesFiltro a = new FaltantesFiltro(10, 2);
-    FaltantesFiltro b = new FaltantesFiltro(20, 1);
+    FaltantesFiltro a = new FaltantesFiltro(10, 2, null);
+    FaltantesFiltro b = new FaltantesFiltro(20, 1, null);
 
     assertNotEquals(a, b);
   }

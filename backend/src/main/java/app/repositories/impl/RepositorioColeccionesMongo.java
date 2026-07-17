@@ -167,6 +167,9 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
 
     List<AggregationOperation> filtrado = new ArrayList<>();
 
+    filtrado.add(Aggregation.lookup("figuritas", "repetidas.figurita.$id", "_id", "repetidas.figurita"));
+    filtrado.add(Aggregation.unwind("repetidas.figurita"));
+
     if (filtros.metodoIntercambio() != null) {
       filtrado.add(Aggregation.match(
           Criteria.where("repetidas.metodos").is(filtros.metodoIntercambio())
@@ -176,7 +179,13 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     if (colIdFaltantes != null) {
       List<String> idsFaltantes = obtenerIdsFaltantes(colIdFaltantes);
       filtrado.add(Aggregation.match(
-          Criteria.where("repetidas.figurita.$id").in(idsFaltantes)
+          Criteria.where("repetidas.figurita._id").in(idsFaltantes)
+      ));
+    }
+
+    if (filtros.jugador() != null && !filtros.jugador().isBlank()) {
+      filtrado.add(Aggregation.match(
+          Criteria.where("repetidas.figurita.jugador").regex(filtros.jugador(), "i")
       ));
     }
 
@@ -224,16 +233,25 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     int pagina = filtros.pagina();
     int limite = filtros.limite();
 
-    int cantidadResultados = this.contarCampoEnColeccion(colId, "faltantes", new ArrayList<>());
+    List<AggregationOperation> ops = new ArrayList<>();
+    ops.add(Aggregation.lookup("figuritas", "faltantes.$id", "_id", "faltantesFigurita"));
+    ops.add(Aggregation.unwind("faltantesFigurita"));
+
+    if (filtros.jugador() != null && !filtros.jugador().isBlank()) {
+      ops.add(Aggregation.match(
+          Criteria.where("faltantesFigurita.jugador").regex(filtros.jugador(), "i")
+      ));
+    }
+
+    int cantidadResultados = this.contarCampoEnColeccion(colId, "faltantes", ops);
 
     List<AggregationOperation> operaciones = new ArrayList<>();
     operaciones.add(Aggregation.match(Criteria.where("_id").is(colId)));
     operaciones.add(Aggregation.unwind("faltantes"));
-    operaciones.add(Aggregation.lookup("figuritas", "faltantes.$id", "_id", "figurita"));
-    operaciones.add(Aggregation.unwind("figurita"));
+    operaciones.addAll(ops);
     operaciones.add(Aggregation.skip((long) (pagina - 1) * limite));
     operaciones.add(Aggregation.limit(limite));
-    operaciones.add(Aggregation.replaceRoot("figurita"));
+    operaciones.add(Aggregation.replaceRoot("faltantesFigurita"));
 
     Aggregation aggregation = Aggregation.newAggregation(operaciones);
     AggregationResults<Document> resultado = mongoTemplate.aggregate(aggregation, "colecciones", Document.class);

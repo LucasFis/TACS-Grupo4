@@ -97,7 +97,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     PaginaResultado<Figurita> dto = repositorioColecciones.buscarFaltantes(
         coleccion.getId(),
-        new FaltantesFiltro(2, 1)
+        new FaltantesFiltro(2, 1, null )
     );
 
     assertEquals(3, dto.cantidadDeElementos());
@@ -120,7 +120,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     PaginaResultado dto = repositorioColecciones.buscarFaltantes(
         coleccion.getId(),
-        new FaltantesFiltro(2, 2)
+        new FaltantesFiltro(2, 2, null)
     );
 
     assertEquals(1, dto.contenido().size());
@@ -141,7 +141,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas dto = repositorioColecciones.buscarRepetidas(
         coleccion.getId(),
-        new RepetidasFiltro(null, null, 10, 1),
+        new RepetidasFiltro(null, null, null,10, 1),
         null
 
     );
@@ -166,7 +166,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas dto = repositorioColecciones.buscarRepetidas(
         coleccion.getId(),
-        new RepetidasFiltro(MetodoIntercambio.SUBASTA, null, 10, 1),
+        new RepetidasFiltro(MetodoIntercambio.SUBASTA, null, null,10, 1),
         null
     );
 
@@ -188,7 +188,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas<FiguritaIntercambiable> dto = repositorioColecciones.buscarRepetidas(
         coleccion.getId(),
-        new RepetidasFiltro(MetodoIntercambio.INTERCAMBIO, null, 10, 1),
+        new RepetidasFiltro(MetodoIntercambio.INTERCAMBIO, null, null,10, 1),
         null
     );
 
@@ -210,7 +210,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas dto = repositorioColecciones.buscarRepetidas(
         coleccion.getId(),
-        new RepetidasFiltro(null, null, 2, 2),
+        new RepetidasFiltro(null, null, null,2, 2),
         null
     );
 
@@ -276,7 +276,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas<FiguritaIntercambiable> dto = repositorioColecciones.buscarRepetidas(
         colLogueado.getId(),
-        new RepetidasFiltro(null, null, 10, 1),
+        new RepetidasFiltro(null, null, null,10, 1),
         colOtroPerfil.getId()
     );
 
@@ -300,7 +300,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas<FiguritaIntercambiable> dto = repositorioColecciones.buscarRepetidas(
         colLogueado.getId(),
-        new RepetidasFiltro(null, null, 10, 1),
+        new RepetidasFiltro(null, null, null,10, 1),
         colOtroPerfil.getId()
     );
 
@@ -324,7 +324,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     Repetidas<FiguritaIntercambiable> dto = repositorioColecciones.buscarRepetidas(
         colLogueado.getId(),
-        new RepetidasFiltro(MetodoIntercambio.SUBASTA, null, 10, 1),
+        new RepetidasFiltro(MetodoIntercambio.SUBASTA, null, null,10, 1),
         colOtroPerfil.getId()
     );
 

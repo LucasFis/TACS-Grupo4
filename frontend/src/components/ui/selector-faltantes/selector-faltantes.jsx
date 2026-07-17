@@ -62,7 +62,7 @@ const SelectorFaltantes = ({ modo = 'multiple', onChange }) => {
         onToggle={toggle}
         bloqueadas={[]}
         titulo="Tus faltantes"
-        placeholder="Buscar en tus faltantes..."
+        placeholder="Buscar en tus faltantes por nombre de jugador..."
       />
 
       {seleccionadas.length > 0 && (
