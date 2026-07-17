@@ -30,6 +30,11 @@ target/**
 *.iml
 .idea/**
 
+#Agents
+.opencode/**
+AGENTS.md
+opencode.json
+
 # Node / frontend
 node_modules/
 dist/
