@@ -467,6 +467,9 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
         ? new Query()
         : new Query(new Criteria().andOperator(criterios));
     query.fields().include("_id");
+    // Un solo batch: con el batch size default (101) traer todos los IDs requiere un
+    // getMore extra, que contra un Mongo remoto cuesta un round-trip completo.
+    query.cursorBatchSize(10_000);
 
     return mongoTemplate.find(query, Document.class, "figuritas").stream()
         .map(doc -> doc.get("_id"))

@@ -250,8 +250,18 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
         Criteria.where("fechaInicio").lte(ahora),
         Criteria.where("fechaCierre").gt(ahora)
     ));
+    // Solo se necesitan los IDs: leer documentos crudos evita que el mapeo a entidad
+    // resuelva cada @DBRef (autor, perfil, figuritas) con un find adicional por subasta.
+    query.fields().include("figuritaSubastada");
 
-    return mongoTemplate.find(query, Subasta.class);
+    return mongoTemplate.find(query, Document.class, "subastas").stream()
+        .map(doc -> Subasta.builder()
+            .id(doc.get("_id").toString())
+            .figuritaSubastada(Figurita.builder()
+                .id(((DBRef) doc.get("figuritaSubastada")).getId().toString())
+                .build())
+            .build())
+        .toList();
   }
 
   private void conCamposCargados(Query query, CamposSubasta campos) {
