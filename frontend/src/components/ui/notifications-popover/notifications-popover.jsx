@@ -35,6 +35,7 @@ const NotificationsPopover = () => {
   const [notificaciones, setNotificaciones] = useState([])
   const [noLeidas, setNoLeidas] = useState(0)
   const wrapperRef = useRef(null)
+  const abortRef = useRef(null)
 
   useEffect(() => {
     if (!tieneSesion) return
@@ -76,6 +77,9 @@ const NotificationsPopover = () => {
       setAbierto(false)
       return
     }
+    if (abortRef.current) abortRef.current.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
     setAbierto(true)
     const cache = leerCache()
     if (cache) {
@@ -86,17 +90,21 @@ const NotificationsPopover = () => {
       setCargando(true)
     }
     try {
-      const data = await obtenerNotificaciones()
+      const data = await obtenerNotificaciones({}, controller.signal)
+      if (controller.signal.aborted) return
       const lista = Array.isArray(data) ? data : data?.contenido ?? []
       const leidas = Array.isArray(data) ? 0 : data?.no_leidas ?? 0
       setNotificaciones(lista)
       setNoLeidas(leidas)
       guardarCache(lista, leidas)
     } catch (error) {
+      if (controller.signal.aborted) return
       if (!cache) showToast(handleError(error, () => {}), 'error')
     } finally {
-      setCargando(false)
-      setActualizando(false)
+      if (!controller.signal.aborted) {
+        setCargando(false)
+        setActualizando(false)
+      }
     }
   }
 
