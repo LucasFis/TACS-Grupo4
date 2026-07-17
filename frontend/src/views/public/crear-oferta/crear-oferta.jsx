@@ -10,6 +10,7 @@ import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repet
 import Button from '@/components/ui/button/button.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-oferta.module.css'
 
@@ -53,7 +54,7 @@ const CrearOferta = () => {
 
   const cargando = cargandoSubasta || cargandoRepetidas || cargandoPerfil
 
-  if (cargando) return <h2>Cargando...</h2>
+  if (cargando) return <Spinner />
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>
 
   const repetidas = repetidasData?.contenido ?? []

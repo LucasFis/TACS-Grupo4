@@ -12,6 +12,7 @@ import MostradorSugerencias from "./tabs/mostrador-sugerencias.jsx";
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 
 const Sugerencias = () => {
 
@@ -54,7 +55,7 @@ const Sugerencias = () => {
 
                     <div className={styles.statGrid + " d-grid gap-3"}>
                         {isLoading ? (
-                            <h2>Cargando estadisticas...</h2>
+                            <Spinner />
                         ) : error ? (
                             <p className="text-center text-secondary">No se pudo cargar la información</p>
                         ) : (

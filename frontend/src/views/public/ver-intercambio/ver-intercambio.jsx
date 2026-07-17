@@ -8,6 +8,7 @@ import Button from '../../../components/ui/button/button.jsx'
 import OfertaCard from './oferta-card.jsx'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 
 import {
   obtenerPropuesta,
@@ -110,7 +111,7 @@ const VerIntercambio = () => {
     }
   }
 
-  if (cargando) return <div className="container py-4"><h3>Cargando intercambio...</h3></div>
+  if (cargando) return <div className="container py-4"><Spinner /></div>
   if (!propuesta) return <div className="container py-4"><h3>No se encontró el intercambio</h3></div>
 
   const esRecibida = propuesta.tipo === 'RECIBIDA'

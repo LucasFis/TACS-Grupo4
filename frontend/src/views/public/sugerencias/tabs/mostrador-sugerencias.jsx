@@ -2,6 +2,7 @@ import SugerenciaCard from "@/views/public/sugerencias/sugerencia-card.jsx";
 import {useState} from "react";
 import useQueryConError from '@/hooks/useQueryConError'
 import Paginacion from "@/components/ui/paginacion/paginacion.jsx";
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import { buscarSugerencias } from '@/services/sugerenciasService.js'
 
 const MostradorSugerencias = () => {
@@ -21,7 +22,7 @@ const MostradorSugerencias = () => {
     return (
         <div className="d-flex flex-column gap-3">
             {isLoading ? (
-                <h2>Cargando sugerencias...</h2>
+                <Spinner />
             ) : sugerencias.length > 0 ? (
                 <>
                     {sugerencias.map(s => (

@@ -11,6 +11,7 @@ import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import styles from './editar-oferta.module.css'
 
 const obtenerBloqueadas = (repetidas, figuritasSolicitadas) => {
@@ -38,17 +39,17 @@ const EditarOferta = () => {
   const [accionProcesando, setAccionProcesando] = useState('')
   const [showEliminar, setShowEliminar] = useState(false)
 
-  const { data: subasta, isLoading: cargando } = useQueryConError({
+  const { data: subasta, isLoading: cargando, isFetching } = useQueryConError({
     queryKey: ['subasta', subId],
     queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
     showToastOnError: false,
   })
 
-  if (cargando) return <h2>Cargando...</h2>
+  if (cargando) return <Spinner />
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>
 
   const oferta = subasta.ofertas.find((o) => o.id === ofertaId)
-  if (!oferta) return <h2>No se encontró la oferta.</h2>
+  if (!oferta && !isFetching) return <h2>No se encontró la oferta.</h2>
 
   const ofrecidasAnteriores = oferta.figuritas_ofrecidas.map((f) => ({
     ...f,
