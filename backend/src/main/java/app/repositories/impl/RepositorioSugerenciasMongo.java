@@ -201,4 +201,14 @@ public class RepositorioSugerenciasMongo implements RepositorioSugerencias {
 
     mongoTemplate.findAllAndRemove(query, Sugerencia.class);
   }
+
+  public void eliminarNoFavoritasPorPerfil(Perfil perfil) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("autor.$id").is(perfil.getId())
+            .andOperator(Criteria.where("favorito").is(false))
+    );
+
+    mongoTemplate.findAllAndRemove(query, Sugerencia.class);
+  }
 }

@@ -1,5 +1,7 @@
 package app.repositories.impl;
 
+import app.dto.filtros.NotificacionesFiltro;
+import app.dto.paginacion.PaginaResultado;
 import app.model.entities.Perfil;
 import app.model.notificador.Notificacion;
 import app.repositories.RepositorioNotificaciones;
@@ -26,13 +28,13 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
 
   @Override
   public void guardar(List<Notificacion> notificaciones) {
+    if (notificaciones.isEmpty()) return;
     BulkOperations bulk = mongoTemplate.bulkOps(
         BulkOperations.BulkMode.UNORDERED,
         Notificacion.class
     );
 
     for (Notificacion n : notificaciones) {
-
       Query query = new Query(
           Criteria.where("_id").is(n.getId())
       );
@@ -47,15 +49,15 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
     bulk.execute();
   }
 
-    @Override
-    public List<Notificacion> buscarPorPerfil(Perfil perfil) {
-      Query query = new Query();
-      query.addCriteria(
-          Criteria.where("perfil").is(perfil.getId())
-      );
+  @Override
+  public List<Notificacion> buscarPorPerfil(Perfil perfil) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("perfil").is(perfil.getId())
+    );
 
-      return this.mongoTemplate.find(query, Notificacion.class);
-    }
+    return this.mongoTemplate.find(query, Notificacion.class);
+  }
 
   @Override
   public List<Notificacion> buscarPorPerfilFechaDesc(String perfilId) {
@@ -67,5 +69,41 @@ public class RepositorioNotificacionesMongo implements RepositorioNotificaciones
     query.with(Sort.by(Sort.Direction.DESC, "mensaje.fecha"));
 
     return this.mongoTemplate.find(query, Notificacion.class);
+  }
+
+  @Override
+  public PaginaResultado<Notificacion> buscarPorPerfilPaginado(String perfilId, NotificacionesFiltro filtro) {
+    Query query = new Query();
+    query.addCriteria(
+        Criteria.where("perfil").is(perfilId)
+    );
+
+    if (filtro.leida() != null) {
+      query.addCriteria(
+          Criteria.where("leida").is(filtro.leida())
+      );
+    }
+
+    query.with(Sort.by(Sort.Direction.DESC, "mensaje.fecha"));
+
+    long total = this.mongoTemplate.count(query, Notificacion.class);
+
+    int pagina = filtro.pagina();
+    int limite = filtro.limite();
+    query.skip((long) (pagina - 1) * limite).limit(limite);
+
+    List<Notificacion> contenido = this.mongoTemplate.find(query, Notificacion.class);
+    int cantidadDePaginas = (int) Math.ceil((double) total / limite);
+
+    return new PaginaResultado<>(contenido, total, cantidadDePaginas, pagina);
+  }
+
+  @Override
+  public long contarNoLeidas(String perfilId) {
+    Query query = new Query(
+        Criteria.where("perfil").is(perfilId)
+            .and("leida").is(false)
+    );
+    return this.mongoTemplate.count(query, Notificacion.class);
   }
 }

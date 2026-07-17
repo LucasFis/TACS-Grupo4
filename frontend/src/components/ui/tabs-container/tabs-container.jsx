@@ -12,7 +12,7 @@ const TabsContainer = ({ tabs }) => {
             <Tabs tabs={tabs} activeKey={activeKey} onTabChange={setActiveKey} />
 
             <div className="mt-3">
-                {ActiveComponent && (<ActiveComponent {...activeTab.props} />)}
+                {ActiveComponent && (<ActiveComponent key={activeKey} {...activeTab.props} />)}
             </div>
         </div>
     );

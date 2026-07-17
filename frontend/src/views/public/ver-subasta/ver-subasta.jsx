@@ -1,10 +1,10 @@
 import styles from './ver-subasta.module.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
-import { buscarSubasta } from '@/services/subastasService.js'
+import useQueryConError from '@/hooks/useQueryConError'
+import { buscarSubasta, seleccionarOferta } from '@/services/subastasService.js'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
-import SectionTitle from '@/components/ui/section-title/section-title.jsx'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
 import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import OfertaCard from './oferta-card.jsx'
@@ -14,19 +14,30 @@ import { useAuth } from '@/contexts/userContext.jsx'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const VerSubasta = () => {
   const { subId } = useParams()
   const { user } = useAuth()
   const { showToast } = useToast()
-  const { handleError, errorTemplate } = useError()
+  const { handleError } = useError()
 
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState(errorTemplate())
-  const [subasta, setSubasta] = useState(undefined)
   const [tiempo, setTiempo] = useState(0)
   const [subastaAbierta, setSubastaAbierta] = useState(false)
+  const [procesando, setProcesando] = useState(false)
   const navigate = useNavigate()
+
+  const { data: subasta, isLoading: cargando, error, refetch } = useQueryConError({
+    queryKey: ['subasta', subId],
+    queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
+  })
+
+  useEffect(() => {
+    if (subasta) {
+      setSubastaAbierta(subasta.tiempo_restante > 0)
+      setTiempo(subasta.tiempo_restante)
+    }
+  }, [subasta])
 
   const procesarDuracion = () => {
     const horas = Math.floor(tiempo / 3600)
@@ -51,31 +62,42 @@ const VerSubasta = () => {
     return `${dia} ${mes}, ${horas}:${minutos}`
   }
 
-  const cargarSubasta = async () => {
-    try {
-      setCargando(true)
-      const payload = await buscarSubasta({ subId })
-      setSubasta(payload)
-      setSubastaAbierta(new Date(payload.cierre) > new Date())
-      setTiempo(payload.tiempo_restante)
-    } catch (err) {
-      showToast(handleError(err, setError), 'error')
-    } finally {
-      setCargando(false)
+    const adjudicarOferta = async (ofertaId) => {
+      try {
+        setProcesando(true)
+        await seleccionarOferta(subId, ofertaId)
+        refetch()
+      } catch (err) {
+        showToast(handleError(err, () =>{}), 'error')
+      } finally {
+        setProcesando(false)
+      }
     }
-  }
 
   useEffect(() => {
-    cargarSubasta()
-  }, [])
+    if (tiempo <= 0) {
+      setSubastaAbierta(false)
+      return
+    }
 
-  useEffect(() => {
-    if (!tiempo) return
     const interval = setInterval(() => {
-      setTiempo((prev) => Math.max(prev - 1, 0))
+      setTiempo((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval)
+          setSubastaAbierta(false)
+          return 0
+        }
+
+        return prev - 1
+      })
     }, 1000)
     return () => clearInterval(interval)
   }, [tiempo])
+
+  const ofertasOrdenadas = [...(subasta?.ofertas ?? [])].sort((a, b) => {
+    if (a.seleccionada === b.seleccionada) return 0
+    return a.seleccionada ? -1 : 1
+  })
 
   const ofertaPropia = subasta?.ofertas.find((o) => o.autor.id === user.perfil_id)
   const esAutor = subasta?.perfil.id === user.perfil_id
@@ -92,7 +114,7 @@ const VerSubasta = () => {
 
         {cargando ? (
           <h2>Cargando subasta...</h2>
-        ) : error.codigo ? (
+        ) : error ? (
           <h2 className="text-center text-secondary">No se pudo cargar la información</h2>
         ) : (
           <>
@@ -217,12 +239,20 @@ const VerSubasta = () => {
                   Ofertas {subastaAbierta ? 'actuales' : 'históricas'} ({subasta.ofertas.length})
                 </p>
                 <div className="d-flex flex-column gap-2 mt-2">
-                  {subasta.ofertas.length > 0 ? (
-                    subasta.ofertas.map((oferta, index) => (
-                      <OfertaCard key={index} position={index + 1} propuesta={oferta} />
+                  {ofertasOrdenadas.length > 0 ? (
+                    ofertasOrdenadas.map((oferta, index) => (
+                      <OfertaCard
+                        key={oferta.id}
+                        position={index + 1}
+                        propuesta={oferta}
+                        puedeAdjudicar={esAutor && subastaAbierta}
+                        onAdjudicar={adjudicarOferta}
+                      />
                     ))
                   ) : (
-                    <p className="mb-0 text-muted text-center py-3">Aún no hay ofertas</p>
+                    <p className="mb-0 text-muted text-center py-3">
+                      Aún no hay ofertas
+                    </p>
                   )}
                 </div>
               </SectionCard.Section>
@@ -249,6 +279,11 @@ const VerSubasta = () => {
             </SectionCard>
           </>
         )}
+
+        <ModalInformativo open={procesando}>
+          <h3>Adjudicando oferta...</h3>
+          <p>Esto puede tardar unos segundos</p>
+        </ModalInformativo>
       </div>
     </div>
   )

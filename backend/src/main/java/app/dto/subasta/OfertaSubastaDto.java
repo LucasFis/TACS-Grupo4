@@ -13,6 +13,7 @@ public class OfertaSubastaDto {
   private PerfilDto autor;
   private List<FiguritaDto> figuritasOfrecidas;
   private boolean seleccionada;
+  private EstadoProceso estado;
 
   public OfertaSubastaDto(Propuesta propuesta) {
     this.id = propuesta.getId();
@@ -20,6 +21,11 @@ public class OfertaSubastaDto {
     this.figuritasOfrecidas = propuesta.getFiguritasOfrecidas().stream()
         .map(FiguritaDto::new)
         .toList();
-    this.seleccionada = propuesta.getEstadoActual().getValor() == EstadoProceso.SELECCIONADO;
+    EstadoProceso estado = propuesta.getEstadoActual().getValor();
+
+    this.seleccionada =
+            estado == EstadoProceso.SELECCIONADO
+                    || estado == EstadoProceso.ACEPTADO;
+    this.estado = estado;
   }
 }

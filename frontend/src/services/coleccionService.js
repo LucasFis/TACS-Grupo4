@@ -2,18 +2,18 @@ import { api, handleAxiosError } from './api.js'
 
 const COLECCIONES_URL = '/colecciones'
 
-export const buscarFaltantes = async (filtros) => {
+export const buscarFaltantes = async (filtros, signal) => {
   try {
-    const { data } = await api.get(`${COLECCIONES_URL}/faltantes`, { params: filtros })
+    const { data } = await api.get(`${COLECCIONES_URL}/faltantes`, { params: filtros, signal })
     return data
   } catch (error) {
     handleAxiosError(error)
   }
 }
 
-export const buscarRepetidas = async (filtros) => {
+export const buscarRepetidas = async (filtros, signal) => {
   try {
-    const { data } = await api.get(`${COLECCIONES_URL}/repetidas`, { params: filtros })
+    const { data } = await api.get(`${COLECCIONES_URL}/repetidas`, { params: filtros, signal })
 
     return data
   } catch (error) {

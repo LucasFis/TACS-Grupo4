@@ -1,5 +1,7 @@
 package app.servicios;
 
+import app.dto.filtros.NotificacionesFiltro;
+import app.dto.paginacion.PaginaResultado;
 import app.model.entities.Perfil;
 import app.model.notificador.Mensaje;
 import app.model.notificador.Notificacion;
@@ -56,6 +58,17 @@ public class ServicioNotificacion {
   }
 
   /**
+   * Obtiene notificaciones de un perfil con paginación y filtro por estado de lectura.
+   *
+   * @param perfilId identificador del perfil del cual se obtendrán las notificaciones
+   * @param filtro   filtros y parámetros de paginación
+   * @return página de resultados con notificaciones ordenadas por fecha descendente
+   */
+  public PaginaResultado<Notificacion> obtenerPorPerfilPaginado(String perfilId, NotificacionesFiltro filtro) {
+      return repositorioNotificaciones.buscarPorPerfilPaginado(perfilId, filtro);
+  }
+
+  /**
    * Marca todas las notificaciones de un perfil como leídas.
    *
    * @param perfilId identificador del perfil cuyas notificaciones se marcarán como leídas
@@ -64,5 +77,9 @@ public class ServicioNotificacion {
       List<Notificacion> notis = repositorioNotificaciones.buscarPorPerfilFechaDesc(perfilId);
       notis.forEach(Notificacion::marcarLeida);
       this.repositorioNotificaciones.guardar(notis);
+  }
+
+  public long contarNoLeidas(String perfilId) {
+      return repositorioNotificaciones.contarNoLeidas(perfilId);
   }
 }

@@ -1,28 +1,35 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repetidas.jsx'
 import Button from '@/components/ui/button/button.jsx'
 import useCrearPropuesta from './useCrearPropuesta'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-propuesta-intercambio.module.css'
+
+const calcularIniciales = (nombre) => {
+  if (!nombre) return '?'
+  return nombre
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+}
 
 const CrearPropuestaIntercambio = () => {
   const { state } = useLocation()
   const figurita = state?.figurita
-  const { seleccionadas, setSeleccionadas, enviar, enviando } = useCrearPropuesta(figurita)
+  const { seleccionadas, setSeleccionadas, enviar, enviando, validando } = useCrearPropuesta(figurita)
 
   if (!figurita) return <h2>No se pudo cargar la figurita.</h2>
+  if (validando) return null
 
   const perfilDuenio = {
     id: figurita.perfil_id,
-    nombre: figurita.nombre_usuario,
-    iniciales: figurita.nombre_usuario
-      .split(' ')
-      .map((w) => w[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase(),
-    calificacion_media: figurita.reputacion,
+    nombre: figurita.nombre_usuario ?? 'Usuario',
+    iniciales: calcularIniciales(figurita.nombre_usuario),
+    calificacion_media: figurita.reputacion ?? 0,
   }
 
   return (
@@ -53,13 +60,21 @@ const CrearPropuestaIntercambio = () => {
         <SectionCard>
           <SectionCard.Section>
             <p className="label-seccion">Seleccioná las figuritas que querés ofrecer</p>
+            <div className={styles.aviso}>
+              <span className={styles.avisoIcono}>⚠️</span>
+              <p className={styles.avisoTexto}>
+                <strong>Solo aparecen tus repetidas publicadas para intercambio.</strong>{' '}
+                Si una figurita no aparece acá, probablemente la cargaste solo como <strong>subasta</strong>.
+                Podés cambiar su método en <Link to="/mis-figuritas">Mis Figuritas</Link>.
+              </p>
+            </div>
             <div className="mt-2">
               <SelectorRepetidas
                 modo="multiple"
                 bloqueadas={[]}
                 onChange={setSeleccionadas}
                 metodoIntercambio="INTERCAMBIO"
-                perfilId={figurita.perfil_id}
+                mensajeVacio="No tenés repetidas publicadas para intercambio. Publicá repetidas para poder ofrecer."
               />
             </div>
           </SectionCard.Section>
@@ -71,6 +86,11 @@ const CrearPropuestaIntercambio = () => {
           disabled={seleccionadas.length === 0 || enviando}
           onClick={enviar}
         />
+
+        <ModalInformativo open={enviando}>
+          <h3>Enviando propuesta...</h3>
+          <p>Esto puede tardar unos segundos</p>
+        </ModalInformativo>
       </div>
     </div>
   )

@@ -142,14 +142,35 @@ Esto permite que un solo código base se comporte distinto según el contexto si
 
 ---
 
-## 10. Sin Redux ni librerías de estado externas
+## 10. TanStack Query para estado del servidor
 
-**Decisión:** Todo el estado global se maneja con Context API de React.
+**Problema:** Los componentes que hacían peticiones HTTP con `useEffect` + `useState` eran vulnerables a race conditions. Cuando el usuario cambiaba de tab o filtro rápidamente, las respuestas obsoletas sobreescribían el estado correcto. También había lógica repetida de loading, error handling y refetch en cada componente.
+
+**Decisión:** Se migró a `@tanstack/react-query` v5.101.2 para manejar el estado del servidor ( datos que vienen del backend).
 
 **Por qué:**
-- La aplicación no tiene un árbol de estado lo suficientemente complejo como para justificar Redux
-- 3 contextos (auth, error, toast) cubren todas las necesidades de estado global
+- Resuelve automáticamente las race conditions via `AbortController` y query keys
+- Elimina `useState` + `useEffect` para fetch de datos en 10 componentes
+- Provee cache, deduplicación y reintentos sin código extra
+- El `signal` de AbortController se pasa al backend, que puede detectar el abort
+
+**Qué NO se migró:** Los componentes que solo hacen peticiones en event handlers (submit, click) no necesitan `useQuery` porque no tienen riesgo de race condition.
+
+**Tradeoff:** Se agrega una dependencia nueva. Sin embargo, el peso es mínimo (~13kB gzipped) y el beneficio en fiabilidad y reducción de código lo justifica.
+
+**Ver:** [circuit-breaker.md](circuit-breaker.md) para el detalle completo de la migración.
+
+---
+
+## 11. Sin Redux ni librerías de estado externas
+
+**Decisión:** Todo el estado de UI se maneja con Context API de React. El estado del servidor se maneja con TanStack Query.
+
+**Por qué:**
+- La aplicación no tiene un árbol de estado local lo suficientemente complejo como para justificar Redux
+- 3 contextos (auth, error, toast) cubren todas las necesidades de estado global de UI
+- TanStack Query maneja el estado del servidor (caching, refetch, error handling)
 - El estado de cada vista es local (hooks personalizados con useState)
 - Menos dependencias, menos bundle size, menos complejidad
 
-**Tradeoff:** Si la aplicación creciera significativamente, podría necesitar migrar a Zustand o Redux para evitar renders innecesarios por contextos muy poblados.
+**Tradeoff:** Si la aplicación creciera significativamente en complejidad de estado local, podría necesitar Zustand o Redux. Para estado del servidor, TanStack Query ya cubre el caso.

@@ -277,9 +277,13 @@
 
 ### `GET /perfil/notificaciones`
 - **Auth:** Sí
-- **Descripción:** Notificaciones del perfil.
+- **Descripción:** Notificaciones del perfil, con paginación y filtro por estado de lectura.
 - **Cookie:** `token`
-- **Response `200 OK`:** `List<NotificacionDto>`
+- **Query params:**
+  - `pagina` (opcional, default: 1) — número de página (1-based)
+  - `limite` (opcional, default: 10) — cantidad de elementos por página
+  - `leida` (opcional) — `true` para solo leídas, `false` para solo no leídas, omitir para todas
+- **Response `200 OK`:** `PaginaResultado<NotificacionDto>` → `{ "contenido": [...], "cantidadDeElementos": 0, "cantidadDePaginas": 0, "numero": 1 }`
 
 ### `PATCH /perfil/notificaciones/leidas`
 - **Auth:** Sí

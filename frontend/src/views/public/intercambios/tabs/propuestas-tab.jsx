@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import useQueryConError from '@/hooks/useQueryConError'
 import IntercambioCard from './intercambio-card/intercambio-card.jsx'
 import { buscarPropuestas } from '@/services/propuestasService.js'
 import Paginacion from '@/components/ui/paginacion/paginacion.jsx'
-import { useError } from '@/contexts/errorContext.jsx'
+
 import FiltroIntercambio from '../filtro-intercambio/filtro-intercambio.jsx'
 
 const TEXTOS_ESTADO = {
@@ -14,36 +16,19 @@ const TEXTOS_ESTADO = {
 }
 
 const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
-  const [loading, setLoading] = useState(true)
   const [pagina, setPagina] = useState(1)
-  const [propuestas, setPropuestas] = useState([])
-  const [filtros, setFiltros] = useState({ estado: estadoInicial, tipo })
+  const [estado, setEstado] = useState(estadoInicial)
   const [paramsFigurita, setParamsFigurita] = useState({})
-  const { handleError } = useError()
+  const queryClient = useQueryClient()
+  const queryKey = ['propuestas', { pagina, limite: 10, estado, tipo, ...paramsFigurita }]
 
-  const cargarPropuestas = async () => {
-    try {
-      setLoading(true)
-      const res = await buscarPropuestas({ pagina, limite: 10, ...filtros, ...paramsFigurita })
-      setPropuestas(res)
-    } catch (error) {
-      handleError(error, () => {})
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    cargarPropuestas()
-  }, [pagina, filtros, paramsFigurita])
-
-  useEffect(() => {
-    setFiltros({ estado: estadoInicial, tipo })
-    setParamsFigurita({})
-  }, [tipo])
+  const { data: propuestas, isLoading } = useQueryConError({
+    queryKey,
+    queryFn: ({ signal }) => buscarPropuestas({ pagina, limite: 10, estado, tipo, ...paramsFigurita }, signal),
+  })
 
   const cambiarFiltro = (nuevoEstado) => {
-    setFiltros((prev) => (prev.estado === nuevoEstado ? prev : { ...prev, estado: nuevoEstado }))
+    setEstado((prev) => (prev === nuevoEstado ? prev : nuevoEstado))
     setPagina(1)
   }
 
@@ -52,15 +37,19 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
     setPagina(1)
   }
 
+  const onActualizado = () => {
+    queryClient.invalidateQueries({ queryKey: ['propuestas'] })
+  }
+
   return (
     <div className="container-fluid px-0 d-flex flex-column gap-4">
       <FiltroIntercambio
-        estado={filtros.estado}
+        estado={estado}
         onChangeEstado={cambiarFiltro}
         onAplicarFigurita={handleAplicarFigurita}
       />
 
-      {loading ? (
+      {isLoading ? (
         <div className="d-flex flex-column gap-3">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="rounded-3 placeholder-glow border" style={{ height: '140px' }}>
@@ -71,7 +60,7 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
       ) : propuestas?.contenido?.length > 0 ? (
         <>
           <p className="mb-0">
-            {TEXTOS_ESTADO[filtros.estado]} ({propuestas.cantidad_de_elementos})
+            {TEXTOS_ESTADO[estado]} ({propuestas.cantidad_de_elementos})
           </p>
           <div className="d-flex flex-column gap-3">
             {propuestas.contenido.map((i) => (
@@ -79,7 +68,7 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
                 key={i.id}
                 intercambio={i}
                 tipo={tipo}
-                onActualizado={cargarPropuestas}
+                onActualizado={onActualizado}
               />
             ))}
           </div>

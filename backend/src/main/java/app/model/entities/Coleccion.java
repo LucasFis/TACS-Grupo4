@@ -52,6 +52,11 @@ public class Coleccion {
           existente.getCantidadExistente()
               + repetida.getCantidadExistente()
       );
+      repetida.getMetodos().forEach(m -> {
+        if (!existente.getMetodos().contains(m)) {
+          existente.getMetodos().add(m);
+        }
+      });
       return;
     }
 
@@ -136,6 +141,11 @@ public class Coleccion {
         repetida.eliminarReserva();
       }
     });
+  }
+
+  public List<MetodoIntercambio> getMetodosDe(Figurita figurita) {
+    FiguritaIntercambiable fi = obtenerRepetida(figurita);
+    return fi != null ? new ArrayList<>(fi.getMetodos()) : List.of();
   }
 
   private FiguritaIntercambiable obtenerRepetida(Figurita figurita) {

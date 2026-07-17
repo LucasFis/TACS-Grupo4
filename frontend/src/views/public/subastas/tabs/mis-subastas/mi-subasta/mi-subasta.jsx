@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ConfirmModal from '../../../../../../components/ui/confirm-modal/confirm-modal.jsx'
 import CalificarModal from '../../../../../../components/ui/calificar-modal/calificar-modal.jsx'
 import CabeceraFigurita from '../../../../../../components/ui/cabecera-figurita/cabecera-figurita.jsx'
@@ -16,6 +16,7 @@ import { derivarTiempo } from '../../../../../../utils/subastasTiempo.js'
 import { useNavigate } from 'react-router'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
+import ModalInformativo from '../../../../../../components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './mi-subasta.module.css'
 
 const BADGE_ESTADO = {
@@ -49,7 +50,7 @@ const MODAL_CONFIG = {
   },
 }
 
-const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
+const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const {
     id: subastaId,
     figurita_subastada,
@@ -59,22 +60,33 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
     ya_calificado,
   } = subasta
 
-  const { tiempoRestante, finalizadaHace, finalizaPronto } = derivarTiempo({ fecha_cierre })
+  const [tiempoRestante, setTiempoRestante] = useState(subasta.tiempo_restante)
   const navigate = useNavigate()
   const { showToast } = useToast()
   const { handleError } = useError()
   const [modal, setModal] = useState(null)
-  const [loadingModal, setLoadingModal] = useState(false)
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
+  const [procesando, setProcesando] = useState(false)
+  const [accionProcesando, setAccionProcesando] = useState('')
+
+  const finalizaPronto = tiempoRestante > 0 && tiempoRestante <= 3600;
 
   const estadoKey = finalizada ? 'adjudicada' : finalizaPronto ? 'finaliza_pronto' : 'activa'
   const badge = BADGE_ESTADO[estadoKey]
   const haySeleccionada = ofertas?.some((o) => o.seleccionada)
   const config = modal ? MODAL_CONFIG[modal.tipo] : null
 
+  const ACCION_LABELS = {
+    adjudicar: 'Adjudicando oferta...',
+    rechazar: 'Rechazando oferta...',
+    cancelar: 'Cancelando subasta...',
+    cerrar: 'Cerrando subasta...',
+  }
+
   const handleConfirmar = async () => {
     try {
-      setLoadingModal(true)
+      setProcesando(true)
+      setAccionProcesando(ACCION_LABELS[modal.tipo] ?? 'Procesando...')
       if (modal.tipo === 'adjudicar') await seleccionarOferta(subastaId, modal.ofertaId)
       else if (modal.tipo === 'rechazar') await rechazarOferta(subastaId, modal.ofertaId)
       else if (modal.tipo === 'cancelar') await cancelarSubasta(subastaId)
@@ -84,21 +96,46 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
     } finally {
-      setLoadingModal(false)
+      setProcesando(false)
     }
   }
 
   const handleCalificar = async ({ valor, descripcion }) => {
-    await calificarPerfil({
-      destinatarioId: oferta_ganadora.autor.id,
-      valor,
-      descripcion,
-      transactionId: subastaId,
-      tipoTransaccion: 'SUBASTA',
-    })
-    setMostrarCalificar(false)
-    onRefresh()
+    try {
+      setProcesando(true)
+      await calificarPerfil({
+        destinatarioId: oferta_ganadora.autor.id,
+        valor,
+        descripcion,
+        transactionId: subastaId,
+        tipoTransaccion: 'SUBASTA',
+      })
+      setMostrarCalificar(false)
+      onRefresh()
+    } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
+    } finally {
+      setProcesando(false)
+    }
   }
+
+    useEffect(() => {
+      if (tiempoRestante <= 0) return
+
+      const interval = setInterval(() => {
+        setTiempoRestante((prev) => Math.max(prev - 1, 0))
+      }, 1000)
+
+      return () => clearInterval(interval)
+    }, [tiempoRestante])
+
+    const formatearTiempo = (segundos) => {
+        if (segundos <= 0) return '00:00:00'
+        const horas = Math.floor(segundos / 3600)
+        const minutos = Math.floor((segundos % 3600) / 60)
+        const segs = segundos % 60
+        return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`
+    }
 
   return (
     <>
@@ -107,7 +144,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
 
         <BarraTiempo
           finalizada={finalizada}
-          tiempoRestante={tiempoRestante}
+          tiempoRestante={formatearTiempo(tiempoRestante)}
           finalizadaHace={finalizadaHace}
           derecha={
             !finalizada && (
@@ -203,7 +240,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
         show={modal !== null}
         titulo={config?.titulo}
         mensaje={config?.mensaje}
-        labelConfirmar={loadingModal ? 'Cargando...' : config?.labelConfirmar}
+        labelConfirmar={config?.labelConfirmar}
         onConfirmar={handleConfirmar}
         onCancelar={() => setModal(null)}
       />
@@ -216,6 +253,11 @@ const MiSubasta = ({ subasta, finalizada, onRefresh }) => {
           onCancelar={() => setMostrarCalificar(false)}
         />
       )}
+
+      <ModalInformativo open={procesando}>
+        <h3>{accionProcesando}</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </>
   )
 }

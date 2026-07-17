@@ -8,6 +8,7 @@ import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import { IconoAdvertencia } from '@/components/ui/iconos/advertencia/advertencia.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const NuevaRepetida = () => {
   const [figurita, setFigurita] = useState(undefined)
@@ -17,6 +18,7 @@ const NuevaRepetida = () => {
   const [modosIntercambio, setModosIntercambio] = useState(['SUBASTA', 'INTERCAMBIO'])
   const [errorFormato, setErrorFormato] = useState('')
   const [tocado, setTocado] = useState(false)
+  const [procesando, setProcesando] = useState(false)
   const { showToast } = useToast()
   const { handleError } = useError()
 
@@ -74,6 +76,7 @@ const NuevaRepetida = () => {
     }
 
     try {
+      setProcesando(true)
       await agregarRepetida({
         id: figurita.id,
         cantidad: cantidad,
@@ -90,6 +93,8 @@ const NuevaRepetida = () => {
         handleError(error, (m) => {}),
         'error',
       )
+    } finally {
+      setProcesando(false)
     }
   }
 
@@ -235,6 +240,11 @@ const NuevaRepetida = () => {
         label="Publicar Repetida ↗"
         onClick={() => ejecutarFormulario()}
       />
+
+      <ModalInformativo open={procesando}>
+        <h3>Agregando repetida...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </div>
   )
 }

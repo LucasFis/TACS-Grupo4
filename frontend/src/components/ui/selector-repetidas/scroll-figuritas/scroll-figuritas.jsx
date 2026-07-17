@@ -13,7 +13,11 @@ const Skeleton = () => (
   </div>
 )
 
-const SinResultados = () => <div className={styles['scroll-sin-resultados']}>No hay resultados</div>
+const SinResultados = ({ mensaje }) => (
+  <div className={styles['scroll-sin-resultados']}>
+    {mensaje || 'No hay resultados'}
+  </div>
+)
 
 const ScrollFiguritas = ({
   figuritas = [],
@@ -28,6 +32,7 @@ const ScrollFiguritas = ({
   bloqueadas = [],
   titulo = '',
   placeholder = '',
+  mensajeVacio = null,
 }) => {
   const [busqueda, setBusqueda] = useState('')
   const debounceRef = useRef(null)
@@ -82,7 +87,7 @@ const ScrollFiguritas = ({
           {loading ? (
             <Skeleton />
           ) : filtradas.length === 0 ? (
-            <SinResultados />
+            <SinResultados mensaje={mensajeVacio} />
           ) : (
             filtradas.map((fig) => (
               <FilaScroll

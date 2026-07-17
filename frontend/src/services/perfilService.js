@@ -2,9 +2,9 @@ import { api, handleAxiosError } from './api.js'
 
 const PERFIL_URL = '/perfil'
 
-export const buscarContadoresSugerencias = async () => {
+export const buscarContadoresSugerencias = async (signal) => {
   try {
-    const { data } = await api.get(`${PERFIL_URL}/contadores`, {})
+    const { data } = await api.get(`${PERFIL_URL}/contadores`, { signal })
     return data
   } catch (error) {
     handleAxiosError(error)
@@ -23,27 +23,51 @@ export const calificarPerfil = async (
   })
 }
 
-export const buscarPerfil = async () => {
+export const buscarPerfil = async (perfilId, signal) => {
   try {
-    const { data } = await api.get(`${PERFIL_URL}`)
+
+    const url = perfilId
+      ? `/perfil/${perfilId}`
+      : '/perfil'
+
+    const { data } = await api.get(url, { signal })
+
     return data
+
   } catch (error) {
     handleAxiosError(error)
   }
 }
 
-export const buscarCalificaciones = async (filtros) => {
-  try {
-    const { data } = await api.get(`${PERFIL_URL}/calificaciones`, { params: filtros })
+export const buscarCalificaciones = async (
+    perfilId,
+    filtros,
+    signal
+) => {
+    try{
+    const url = perfilId
+        ? `/perfil/${perfilId}/calificaciones`
+        : '/perfil/calificaciones'
+
+    const { data } = await api.get(url,{
+        params:filtros,
+        signal
+    })
+
     return data
-  } catch (error) {
-    handleAxiosError(error)
-  }
+    } catch (error){
+        handleAxiosError(error)
+    }
+
 }
 
-export const buscarContadores = async () => {
+export const buscarContadores = async (perfilId, signal) => {
   try {
-    const { data } = await api.get(`${PERFIL_URL}/contadores`)
+    const url = perfilId
+      ? `${PERFIL_URL}/${perfilId}/contadores`
+      : `${PERFIL_URL}/contadores`
+
+    const { data } = await api.get(url, { signal })
     return data
   } catch (error) {
     handleAxiosError(error)

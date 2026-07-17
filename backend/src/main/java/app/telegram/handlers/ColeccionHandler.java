@@ -130,7 +130,7 @@ public class ColeccionHandler implements BotHandler {
       String token = sessionManager.getToken(chatId);
       String colId = servicioJwt.getColeccionId(token);
 
-      FaltantesFiltro filtros = new FaltantesFiltro(5, pagina + 1);
+      FaltantesFiltro filtros = new FaltantesFiltro(5, pagina + 1, null);
       PaginaResultado<FiguritaDto> resultado = coleccionService.buscarFaltantes(colId, filtros);
 
       if (resultado.contenido().isEmpty()) {
@@ -183,7 +183,7 @@ public class ColeccionHandler implements BotHandler {
       String token = sessionManager.getToken(chatId);
       String colId = servicioJwt.getColeccionId(token);
 
-      RepetidasFiltro filtros = new RepetidasFiltro(null, null, 5, pagina + 1);
+      RepetidasFiltro filtros = new RepetidasFiltro(null, null, null,5, pagina + 1);
       Repetidas<FiguritaIntercambiableDto> resultado = coleccionService.buscarRepetidas(colId, filtros);
 
       if (resultado.getData().contenido().isEmpty()) {
@@ -261,11 +261,11 @@ public class ColeccionHandler implements BotHandler {
 
       case "faltante:esperando_figId" -> {
         estadoPendiente.remove(chatId);
-        yield confirmarAgregarFaltante(chatId, texto);
+        yield confirmarAgregarFaltante(chatId, texto.trim().toUpperCase());
       }
 
       case "repetida:esperando_figId" -> {
-        datosPendientes.get(chatId).put("figId", texto);
+        datosPendientes.get(chatId).put("figId", texto.trim().toUpperCase());
         estadoPendiente.put(chatId, "repetida:esperando_cantidad");
         yield BotResponse.texto("📦 ¿Cuántas unidades repetidas tenés?");
       }

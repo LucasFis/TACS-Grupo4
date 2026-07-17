@@ -38,14 +38,25 @@ export const ErrorProvider = ({ children }) => {
 
 
             default: {
+                const erroresPorCampo = error.errors && Object.keys(error.errors).length > 0
+                    ? Object.entries(error.errors)
+                        .map(([campo, msg]) => `${campo}: ${msg}`)
+                        .join(' | ')
+                    : null
+
+                const mensajeBase = error.message || "No se pudo completar la acción"
+                const mensajeFinal = erroresPorCampo
+                    ? `${mensajeBase} — ${erroresPorCampo}`
+                    : mensajeBase
+
                 const errorProcesado = {
                     codigo: error.code || error.status,
-                    mensaje: error.message,
+                    mensaje: mensajeFinal,
                     errors: error.errors
                 }
 
                 setter(errorProcesado)
-                return errorProcesado.mensaje || "Ocurrió un error inesperado"
+                return errorProcesado.mensaje
             }
         }
     };

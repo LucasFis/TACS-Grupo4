@@ -23,6 +23,10 @@ export const ping = async () => {
 //Esta funcion, lo que hace es mapear el error de axios a un error de nuestro "dominio".
 const handleAxiosError = (error) => {
 
+    if (error.code === "ERR_CANCELED" || axios.isCancel(error)) {
+        throw error;
+    }
+
     if (error.code === "ERR_NETWORK") {
         throw {
             type: "SERVER_DOWN",

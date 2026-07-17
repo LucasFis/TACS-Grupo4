@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import useQueryConError from '@/hooks/useQueryConError'
 import { buscarSubasta, crearOferta } from '@/services/subastasService.js'
 import { buscarPerfil } from '@/services/perfilService.js'
 import { buscarRepetidas } from '@/services/coleccionService.js'
@@ -9,6 +10,7 @@ import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repet
 import Button from '@/components/ui/button/button.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-oferta.module.css'
 
 const obtenerBloqueadas = (repetidas, figuritasSolicitadas) => {
@@ -29,37 +31,33 @@ const CrearOferta = () => {
   const { subId } = useParams()
   const navigate = useNavigate()
 
-  const [subasta, setSubasta] = useState(null)
-  const [repetidas, setRepetidas] = useState([])
-  const [calificacionUsuario, setCalificacion] = useState(null)
-  const [cargando, setCargando] = useState(true)
   const [figuritasExtra, setFiguritasExtra] = useState([])
+  const [procesando, setProcesando] = useState(false)
   const { handleError } = useError()
   const { showToast } = useToast()
 
-  useEffect(() => {
-    const cargar = async () => {
-      try {
-        setCargando(true)
-        const [payloadSubasta, payloadRepetidas, payloadPerfil] = await Promise.all([
-          buscarSubasta({ subId }),
-          buscarRepetidas({ pagina: 1, limite: 10 }),
-          buscarPerfil(),
-        ])
-        setSubasta(payloadSubasta)
-        setRepetidas(payloadRepetidas?.contenido ?? [])
-        setCalificacion(payloadPerfil?.calificacion_media ?? null)
-      } catch (e) {
-        handleError(e, (err) => showToast(err.mensaje, 'error'))
-      } finally {
-        setCargando(false)
-      }
-    }
-    cargar()
-  }, [subId])
+  const { data: subasta, isLoading: cargandoSubasta } = useQueryConError({
+    queryKey: ['subasta', subId],
+    queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
+  })
+
+  const { data: repetidasData, isLoading: cargandoRepetidas } = useQueryConError({
+    queryKey: ['repetidas', { pagina: 1, limite: 10 }],
+    queryFn: ({ signal }) => buscarRepetidas({ pagina: 1, limite: 10 }, signal),
+  })
+
+  const { data: perfil, isLoading: cargandoPerfil } = useQueryConError({
+    queryKey: ['perfil'],
+    queryFn: ({ signal }) => buscarPerfil(undefined, signal),
+  })
+
+  const cargando = cargandoSubasta || cargandoRepetidas || cargandoPerfil
 
   if (cargando) return <h2>Cargando...</h2>
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>
+
+  const repetidas = repetidasData?.contenido ?? []
+  const calificacionUsuario = perfil?.calificacion_media ?? null
 
   // ── Validaciones ───────────────────────────────────────────────────────────
   const calMinima = subasta.calificacion_minima_solicitada ?? 0
@@ -72,12 +70,15 @@ const CrearOferta = () => {
 
   const onEnviar = async () => {
     try {
+      setProcesando(true)
       const ids = [...bloqueadas, ...figuritasExtra].map((f) => f.figurita_id ?? f.id)
       await crearOferta(subId, ids)
       showToast('Oferta creada correctamente', 'success')
       navigate('/subastas')
     } catch (e) {
       handleError(e, (err) => showToast(err.mensaje, 'error'))
+    } finally {
+      setProcesando(false)
     }
   }
 
@@ -90,10 +91,14 @@ const CrearOferta = () => {
           ' p-2 d-flex flex-column justify-content-center align-items-center gap-2 w-100 rounded-2 mb-3'
         }
       >
-        <div className={styles.figuritaImagen + ' bg-white rounded-3 '}></div>
+        <img
+          className={`${styles.figuritaImagen} bg-white rounded-3`}
+          src={subasta.figurita?.imagen_url || '/jugador-placeholder.png'}
+          alt={subasta.figurita?.jugador}
+        />
 
-        <h4 className={'text-white'}>{subasta.figurita.jugador}</h4>
-        <h6 className={'text-white'}>{subasta.figurita.seleccion}</h6>
+        <h4 className="text-white">{subasta.figurita.jugador}</h4>
+        <h6 className="text-white">{subasta.figurita.seleccion}</h6>
       </div>
 
       <SectionCard>
@@ -195,6 +200,11 @@ const CrearOferta = () => {
           />
         </div>
       )}
+
+      <ModalInformativo open={procesando}>
+        <h3>Enviando oferta...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </div>
   )
 }

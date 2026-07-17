@@ -25,3 +25,9 @@
     background-color: rgba(177, 245, 199, 0.4);
     color: var(--color-secondary);
 }
+
+.ofertaSeleccionada,
+.ofertaSeleccionada .position {
+    background-color: rgba(144, 238, 144, 0.2);
+    border: 3px solid rgba(144, 238, 144, 0.5);
+}

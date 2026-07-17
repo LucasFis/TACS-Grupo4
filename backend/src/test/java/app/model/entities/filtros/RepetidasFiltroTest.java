@@ -13,6 +13,7 @@ class RepetidasFiltroTest {
     RepetidasFiltro filtro = new RepetidasFiltro(
         MetodoIntercambio.SUBASTA,
         "1000",
+        null,
         5,
         1
     );
@@ -25,7 +26,7 @@ class RepetidasFiltroTest {
 
   @Test
   void deberiaAceptarValoresNull() {
-    RepetidasFiltro filtro = new RepetidasFiltro(null,null, null, null);
+    RepetidasFiltro filtro = new RepetidasFiltro(null,null, null, null, null);
 
     assertNull(filtro.metodoIntercambio());
     assertNull(filtro.perfilId());
@@ -35,8 +36,8 @@ class RepetidasFiltroTest {
 
   @Test
   void deberiaSerIgualSiLosValoresSonIguales() {
-    RepetidasFiltro a = new RepetidasFiltro(MetodoIntercambio.SUBASTA,"1000", 5, 1);
-    RepetidasFiltro b = new RepetidasFiltro(MetodoIntercambio.SUBASTA, "1000", 5, 1);
+    RepetidasFiltro a = new RepetidasFiltro(MetodoIntercambio.SUBASTA,"1000", null, 5, 1);
+    RepetidasFiltro b = new RepetidasFiltro(MetodoIntercambio.SUBASTA, "1000", null, 5, 1);
 
     assertEquals(a, b);
     assertEquals(a.hashCode(), b.hashCode());

@@ -7,6 +7,7 @@ import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import Button from '../../../components/ui/button/button.jsx'
 import OfertaCard from './oferta-card.jsx'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 import {
   obtenerPropuesta,
@@ -33,6 +34,8 @@ const VerIntercambio = () => {
   const [propuesta, setPropuesta] = useState(null)
   const [showConfirmAceptar, setShowConfirmAceptar] = useState(false)
   const [conflictosData, setConflictosData] = useState(null)
+  const [procesando, setProcesando] = useState(false)
+  const [accionProcesando, setAccionProcesando] = useState('')
 
   const { handleError } = useError()
   const { showToast } = useToast()
@@ -65,33 +68,45 @@ const VerIntercambio = () => {
 
   const ejecutarAceptar = async () => {
     try {
-      await aceptarPropuesta(propuesta.id)
       setShowConfirmAceptar(false)
       setConflictosData(null)
+      setProcesando(true)
+      setAccionProcesando('Aceptando intercambio...')
+      await aceptarPropuesta(propuesta.id)
       setPropuesta((prev) => ({ ...prev, estado: 'ACEPTADO' }))
       showToast('Propuesta aceptada correctamente.')
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
+    } finally {
+      setProcesando(false)
     }
   }
 
   const ejecutarRechazar = async () => {
     try {
+      setProcesando(true)
+      setAccionProcesando('Rechazando intercambio...')
       await rechazarPropuesta(propuesta.id)
       setPropuesta((prev) => ({ ...prev, estado: 'RECHAZADO' }))
       showToast('Propuesta rechazada correctamente.')
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
+    } finally {
+      setProcesando(false)
     }
   }
 
   const ejecutarCancelar = async () => {
     try {
+      setProcesando(true)
+      setAccionProcesando('Cancelando intercambio...')
       await cancelarPropuesta(propuesta.id)
       setPropuesta((prev) => ({ ...prev, estado: 'CANCELADO' }))
       showToast('Propuesta cancelada correctamente.')
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
+    } finally {
+      setProcesando(false)
     }
   }
 
@@ -190,6 +205,11 @@ const VerIntercambio = () => {
           onCancelar={() => { setShowConfirmAceptar(false); setConflictosData(null) }}
           advertencia={construirAdvertenciaConflictos(conflictosData)}
         />
+
+        <ModalInformativo open={procesando}>
+          <h3>{accionProcesando}</h3>
+          <p>Esto puede tardar unos segundos</p>
+        </ModalInformativo>
       </div>
     </div>
   )

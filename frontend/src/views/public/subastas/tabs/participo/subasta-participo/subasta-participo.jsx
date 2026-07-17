@@ -6,15 +6,22 @@ import BarraTiempo from '../../../../../../components/ui/barra-tiempo/barra-tiem
 import EtiquetaFiguritasOfrecidas from '../../../../../../components/ui/etiqueta-figuritas-propuesta/etiqueta-figuritas-propuesta.jsx'
 import Etiqueta from '../../../../../../components/ui/etiqueta/etiqueta.jsx'
 import Button from '../../../../../../components/ui/button/button.jsx'
-import { useState } from 'react'
+import ModalInformativo from '../../../../../../components/ui/modales/modal-informativo/modal-informativo.jsx'
+import { useToast } from '@/contexts/toastContext.jsx'
+import { useError } from '@/contexts/errorContext.jsx'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
-const SubastaParticipo = ({ subasta, finalizada, onRefresh }) => {
+const SubastaParticipo = ({ subasta, finalizada, finalizadaHace, onRefresh }) => {
   const { id, autor, figurita_subastada, fecha_cierre, tu_oferta, ya_calificado } = subasta
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
+  const [procesando, setProcesando] = useState(false)
   const navigate = useNavigate()
+  const { showToast } = useToast()
+  const { handleError } = useError()
 
-  const { tiempoRestante, finalizadaHace, finalizaPronto } = derivarTiempo({ fecha_cierre })
+  const [tiempoRestante, setTiempoRestante] = useState(subasta.tiempo_restante)
+  const finalizaPronto = tiempoRestante > 0 && tiempoRestante <= 3600
 
   const badgeEstado = finalizada
     ? null
@@ -23,16 +30,45 @@ const SubastaParticipo = ({ subasta, finalizada, onRefresh }) => {
       : { label: 'Activa', variante: 'exito' }
 
   const handleCalificar = async ({ valor, descripcion }) => {
-    await calificarPerfil({
-      destinatarioId: autor.id,
-      valor,
-      descripcion,
-      transactionId: id,
-      tipoTransaccion: 'SUBASTA',
-    })
-    setMostrarCalificar(false)
-    onRefresh()
+    try {
+      setProcesando(true)
+      await calificarPerfil({
+        destinatarioId: autor.id,
+        valor,
+        descripcion,
+        transactionId: id,
+        tipoTransaccion: 'SUBASTA',
+      })
+      setMostrarCalificar(false)
+      onRefresh()
+    } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
+    } finally {
+      setProcesando(false)
+    }
   }
+
+    useEffect(() => {
+      if (tiempoRestante <= 0) return
+
+      const interval = setInterval(() => {
+        setTiempoRestante((prev) => Math.max(prev - 1, 0))
+      }, 1000)
+
+      return () => clearInterval(interval)
+    }, [tiempoRestante])
+
+    const formatearTiempo = (segundos) => {
+      if (segundos <= 0) return '00:00:00'
+
+      const horas = Math.floor(segundos / 3600)
+      const minutos = Math.floor((segundos % 3600) / 60)
+      const segs = segundos % 60
+
+      return `${horas.toString().padStart(2, '0')}:${minutos
+        .toString()
+        .padStart(2, '0')}:${segs.toString().padStart(2, '0')}`
+    }
 
   const puedoCalificar = finalizada && tu_oferta?.seleccionada && !ya_calificado
 
@@ -42,7 +78,7 @@ const SubastaParticipo = ({ subasta, finalizada, onRefresh }) => {
 
       <BarraTiempo
         finalizada={finalizada}
-        tiempoRestante={tiempoRestante}
+        tiempoRestante={formatearTiempo(tiempoRestante)}
         finalizadaHace={finalizadaHace}
         derecha={
           <>
@@ -93,6 +129,11 @@ const SubastaParticipo = ({ subasta, finalizada, onRefresh }) => {
         onConfirmar={handleCalificar}
         onCancelar={() => setMostrarCalificar(false)}
       />
+
+      <ModalInformativo open={procesando}>
+        <h3>Calificando usuario...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </div>
   )
 }

@@ -167,6 +167,9 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
 
     List<AggregationOperation> filtrado = new ArrayList<>();
 
+    filtrado.add(Aggregation.lookup("figuritas", "repetidas.figurita.$id", "_id", "repetidas.figurita"));
+    filtrado.add(Aggregation.unwind("repetidas.figurita"));
+
     if (filtros.metodoIntercambio() != null) {
       filtrado.add(Aggregation.match(
           Criteria.where("repetidas.metodos").is(filtros.metodoIntercambio())
@@ -176,7 +179,13 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     if (colIdFaltantes != null) {
       List<String> idsFaltantes = obtenerIdsFaltantes(colIdFaltantes);
       filtrado.add(Aggregation.match(
-          Criteria.where("repetidas.figurita.$id").in(idsFaltantes)
+          Criteria.where("repetidas.figurita._id").in(idsFaltantes)
+      ));
+    }
+
+    if (filtros.jugador() != null && !filtros.jugador().isBlank()) {
+      filtrado.add(Aggregation.match(
+          Criteria.where("repetidas.figurita.jugador").regex(filtros.jugador(), "i")
       ));
     }
 
@@ -224,16 +233,25 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     int pagina = filtros.pagina();
     int limite = filtros.limite();
 
-    int cantidadResultados = this.contarCampoEnColeccion(colId, "faltantes", new ArrayList<>());
+    List<AggregationOperation> ops = new ArrayList<>();
+    ops.add(Aggregation.lookup("figuritas", "faltantes.$id", "_id", "faltantesFigurita"));
+    ops.add(Aggregation.unwind("faltantesFigurita"));
+
+    if (filtros.jugador() != null && !filtros.jugador().isBlank()) {
+      ops.add(Aggregation.match(
+          Criteria.where("faltantesFigurita.jugador").regex(filtros.jugador(), "i")
+      ));
+    }
+
+    int cantidadResultados = this.contarCampoEnColeccion(colId, "faltantes", ops);
 
     List<AggregationOperation> operaciones = new ArrayList<>();
     operaciones.add(Aggregation.match(Criteria.where("_id").is(colId)));
     operaciones.add(Aggregation.unwind("faltantes"));
-    operaciones.add(Aggregation.lookup("figuritas", "faltantes.$id", "_id", "figurita"));
-    operaciones.add(Aggregation.unwind("figurita"));
+    operaciones.addAll(ops);
     operaciones.add(Aggregation.skip((long) (pagina - 1) * limite));
     operaciones.add(Aggregation.limit(limite));
-    operaciones.add(Aggregation.replaceRoot("figurita"));
+    operaciones.add(Aggregation.replaceRoot("faltantesFigurita"));
 
     Aggregation aggregation = Aggregation.newAggregation(operaciones);
     AggregationResults<Document> resultado = mongoTemplate.aggregate(aggregation, "colecciones", Document.class);
@@ -474,18 +492,14 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     operaciones.addAll(ops);
     operaciones.add(Aggregation.skip((long) (pagina - 1) * limite));
     operaciones.add(Aggregation.limit(limite));
-    operaciones.add(Aggregation.lookup(
-        "perfiles",
-        "repetidas.perfilId",
-        "_id",
-        "perfil"
-    ));
-    operaciones.add(Aggregation.unwind("perfil", true));
-    operaciones.add(Aggregation.project()
-        .and("repetidas").as("figurita")
-        .and("perfil._id").as("perfilId")
-        .and("perfil.nombre").as("perfilNombre")
-        .and("perfil.calificacionMedia").as("perfilCalificacionMedia"));
+
+    operaciones.addAll(obtenerLookupPerfilCompatible());
+
+      operaciones.add(Aggregation.project()
+              .and("repetidas").as("figurita")
+              .and("perfil._id").as("perfilId")
+              .and("perfil.nombre").as("perfilNombre")
+              .and("perfil.calificacionMedia").as("perfilCalificacionMedia"));
 
     return mongoTemplate.aggregate(
         Aggregation.newAggregation(operaciones),
@@ -542,6 +556,79 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
         .map(doc -> converter.read(FiguritaIntercambiable.class, doc))
         .toList();
   }
+
+    /**
+     * Construye las etapas de agregación necesarias para obtener el perfil
+     * asociado a una figurita intercambiable soportando ambos formatos
+     * históricos de almacenamiento del identificador.
+     *
+     * <p>La aplicación convivió con dos representaciones distintas del
+     * {@code perfilId} dentro de {@code repetidas}:
+     *
+     * <ul>
+     *   <li>Como {@link org.bson.types.ObjectId} almacenado en la colección
+     *       {@code perfiles}.</li>
+     *   <li>Como {@link String} dentro del documento embebido
+     *       {@code repetidas.perfilId}.</li>
+     * </ul>
+     *
+     * <p>Para mantener compatibilidad con ambas versiones se realizan dos
+     * {@code $lookup}: uno utilizando el valor original y otro convirtiéndolo
+     * previamente a {@code ObjectId}. Luego se selecciona automáticamente el
+     * resultado que haya producido coincidencias.
+     *
+     * @return etapas de agregación para incorporar el perfil asociado al
+     *         documento actual.
+     */
+    private List<AggregationOperation> obtenerLookupPerfilCompatible() {
+        List<AggregationOperation> operaciones = new ArrayList<>();
+
+        operaciones.add(context ->
+                new Document("$addFields",
+                        new Document("perfilObjectId",
+                                new Document("$convert",
+                                        new Document("input", "$repetidas.perfilId")
+                                                .append("to", "objectId")
+                                                .append("onError", null)
+                                                .append("onNull", null)
+                                )
+                        )
+                )
+        );
+
+        operaciones.add(Aggregation.lookup(
+                "perfiles",
+                "repetidas.perfilId",
+                "_id",
+                "perfilString"
+        ));
+
+        operaciones.add(Aggregation.lookup(
+                "perfiles",
+                "perfilObjectId",
+                "_id",
+                "perfilObject"
+        ));
+
+        operaciones.add(context ->
+                new Document("$addFields",
+                        new Document("perfil",
+                                new Document("$cond", List.of(
+                                        new Document("$gt", List.of(
+                                                new Document("$size", "$perfilObject"),
+                                                0
+                                        )),
+                                        "$perfilObject",
+                                        "$perfilString"
+                                ))
+                        )
+                )
+        );
+
+        operaciones.add(Aggregation.unwind("perfil", true));
+
+        return operaciones;
+    }
 
   /**
    * Convierte documentos de agregación en proyecciones {@link FiguritaIntercambiableConPerfil},

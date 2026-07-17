@@ -3,8 +3,10 @@ package app.controllers;
 import app.dto.CalificacionDto;
 import app.dto.ContadorDto;
 import app.dto.NotificacionDto;
+import app.dto.NotificacionesPaginadasDto;
 import app.dto.PerfilDto;
 import app.dto.SugerenciaDto;
+import app.dto.filtros.NotificacionesFiltro;
 import app.dto.filtros.SugerenciasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.dto.request.CalificacionRequest;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/perfil")
@@ -93,17 +96,19 @@ public class ControladorPerfil {
     }
 
     /**
-     * Obtiene las notificaciones del perfil autenticado.
+     * Obtiene las notificaciones del perfil autenticado, con paginación y filtro por estado.
      *
-     * @param token token JWT del que se extrae el identificador del perfil
-     * @return 200 OK con la lista de notificaciones del perfil
+     * @param token  token JWT del que se extrae el identificador del perfil
+     * @param filtros filtros y parámetros de paginación (pagina, limite, leida)
+     * @return 200 OK con la página de notificaciones del perfil
      */
     @GetMapping("/notificaciones")
-    public ResponseEntity<List<NotificacionDto>> obtenerNotificaciones(
-        @CookieValue String token
+    public ResponseEntity<NotificacionesPaginadasDto> obtenerNotificaciones(
+        @CookieValue String token,
+        @ModelAttribute NotificacionesFiltro filtros
     ) {
         String perfilId = this.servicioJwt.getPerfilId(token);
-        return ResponseEntity.ok(this.perfilService.obtenerNotificaciones(perfilId));
+        return ResponseEntity.ok(this.perfilService.obtenerNotificaciones(perfilId, filtros));
     }
 
     /**
@@ -150,6 +155,62 @@ public class ControladorPerfil {
         String perfilId = this.servicioJwt.getPerfilId(token);
         this.perfilService.editarPerfil(perfilId, body);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Obtiene los datos públicos de un perfil a partir de su identificador.
+     * Este endpoint se utiliza para visualizar el perfil de otro usuario.
+     *
+     * @param perfilId identificador del perfil a consultar
+     * @return 200 OK con los datos públicos del perfil
+     */
+    @GetMapping("/{perfilId}")
+    public ResponseEntity<PerfilDto> obtenerPerfilPorId(
+            @PathVariable String perfilId
+    ) {
+        return ResponseEntity.ok(
+                perfilService.obtenerPerfil(perfilId)
+        );
+    }
+
+    /**
+     * Obtiene las calificaciones recibidas por un perfil específico, de forma paginada.
+     * Este endpoint se utiliza para visualizar las calificaciones de otro usuario.
+     *
+     * @param perfilId identificador del perfil
+     * @param pagina número de página solicitado
+     * @param limite cantidad máxima de resultados por página
+     * @return 200 OK con la página de calificaciones del perfil indicado
+     */
+    @GetMapping("/{perfilId}/calificaciones")
+    public ResponseEntity<PaginaResultado<CalificacionDto>> obtenerCalificacionesPerfil(
+            @PathVariable String perfilId,
+            @RequestParam Integer pagina,
+            @RequestParam Integer limite
+    ) {
+        return ResponseEntity.ok(
+                perfilService.obtenerCalificaciones(
+                        perfilId,
+                        pagina,
+                        limite
+                )
+        );
+    }
+
+    /**
+     * Obtiene los contadores de figuritas repetidas y faltantes de un perfil específico.
+     * Este endpoint se utiliza para visualizar los contadores de otro usuario.
+     *
+     * @param perfilId identificador del perfil
+     * @return 200 OK con la lista de contadores del perfil indicado
+     */
+    @GetMapping("/{perfilId}/contadores")
+    public ResponseEntity<List<ContadorDto>> obtenerContadoresPerfil(
+            @PathVariable String perfilId
+    ) {
+        return ResponseEntity.ok(
+                this.perfilService.obtenerContadores(perfilId)
+        );
     }
 
 }

@@ -25,6 +25,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -108,6 +109,29 @@ public class ControladorSugerenciasTest {
   @Test
   void alternarFavorito_sinCookie_retorna400() throws Exception {
     mockMvc.perform(patch("/sugerencias/{id}/favorito", sugerenciaId))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void recalcularSugerencias_retorna204() throws Exception {
+    doNothing().when(servicioSugerencia).recalcularSugerencias(perfilId);
+
+    mockMvc.perform(post("/sugerencias/recalcular").cookie(cookie))
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  void recalcularSugerencias_perfilNoEncontrado_retorna404() throws Exception {
+    doThrow(new NotFoundException("Perfil no encontrado"))
+        .when(servicioSugerencia).recalcularSugerencias(perfilId);
+
+    mockMvc.perform(post("/sugerencias/recalcular").cookie(cookie))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void recalcularSugerencias_sinCookie_retorna400() throws Exception {
+    mockMvc.perform(post("/sugerencias/recalcular"))
         .andExpect(status().isBadRequest());
   }
 }

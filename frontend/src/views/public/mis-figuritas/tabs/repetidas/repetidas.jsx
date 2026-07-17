@@ -1,53 +1,38 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQueryClient } from '@tanstack/react-query';
+import useQueryConError from '@/hooks/useQueryConError';
 import { buscarRepetidas, editarRepetida } from '@/services/coleccionService.js'
 import RepetidaCard from "../../../../../components/ui/repetida-card/repetida-card.jsx";
 import FilterChip from "../../../../../components/ui/filter-chip/filter-chip.jsx";
 import Button from "../../../../../components/ui/button/button.jsx";
 import { useNavigate } from "react-router";
 import Paginacion from "../../../../../components/ui/paginacion/paginacion.jsx";
-import {useError} from "@/contexts/errorContext.jsx";
-import { useToast } from '@/contexts/toastContext.jsx'
+import { useError } from "@/contexts/errorContext.jsx";
+import { useToast } from '@/contexts/toastContext.jsx';
 import EditarRepetidaModal from '@/components/ui/editar-repetida-modal/editar-repetida-modal.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const Repetidas = () => {
-    const [repetidas, setRepetidas] = useState({});
     const [filtros, setFiltros] = useState({
         metodoIntercambio: "",
     });
 
     const [showModal, setShowModal] = useState(false);
     const [repetidaSeleccionada, setRepetidaSeleccionada] = useState(undefined);
+    const [procesando, setProcesando] = useState(false);
+    const [accionProcesando, setAccionProcesando] = useState('');
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [pagina, setPagina] = useState(1);
 
-    const {handleError} = useError()
+    const { handleError } = useError();
     const {showToast} = useToast()
-
+    const queryClient = useQueryClient()
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const cargarRepetidas = async () => {
-            try {
-                setLoading(true);
-
-                const repetidasApi = await buscarRepetidas({
-                    ...filtros,
-                    pagina,
-                    limite: 10,
-                });
-
-                setRepetidas(repetidasApi);
-            } catch (err) {
-              showToast(handleError(err, setError),'error')
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        cargarRepetidas();
-    }, [filtros, pagina]);
+    const { data: repetidas, isLoading, error } = useQueryConError({
+        queryKey: ['repetidas', { ...filtros, pagina, limite: 10 }],
+        queryFn: ({ signal }) => buscarRepetidas({ ...filtros, pagina, limite: 10 }, signal),
+    })
 
     const cambiarFiltro = (nuevoTipo) => {
         setFiltros((prev) => {
@@ -74,29 +59,36 @@ const Repetidas = () => {
 
   const guardarCambiosRepetida = async (payload) => {
     try {
+      setProcesando(true);
+      setAccionProcesando('Guardando repetida...');
       await editarRepetida(
         repetidaSeleccionada.figurita_id,
         payload
       );
 
-      setRepetidas((prev) => ({
-        ...prev,
-        contenido: prev.contenido.map((item) =>
-          item.figurita_id === repetidaSeleccionada.figurita_id
-            ? {
-              ...item,
-              cantidad_existente: payload.cantidadNueva,
-              metodos: payload.metodos,
-            }
-            : item
-        ),
-      }));
+      queryClient.setQueryData(
+        ['repetidas', { ...filtros, pagina, limite: 10 }],
+        (old) => ({
+          ...old,
+          contenido: old.contenido.map((item) =>
+            item.figurita_id === repetidaSeleccionada.figurita_id
+              ? {
+                ...item,
+                cantidad_existente: payload.cantidadNueva,
+                metodos: payload.metodos,
+              }
+              : item
+          ),
+        })
+      );
 
       showToast("Repetida actualizada", "success");
       cerrarModalEdicion();
     } catch (err) {
 
       showToast(handleError(err, () => {}), "error");
+    } finally {
+      setProcesando(false);
     }
   };
 
@@ -109,7 +101,7 @@ const Repetidas = () => {
     }
 
     return (
-        <div className="container-fluid px-0 d-flex flex-column gap-4">
+        <div className="container-fluid px-0 d-flex flex-column gap-4" style={showModal ? { pointerEvents: 'none' } : undefined}>
 
             <div className="row g-3 justify-content-center">
                 <div className="col-6 col-md-4">
@@ -118,7 +110,7 @@ const Repetidas = () => {
                         style={{ backgroundColor: "var(--color-primary)" }}
                     >
                         <p className="mb-1 fw-bold fs-2">
-                            {repetidas.publicadas ?? 0}
+                            {repetidas?.publicadas ?? 0}
                         </p>
                         <p className="mb-0 text-muted">Publicadas</p>
                     </div>
@@ -130,7 +122,7 @@ const Repetidas = () => {
                         style={{ backgroundColor: "var(--color-primary)" }}
                     >
                         <p className="mb-1 fw-bold fs-2">
-                            {repetidas.disponibles ?? 0}
+                            {repetidas?.disponibles ?? 0}
                         </p>
                         <p className="mb-0 text-muted">Disponibles</p>
                     </div>
@@ -168,7 +160,7 @@ const Repetidas = () => {
 
             <div className="d-flex justify-content-between align-items-center gap-3 flex-nowrap">
                 <p className="mb-0">
-                    {repetidas.cantidad_de_elementos ?? 0} resultados encontrados
+                    {repetidas?.cantidad_de_elementos ?? 0} resultados encontrados
                 </p>
 
                 <div className="flex-shrink-0">
@@ -182,7 +174,7 @@ const Repetidas = () => {
                 </div>
             </div>
 
-            {loading ? (
+            {isLoading ? (
                 <div className="row g-4">
                     {[...Array(8)].map((_, i) => (
                         <div
@@ -226,7 +218,7 @@ const Repetidas = () => {
                     <Paginacion
                         page={pagina}
                         totalPages={
-                            repetidas.cantidad_de_paginas ?? 1
+                            repetidas?.cantidad_de_paginas ?? 1
                         }
                         onChange={setPagina}
                     />
@@ -240,6 +232,11 @@ const Repetidas = () => {
                 onGuardar={guardarCambiosRepetida}
               />
             )}
+
+            <ModalInformativo open={procesando}>
+              <h3>{accionProcesando}</h3>
+              <p>Esto puede tardar unos segundos</p>
+            </ModalInformativo>
         </div>
     );
 };

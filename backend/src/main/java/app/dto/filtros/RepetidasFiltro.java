@@ -6,6 +6,7 @@ public record RepetidasFiltro(
     MetodoIntercambio metodoIntercambio,
     // para coincidir las faltantes del perfilId con las repetidas del perfil actual
     String perfilId,
+    String jugador,
     Integer limite,
     Integer pagina
 ) {

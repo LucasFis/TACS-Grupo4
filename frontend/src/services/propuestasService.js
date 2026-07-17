@@ -2,14 +2,14 @@ import { api, handleAxiosError } from "./api.js";
 
 const PROPUESTAS_URL = "/propuestas";
 
-export const buscarPropuestas = async (filtros) => {
+export const buscarPropuestas = async (filtros, signal) => {
     try {
         const filtrosLimpios = Object.fromEntries(
             Object.entries(filtros)
                 .filter(([_, value]) => value !== "" && value != null)
         );
         const {data} = await api.get(PROPUESTAS_URL,
-            {params: {...filtrosLimpios}}
+            {params: {...filtrosLimpios}, signal}
         );
         return data
     } catch (error) {

@@ -4,6 +4,8 @@ import app.exceptions.BadRequestException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import app.exceptions.ForbiddenException;
 import lombok.AllArgsConstructor;
@@ -44,19 +46,8 @@ public class Propuesta {
         List.of(new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE))
     );
 
-    @Getter(AccessLevel.NONE)
     @Builder.Default
     private EstadoPropuesta estadoActual = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
-
-    public EstadoPropuesta getEstadoActual() {
-        if (estado == null || estado.isEmpty()) {
-            EstadoPropuesta inicial = new EstadoPropuesta(LocalDateTime.now(), EstadoProceso.PENDIENTE);
-            estado = new ArrayList<>();
-            estado.add(inicial);
-            return inicial;
-        }
-        return estado.get(estado.size() - 1);
-    }
 
     /**
      * Acepta la propuesta. Valida que {@code usuario} sea el destinatario
@@ -127,14 +118,29 @@ public class Propuesta {
     }
 
     private void ejecutarIntercambio() {
+        // Capturar métodos antes de modificar las colecciones
+        List<MetodoIntercambio> metodosBuscada = this.destinatario.getColeccion()
+            .getMetodosDe(this.getFiguritaBuscada());
+        Map<String, List<MetodoIntercambio>> metodosOfrecidas = this.getFiguritasOfrecidas().stream()
+            .collect(Collectors.toMap(Figurita::getId, f -> this.autor.getColeccion().getMetodosDe(f)));
+
+        // Destinatario entrega figuritaBuscada y recibe figuritasOfrecidas
         this.getFiguritasOfrecidas()
             .forEach(f -> this.destinatario.getColeccion().eliminarFaltante(f));
         this.destinatario.getColeccion()
             .descontarRepetida(this.getFiguritaBuscada());
+        this.getFiguritasOfrecidas()
+            .forEach(f -> this.destinatario.getColeccion().agregarRepetida(
+                new FiguritaIntercambiable(f, 1, metodosOfrecidas.get(f.getId()), this.destinatario.getId())
+            ));
 
+        // Autor entrega figuritasOfrecidas y recibe figuritaBuscada
         this.getFiguritasOfrecidas()
             .forEach(f -> this.autor.getColeccion().descontarRepetida(f));
         this.autor.getColeccion().eliminarFaltante(this.getFiguritaBuscada());
+        this.autor.getColeccion().agregarRepetida(
+            new FiguritaIntercambiable(this.getFiguritaBuscada(), 1, metodosBuscada, this.autor.getId())
+        );
     }
 
     private void ejecutarRechazo() {
@@ -164,7 +170,7 @@ public class Propuesta {
     }
 
     private void validarPendiente() {
-        if (getEstadoActual().getValor() != EstadoProceso.PENDIENTE) {
+        if (this.getEstadoActual().getValor() != EstadoProceso.PENDIENTE) {
             throw new BadRequestException("La propuesta ya fue respondida");
         }
     }

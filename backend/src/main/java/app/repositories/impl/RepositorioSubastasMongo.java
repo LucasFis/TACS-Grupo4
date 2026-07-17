@@ -41,6 +41,8 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
       update.set("fechaCierre", subasta.getFechaCierre());
     }
 
+    update.set("avisoFinalEnviado", subasta.isAvisoFinalEnviado());
+
     mongoTemplate.updateFirst(
         Query.query(Criteria.where("_id").is(subasta.getId())),
         update,
@@ -224,5 +226,22 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
       subasta.setFiguritasSolicitadas(new ArrayList<>());
     }
     return subasta;
+  }
+
+  @Override
+  public List<Subasta> buscarActivas() {
+
+      Date ahora = new Date();
+      Query query = new Query();
+      query.addCriteria(
+              new Criteria().andOperator(
+                      Criteria.where("fechaInicio").lte(ahora),
+                      Criteria.where("fechaCierre").gt(ahora)
+              )
+      );
+      return mongoTemplate.find(query, Subasta.class)
+              .stream()
+              .map(this::normalizar)
+              .toList();
   }
 }
