@@ -16,6 +16,7 @@ import { derivarTiempo } from '../../../../../../utils/subastasTiempo.js'
 import { useNavigate } from 'react-router'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
+import ModalInformativo from '../../../../../../components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './mi-subasta.module.css'
 
 const BADGE_ESTADO = {
@@ -64,8 +65,9 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const { showToast } = useToast()
   const { handleError } = useError()
   const [modal, setModal] = useState(null)
-  const [loadingModal, setLoadingModal] = useState(false)
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
+  const [procesando, setProcesando] = useState(false)
+  const [accionProcesando, setAccionProcesando] = useState('')
 
   const finalizaPronto = tiempoRestante > 0 && tiempoRestante <= 3600;
 
@@ -74,9 +76,17 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const haySeleccionada = ofertas?.some((o) => o.seleccionada)
   const config = modal ? MODAL_CONFIG[modal.tipo] : null
 
+  const ACCION_LABELS = {
+    adjudicar: 'Adjudicando oferta...',
+    rechazar: 'Rechazando oferta...',
+    cancelar: 'Cancelando subasta...',
+    cerrar: 'Cerrando subasta...',
+  }
+
   const handleConfirmar = async () => {
     try {
-      setLoadingModal(true)
+      setProcesando(true)
+      setAccionProcesando(ACCION_LABELS[modal.tipo] ?? 'Procesando...')
       if (modal.tipo === 'adjudicar') await seleccionarOferta(subastaId, modal.ofertaId)
       else if (modal.tipo === 'rechazar') await rechazarOferta(subastaId, modal.ofertaId)
       else if (modal.tipo === 'cancelar') await cancelarSubasta(subastaId)
@@ -86,20 +96,27 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
     } finally {
-      setLoadingModal(false)
+      setProcesando(false)
     }
   }
 
   const handleCalificar = async ({ valor, descripcion }) => {
-    await calificarPerfil({
-      destinatarioId: oferta_ganadora.autor.id,
-      valor,
-      descripcion,
-      transactionId: subastaId,
-      tipoTransaccion: 'SUBASTA',
-    })
-    setMostrarCalificar(false)
-    onRefresh()
+    try {
+      setProcesando(true)
+      await calificarPerfil({
+        destinatarioId: oferta_ganadora.autor.id,
+        valor,
+        descripcion,
+        transactionId: subastaId,
+        tipoTransaccion: 'SUBASTA',
+      })
+      setMostrarCalificar(false)
+      onRefresh()
+    } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
+    } finally {
+      setProcesando(false)
+    }
   }
 
     useEffect(() => {
@@ -223,7 +240,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
         show={modal !== null}
         titulo={config?.titulo}
         mensaje={config?.mensaje}
-        labelConfirmar={loadingModal ? 'Cargando...' : config?.labelConfirmar}
+        labelConfirmar={config?.labelConfirmar}
         onConfirmar={handleConfirmar}
         onCancelar={() => setModal(null)}
       />
@@ -236,6 +253,11 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
           onCancelar={() => setMostrarCalificar(false)}
         />
       )}
+
+      <ModalInformativo open={procesando}>
+        <h3>{accionProcesando}</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </>
   )
 }

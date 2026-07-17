@@ -345,7 +345,7 @@ public class PropuestaHandler implements BotHandler {
       }
 
       case "propuesta:esperando_figurita_buscada" -> {
-        datosPendientes.get(chatId).put("figuritaBuscadaId", texto);
+        datosPendientes.get(chatId).put("figuritaBuscadaId", texto.trim().toUpperCase());
         estadoPendiente.put(chatId, "propuesta:esperando_figuritas_ofrecidas");
         yield BotResponse.texto("""
                         Paso 3/4 — ¿Qué figuritas querés ofrecer?
@@ -355,7 +355,7 @@ public class PropuestaHandler implements BotHandler {
 
       case "propuesta:esperando_figuritas_ofrecidas" -> {
         List<String> ids = Arrays.stream(texto.split(","))
-            .map(String::trim)
+            .map(s -> s.trim().toUpperCase())
             .filter(s -> !s.isBlank())
             .toList();
 

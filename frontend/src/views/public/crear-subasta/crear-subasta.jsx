@@ -6,6 +6,7 @@ import SelectorFaltantes from '@/components/ui/selector-faltantes/selector-falta
 import Button from '@/components/ui/button/button.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-subasta.module.css'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -252,13 +253,18 @@ const CrearSubasta = () => {
       />
 
       <div className={styles.acciones}>
-        <Button label="Cancelar" variant="secondary" onClick={() => navigate(-1)} />
+        <Button label="Cancelar" variante="secondary" onClick={() => navigate(-1)} />
         <Button
           label={loading ? 'Publicando...' : 'Publicar subasta ↗'}
           disabled={!puedePublicar || loading}
           onClick={handlePublicar}
         />
       </div>
+
+      <ModalInformativo open={loading}>
+        <h3>Publicando subasta...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </main>
   )
 }

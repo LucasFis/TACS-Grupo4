@@ -261,11 +261,11 @@ public class ColeccionHandler implements BotHandler {
 
       case "faltante:esperando_figId" -> {
         estadoPendiente.remove(chatId);
-        yield confirmarAgregarFaltante(chatId, texto);
+        yield confirmarAgregarFaltante(chatId, texto.trim().toUpperCase());
       }
 
       case "repetida:esperando_figId" -> {
-        datosPendientes.get(chatId).put("figId", texto);
+        datosPendientes.get(chatId).put("figId", texto.trim().toUpperCase());
         estadoPendiente.put(chatId, "repetida:esperando_cantidad");
         yield BotResponse.texto("📦 ¿Cuántas unidades repetidas tenés?");
       }

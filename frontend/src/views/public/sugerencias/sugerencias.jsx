@@ -11,6 +11,7 @@ import ExtraInfo from "@/components/ui/extra-info/extra-info.jsx";
 import MostradorSugerencias from "./tabs/mostrador-sugerencias.jsx";
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const Sugerencias = () => {
 
@@ -72,6 +73,11 @@ const Sugerencias = () => {
 
                     <MostradorSugerencias key={revision} />
                 </div>
+
+                <ModalInformativo open={recalculando}>
+                    <h3>Recalculando sugerencias...</h3>
+                    <p>Esto puede tardar unos segundos</p>
+                </ModalInformativo>
             </div>
         </main>
     )

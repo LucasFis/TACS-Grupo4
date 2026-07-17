@@ -8,6 +8,7 @@ import {useToast} from "@/contexts/toastContext.jsx";
 import {useError} from "@/contexts/errorContext.jsx";
 import Breadcrumb from "@/components/ui/breadcrumb/breadcrumb.jsx";
 import { IconoAdvertencia } from '@/components/ui/iconos/advertencia/advertencia.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 
 const NuevaFaltante = () => {
     const [figurita, setFigurita] = useState(undefined);
@@ -15,6 +16,7 @@ const NuevaFaltante = () => {
     const [jugador, setJugador] = useState('');
     const [errorFormato, setErrorFormato] = useState('');
     const [tocado, setTocado] = useState(false);
+    const [procesando, setProcesando] = useState(false);
 
     const {showToast} = useToast();
     const {handleError} = useError();
@@ -57,6 +59,7 @@ const NuevaFaltante = () => {
         }
 
         try {
+            setProcesando(true)
             await agregarFaltante(figurita)
             setNumero('')
             setJugador('')
@@ -64,6 +67,8 @@ const NuevaFaltante = () => {
             showToast("Faltante agregada correctamente","success")
         } catch (error) {
             showToast(handleError(error, (m) => {}),'error')
+        } finally {
+            setProcesando(false)
         }
     }
 
@@ -150,6 +155,11 @@ const NuevaFaltante = () => {
                 label="Publicar faltante ↗"
                 onClick={() => ejecutarFormulario()}
             />
+
+            <ModalInformativo open={procesando}>
+                <h3>Agregando faltante...</h3>
+                <p>Esto puede tardar unos segundos</p>
+            </ModalInformativo>
 
         </div>
     );

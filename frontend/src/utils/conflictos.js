@@ -2,6 +2,5 @@ export function construirAdvertenciaConflictos(conflictosData) {
   if (!conflictosData?.tieneConflictos) return null
   const { figuritasEnConflicto } = conflictosData
   const nombres = figuritasEnConflicto.map(f => f.jugador).join(', ')
-  const plural = figuritasEnConflicto.length > 1
-  return `${nombres} también está${plural ? 'n' : ''} involucrada${plural ? 's' : ''} en otras transacciones pendientes.`
+  return `Tenés otros intercambios o subastas activas donde también podrías conseguir a ${nombres}.\n\nAceptar este intercambio no las cancela automáticamente. Recordá cancelarlas o rechazarlas manualmente después.`
 }

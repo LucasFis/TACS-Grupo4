@@ -10,6 +10,7 @@ import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repet
 import Button from '@/components/ui/button/button.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-oferta.module.css'
 
 const obtenerBloqueadas = (repetidas, figuritasSolicitadas) => {
@@ -31,6 +32,7 @@ const CrearOferta = () => {
   const navigate = useNavigate()
 
   const [figuritasExtra, setFiguritasExtra] = useState([])
+  const [procesando, setProcesando] = useState(false)
   const { handleError } = useError()
   const { showToast } = useToast()
 
@@ -68,12 +70,15 @@ const CrearOferta = () => {
 
   const onEnviar = async () => {
     try {
+      setProcesando(true)
       const ids = [...bloqueadas, ...figuritasExtra].map((f) => f.figurita_id ?? f.id)
       await crearOferta(subId, ids)
       showToast('Oferta creada correctamente', 'success')
       navigate('/subastas')
     } catch (e) {
       handleError(e, (err) => showToast(err.mensaje, 'error'))
+    } finally {
+      setProcesando(false)
     }
   }
 
@@ -195,6 +200,11 @@ const CrearOferta = () => {
           />
         </div>
       )}
+
+      <ModalInformativo open={procesando}>
+        <h3>Enviando oferta...</h3>
+        <p>Esto puede tardar unos segundos</p>
+      </ModalInformativo>
     </div>
   )
 }
