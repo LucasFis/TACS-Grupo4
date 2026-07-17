@@ -23,7 +23,7 @@ const ConfirmModal = ({
             {advertencia && (
               <div
                 className="alert alert-warning py-2 px-3 mb-3"
-                style={{ fontSize: "0.85rem" }}
+                style={{ fontSize: "0.85rem", whiteSpace: "pre-line" }}
                 role="alert"
               >
                 {advertencia}
