@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
 
             setUser(undefined);
             localStorage.removeItem("sesion");
+            localStorage.removeItem("notificaciones_cache");
             navigate("/")
         };
 
@@ -64,6 +65,7 @@ export const AuthProvider = ({ children }) => {
     const cerrarSesion = async () => {
         setUser(undefined)
         localStorage.removeItem("sesion")
+        localStorage.removeItem("notificaciones_cache")
 
         await logout()
 
