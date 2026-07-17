@@ -273,6 +273,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
 
     ops.add(Aggregation.lookup("figuritas", "repetidas.figurita.$id", "_id", "repetidas.figurita"));
     ops.add(Aggregation.unwind("repetidas.figurita"));
+    ops.add(Aggregation.match(Criteria.where("repetidas.figurita").type(3)));
 
     if (filtros.tipos() != null && !filtros.tipos().isEmpty()) {
       ops.add(Aggregation.match(
@@ -328,6 +329,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
 
     ops.add(Aggregation.lookup("figuritas", "repetidas.figurita.$id", "_id", "repetidas.figurita"));
     ops.add(Aggregation.unwind("repetidas.figurita"));
+    ops.add(Aggregation.match(Criteria.where("repetidas.figurita").type(3)));
 
     for (String termino : terminos) {
       List<Criteria> criteriosPorTermino = new ArrayList<>();
