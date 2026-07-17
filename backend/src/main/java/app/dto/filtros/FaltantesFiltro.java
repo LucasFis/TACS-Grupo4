@@ -2,7 +2,8 @@ package app.dto.filtros;
 
 public record FaltantesFiltro (
     Integer limite,
-    Integer pagina
+    Integer pagina,
+    String jugador
 ) {
   public FaltantesFiltro {
     if(limite == null){

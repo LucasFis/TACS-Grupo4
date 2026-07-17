@@ -97,7 +97,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     PaginaResultado<Figurita> dto = repositorioColecciones.buscarFaltantes(
         coleccion.getId(),
-        new FaltantesFiltro(2, 1)
+        new FaltantesFiltro(2, 1, null )
     );
 
     assertEquals(3, dto.cantidadDeElementos());
@@ -120,7 +120,7 @@ public class RepositorioColeccionesTest extends MongoTestBase {
 
     PaginaResultado dto = repositorioColecciones.buscarFaltantes(
         coleccion.getId(),
-        new FaltantesFiltro(2, 2)
+        new FaltantesFiltro(2, 2, null)
     );
 
     assertEquals(1, dto.contenido().size());
