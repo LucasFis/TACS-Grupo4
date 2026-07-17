@@ -6,6 +6,7 @@ import MiSubasta from './mi-subasta/mi-subasta.jsx'
 import Paginacion from '../../../../../components/ui/paginacion/paginacion.jsx'
 import FiltroSubasta from '../../filtro-subasta/filtro-subasta.jsx'
 import { useAuth } from '@/contexts/userContext.jsx'
+import styles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 
 
 const MisSubastas = () => {
@@ -17,7 +18,7 @@ const MisSubastas = () => {
   const queryClient = useQueryClient()
   const queryKey = ['subastas', 'misSubastas', { autorId: user.perfil_id, estado, pagina, limite: 5, ...paramsFigurita }]
 
-  const { data, isLoading } = useQueryConError({
+  const { data, isLoading, isFetching } = useQueryConError({
     queryKey,
     queryFn: ({ signal }) => buscarSubastas({ autorId: user.perfil_id, estado, pagina, limite: 5, ...paramsFigurita }, signal),
   })
@@ -37,6 +38,13 @@ const MisSubastas = () => {
         onChangeEstado={cambiarEstado}
         onAplicarFigurita={(p) => { setParamsFigurita(p); setPagina(1) }}
       />
+
+      {isFetching && !isLoading && (
+        <div className={styles.actualizando}>
+          <div className={styles.spinnerChico} />
+          <span>Actualizando...</span>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="d-flex flex-column gap-3">
