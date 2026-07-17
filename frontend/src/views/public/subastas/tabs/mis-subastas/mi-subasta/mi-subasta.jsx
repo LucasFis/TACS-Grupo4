@@ -113,6 +113,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
       setMostrarCalificar(false)
       onRefresh()
     } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
     } finally {
       setProcesando(false)
     }

@@ -253,7 +253,7 @@ const CrearSubasta = () => {
       />
 
       <div className={styles.acciones}>
-        <Button label="Cancelar" variant="secondary" onClick={() => navigate(-1)} />
+        <Button label="Cancelar" variante="secondary" onClick={() => navigate(-1)} />
         <Button
           label={loading ? 'Publicando...' : 'Publicar subasta ↗'}
           disabled={!puedePublicar || loading}

@@ -7,6 +7,8 @@ import EtiquetaFiguritasOfrecidas from '../../../../../../components/ui/etiqueta
 import Etiqueta from '../../../../../../components/ui/etiqueta/etiqueta.jsx'
 import Button from '../../../../../../components/ui/button/button.jsx'
 import ModalInformativo from '../../../../../../components/ui/modales/modal-informativo/modal-informativo.jsx'
+import { useToast } from '@/contexts/toastContext.jsx'
+import { useError } from '@/contexts/errorContext.jsx'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
@@ -15,6 +17,8 @@ const SubastaParticipo = ({ subasta, finalizada, finalizadaHace, onRefresh }) =>
   const [mostrarCalificar, setMostrarCalificar] = useState(false)
   const [procesando, setProcesando] = useState(false)
   const navigate = useNavigate()
+  const { showToast } = useToast()
+  const { handleError } = useError()
 
   const [tiempoRestante, setTiempoRestante] = useState(subasta.tiempo_restante)
   const finalizaPronto = tiempoRestante > 0 && tiempoRestante <= 3600
@@ -38,6 +42,7 @@ const SubastaParticipo = ({ subasta, finalizada, finalizadaHace, onRefresh }) =>
       setMostrarCalificar(false)
       onRefresh()
     } catch (error) {
+      showToast(handleError(error, () => {}), 'error')
     } finally {
       setProcesando(false)
     }
