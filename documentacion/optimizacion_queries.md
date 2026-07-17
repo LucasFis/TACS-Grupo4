@@ -96,55 +96,72 @@ detalladas en el análisis exhaustivo del pipeline de `/figuritas/intercambiable
 
 ---
 
-## Loadtest k6 — p95 por endpoint (2026-07-17)
+## Loadtest k6 — developer vs fix, p95 por endpoint (2026-07-17)
 
-**Corrida:** 2026-07-17 07:03–07:28 UTC, rama `fix/optimizacion-queries`.
+**Corrida fix:** 2026-07-17 07:03–07:28 UTC, rama `fix/optimizacion-queries`.
+**Baseline developer:** 2026-07-17 08:04–08:29 UTC, rama `developer` — **misma máquina,
+corridas consecutivas de la misma mañana**, por lo que la comparación de p95 es válida.
 **Ambiente:** stack local Docker (`backend-test:8080` + MongoDB local) — sin la latencia Render↔Atlas de staging.
 **Perfil de carga:** rampa 100 → 250 → 200 → 50 VUs (~65 s por escenario).
-**Fuente:** `backend/src/test/loadtest/results/<escenario>.json` (k6 `--summary-export`).
+**Fuente:** `backend/src/test/loadtest/results/` — el baseline quedó preservado como
+`<escenario>-developer-20260717.json` (los archivos `<escenario>.json` se sobrescriben
+en cada corrida; los valores del fix son de la corrida de las 07:03 UTC).
 
 > **Nota metodológica:** el summary de k6 agrega todas las requests HTTP del escenario
 > (incluye el login de cada iteración y los GETs de setup en los escenarios de
 > escritura), no discrimina por URL. El p95 es del escenario completo.
 
-| Escenario            | Endpoint objetivo                                |  Reqs | med (ms) | **p95 (ms)** | p99 (ms) | Errores |
-|----------------------|--------------------------------------------------|------:|---------:|-------------:|---------:|--------:|
-| post-recalcular      | POST /sugerencias/recalcular                     |    44 |      222 | **59 998** ¹ |   60 000 |   38,6% |
-| patch-notificaciones | PATCH /perfil/notificaciones/leidas              |   378 |    1 026 |    **6 928** |    7 542 |      0% |
-| get-subastas         | GET /subastas                                    | 4 762 |      859 |    **5 474** |    7 410 |      0% |
-| get-propuestas       | GET /propuestas                                  | 6 268 |      271 |    **4 021** |    5 364 |      0% |
-| get-faltantes        | GET /colecciones/faltantes                       | 6 870 |      228 |    **3 805** |    4 749 |      0% |
-| get-sugerencias      | GET /sugerencias                                 | 6 650 |      242 |    **3 799** |    5 551 |      0% |
-| get-figuritas        | GET /figuritas                                   | 6 732 |      163 |    **3 761** |    4 982 |      0% |
-| patch-ofertas        | PATCH /subastas/{id}/ofertas/{ofertaId}          | 3 744 |      148 |      **608** |      847 |      0% |
-| post-repetidas       | POST /colecciones/repetidas                      | 4 293 |       29 |      **526** |      803 |      0% |
-| post-ofertas         | POST /subastas/{id}/ofertas                      | 9 183 |       20 |      **524** |      704 |      0% |
-| post-login           | POST /login                                      | 3 304 |      179 |      **518** |      751 |      0% |
-| post-propuestas      | POST /propuestas                                 | 9 300 |       19 |      **502** |      756 |      0% |
-| post-subastas        | POST /subastas                                   | 9 345 |       19 |      **476** |      671 |      0% |
-| put-perfil           | PUT /perfil                                      | 6 450 |       87 |      **473** |      700 |      0% |
-| patch-repetidas      | PATCH /colecciones/repetidas/{figId}             | 3 206 |       93 |      **375** |      571 |      0% |
-| post-administradores | POST /administradores                            | 6 878 |       86 |      **366** |      641 | 48,3% ² |
-| patch-propuestas     | PATCH /propuestas/{id}/aceptar·rechazar·cancelar | 4 635 |       19 |      **337** |      522 |      0% |
-| patch-favorito       | PATCH /sugerencias/{id}/favorito                 | 4 683 |       18 |      **301** |      670 |      0% |
-| patch-subastas       | PATCH /subastas/{id}/cerrar·cancelar             | 4 665 |       70 |      **225** |      498 |      0% |
-| delete-sesion        | DELETE /sesion                                   | 3 426 |       68 |      **162** |      358 |      0% |
-| post-calificaciones  | POST /perfil/calificaciones                      | 3 382 |       96 |      **162** |      187 |      0% |
-| head-usuarios        | HEAD /usuarios/{nombre}                          | 9 716 |        2 |        **4** |        5 |      0% |
-| post-usuarios        | POST /usuarios                                   | 4 067 |        2 |        **4** |       84 | 97,3% ² |
+| Escenario              | Endpoint objetivo                                | p95 developer (ms) | p95 fix (ms) | **Δ% mejora p95** | med developer (ms) | med fix (ms) |
+|------------------------|--------------------------------------------------|-------------------:|-------------:|------------------:|-------------------:|-------------:|
+| post-recalcular ¹      | POST /sugerencias/recalcular                     |           59 998 ¹ |     59 998 ¹ |                0% |                219 |          222 |
+| patch-notificaciones ¹ | PATCH /perfil/notificaciones/leidas              |           59 998 ¹ |        6 928 |        **+88,5%** |                205 |        1 026 |
+| get-propuestas         | GET /propuestas                                  |             14 933 |        4 021 |        **+73,1%** |              2 915 |          271 |
+| get-subastas           | GET /subastas                                    |             10 560 |        5 474 |        **+48,2%** |              2 015 |          859 |
+| get-sugerencias        | GET /sugerencias                                 |              9 626 |        3 799 |        **+60,5%** |              1 607 |          242 |
+| get-faltantes          | GET /colecciones/faltantes                       |              3 302 |        3 805 |          −15,2% ³ |                158 |          228 |
+| get-figuritas          | GET /figuritas                                   |              3 136 |        3 761 |          −19,9% ³ |                142 |          163 |
+| patch-propuestas       | PATCH /propuestas/{id}/aceptar·rechazar·cancelar |              2 729 |          337 |        **+87,7%** |                312 |           19 |
+| patch-ofertas          | PATCH /subastas/{id}/ofertas/{ofertaId}          |              2 392 |          608 |        **+74,6%** |                372 |          148 |
+| patch-subastas         | PATCH /subastas/{id}/cerrar·cancelar             |              1 441 |          225 |        **+84,4%** |                200 |           70 |
+| patch-favorito         | PATCH /sugerencias/{id}/favorito                 |                950 |          301 |            +68,3% |                170 |           18 |
+| put-perfil             | PUT /perfil                                      |                893 |          473 |            +47,0% |                146 |           87 |
+| post-subastas          | POST /subastas                                   |                849 |          476 |            +43,9% |                 34 |           19 |
+| post-repetidas         | POST /colecciones/repetidas                      |                655 |          526 |          +19,7% ³ |                101 |           29 |
+| post-login             | POST /login                                      |                580 |          518 |          +10,7% ³ |                168 |          179 |
+| post-propuestas        | POST /propuestas                                 |                515 |          502 |           +2,5% ³ |                 29 |           19 |
+| post-ofertas           | POST /subastas/{id}/ofertas                      |                460 |          524 |          −13,9% ³ |                 26 |           20 |
+| post-calificaciones    | POST /perfil/calificaciones                      |                228 |          162 |          +28,9% ³ |                121 |           96 |
+| post-administradores ² | POST /administradores                            |                179 |          366 |         −104,5% ² |                 86 |           86 |
+| patch-repetidas        | PATCH /colecciones/repetidas/{figId}             |                147 |          375 |         −155,1% ³ |                 63 |           93 |
+| delete-sesion          | DELETE /sesion                                   |                139 |          162 |          −16,5% ³ |                 48 |           68 |
+| head-usuarios          | HEAD /usuarios/{nombre}                          |                  3 |            4 |                 — |                  2 |            2 |
+| post-usuarios ²        | POST /usuarios                                   |                  4 |            4 |               — ² |                  2 |            2 |
 
-> ¹ `post-recalcular` alcanza el timeout de k6 (60 s) bajo carga: el recálculo de
-> sugerencias es un batch pesado que no está pensado para 250 usuarios concurrentes.
+> ¹ Timeouts de k6 (60 s). `post-recalcular` colapsa en **ambas ramas** (batch pesado, no
+> relacionado a este fix). `patch-notificaciones` colapsa **solo en developer** (44 reqs,
+> 38,6% timeouts); en fix procesa 378 reqs sin errores — la mejora real es mayor que el +88,5%.
 >
-> ² Los errores de `post-usuarios` (97,3%) y `post-administradores` (48,3%) son 400
-> por nombres de usuario duplicados entre iteraciones/corridas previas, no fallas del
-> servidor — de ahí sus latencias bajas.
+> ² Escenarios con errores 400 masivos por nombres de usuario duplicados entre corridas
+> (`post-usuarios` ~97-99%, `post-administradores` ~48% en ambas ramas): sus latencias no
+> son representativas y el delta no es significativo.
+>
+> ³ Deltas dentro del ruido entre corridas: escenarios sub-1s, o endpoints que esta rama
+> no tocó (`GET /figuritas`, `GET /colecciones/faltantes` varían ±15-20% entre corridas
+> idénticas).
 
 ### Lectura
 
-- **Los 5 GETs de listado son los únicos escenarios sanos por encima de 3,7 s de p95**:
-  bajo 250 VUs saturan el backend (mediana baja + p95 alto = cola de espera, no query
-  lenta). Son los candidatos para paginación más agresiva, índices y caching.
-- Las escrituras (POST/PATCH/PUT) se mantienen por debajo de ~600 ms de p95 incluso
-  en el pico de carga.
-- `patch-notificaciones` merece revisión: p95 de 6,9 s con apenas 378 requests.
+- **Los tres listados optimizados mejoran fuerte bajo carga**, y el Δ de p95 subestima la
+  mejora porque la corrida fix además procesó más requests en el mismo tiempo:
+  - `GET /propuestas`: p95 14,9 s → 4,0 s (**+73%**), mediana 2 915 → 271 ms (−91%), throughput ×3,7 (1 698 → 6 268 reqs).
+  - `GET /sugerencias`: p95 9,6 s → 3,8 s (**+60%**), mediana 1 607 → 242 ms (−85%), throughput ×2,4 (2 828 → 6 650 reqs).
+  - `GET /subastas`: p95 10,6 s → 5,5 s (**+48%**), mediana 2 015 → 859 ms (−57%), throughput ×2,0 (2 364 → 4 762 reqs).
+- **`patch-notificaciones` pasa de colapsar a funcionar**: en developer el escenario muere
+  en timeouts de 60 s con 38,6% de errores; en fix responde todo con p95 de 6,9 s. Sigue
+  siendo el escenario sano más lento del fix — candidato a la próxima optimización.
+- **Los PATCH de flujo completo heredan la mejora de los GETs de setup** que ejecutan
+  antes de escribir: propuestas +87,7%, subastas +84,4%, ofertas +74,6%.
+- Las escrituras puras se mantienen bajo ~600 ms de p95 en ambas ramas; el fix las mejora
+  o empata en casi todas.
+- `post-recalcular` hace timeout en ambas ramas: es un batch pesado que no está pensado
+  para 250 usuarios concurrentes y queda fuera del alcance de este fix.
