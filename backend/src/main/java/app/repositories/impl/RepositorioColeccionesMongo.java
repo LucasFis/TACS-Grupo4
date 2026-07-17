@@ -167,6 +167,9 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
 
     List<AggregationOperation> filtrado = new ArrayList<>();
 
+    filtrado.add(Aggregation.lookup("figuritas", "repetidas.figurita.$id", "_id", "repetidas.figurita"));
+    filtrado.add(Aggregation.unwind("repetidas.figurita"));
+
     if (filtros.metodoIntercambio() != null) {
       filtrado.add(Aggregation.match(
           Criteria.where("repetidas.metodos").is(filtros.metodoIntercambio())
@@ -176,7 +179,13 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     if (colIdFaltantes != null) {
       List<String> idsFaltantes = obtenerIdsFaltantes(colIdFaltantes);
       filtrado.add(Aggregation.match(
-          Criteria.where("repetidas.figurita.$id").in(idsFaltantes)
+          Criteria.where("repetidas.figurita._id").in(idsFaltantes) // antes: "repetidas.figurita.$id"
+      ));
+    }
+
+    if (filtros.jugador() != null && !filtros.jugador().isBlank()) {
+      filtrado.add(Aggregation.match(
+          Criteria.where("repetidas.figurita.jugador").regex(filtros.jugador(), "i")
       ));
     }
 
