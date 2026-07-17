@@ -12,6 +12,7 @@ import {
 import { calificarPerfil } from '@/services/perfilService.js'
 import CalificarModal from '@/components/ui/calificar-modal/calificar-modal.jsx'
 import { useState } from 'react'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
@@ -23,6 +24,7 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
   const [showCalificacion, setShowCalificacion] = useState(false)
   const [confirmAction, setConfirmAction] = useState(null)
   const [conflictosData, setConflictosData] = useState(null)
+  const [validandoConflictos, setValidandoConflictos] = useState(false)
   const [procesando, setProcesando] = useState(false)
   const [accionProcesando, setAccionProcesando] = useState('')
 
@@ -96,11 +98,14 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
 
   const handleClickAceptar = async () => {
     try {
+      setValidandoConflictos(true)
       const data = await verificarConflictos(intercambio.id)
       setConflictosData(data)
       setConfirmAction('ACEPTAR')
     } catch (error) {
       showToast(handleError(error, (m) => {}),'error')
+    } finally {
+      setValidandoConflictos(false)
     }
   }
 
@@ -236,6 +241,10 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
         onCancelar={() => { setConfirmAction(null); setConflictosData(null) }}
         advertencia={confirmConfig[confirmAction]?.advertencia}
       />
+
+      <ModalInformativo open={validandoConflictos}>
+        <h3>Validando conflictos...</h3>
+      </ModalInformativo>
 
       <ModalInformativo open={procesando}>
         <h3>{accionProcesando}</h3>
