@@ -33,6 +33,7 @@ const Sugerencias = () => {
             setRecalculando(true)
             await recalcularSugerencias()
             queryClient.invalidateQueries({ queryKey: ['contadoresSugerencias'] })
+            queryClient.invalidateQueries({ queryKey: ['sugerencias'] })
             setRevision(r => r + 1)
             showToast('Sugerencias recalculadas', 'success')
         } catch (error) {

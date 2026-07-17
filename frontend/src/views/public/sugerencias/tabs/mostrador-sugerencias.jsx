@@ -4,12 +4,13 @@ import useQueryConError from '@/hooks/useQueryConError'
 import Paginacion from "@/components/ui/paginacion/paginacion.jsx";
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import { buscarSugerencias } from '@/services/sugerenciasService.js'
+import styles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 
 const MostradorSugerencias = () => {
 
     const [pagina, setPagina] = useState(1)
 
-    const { data, isLoading, error } = useQueryConError({
+    const { data, isLoading, isFetching, error } = useQueryConError({
         queryKey: ['sugerencias', { pagina, limite: 10 }],
         queryFn: ({ signal }) => buscarSugerencias({ pagina, limite: 10 }, signal),
     })
@@ -21,6 +22,7 @@ const MostradorSugerencias = () => {
 
     return (
         <div className="d-flex flex-column gap-3">
+            {isFetching && !isLoading && <div className={styles.actualizando}><div className={styles.spinnerChico} /><span>Actualizando…</span></div>}
             {isLoading ? (
                 <Spinner />
             ) : sugerencias.length > 0 ? (
