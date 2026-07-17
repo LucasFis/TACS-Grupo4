@@ -179,7 +179,7 @@ public class RepositorioColeccionesMongo implements RepositorioColecciones {
     if (colIdFaltantes != null) {
       List<String> idsFaltantes = obtenerIdsFaltantes(colIdFaltantes);
       filtrado.add(Aggregation.match(
-          Criteria.where("repetidas.figurita._id").in(idsFaltantes) // antes: "repetidas.figurita.$id"
+          Criteria.where("repetidas.figurita._id").in(idsFaltantes)
       ));
     }
 
