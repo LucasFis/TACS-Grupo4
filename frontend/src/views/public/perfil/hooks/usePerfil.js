@@ -2,10 +2,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import useQueryConError from '@/hooks/useQueryConError'
 import { buscarContadores, buscarPerfil } from '@/services/perfilService.js'
 import { useAuth } from '@/contexts/userContext.jsx'
+import { useToast } from '@/contexts/toastContext.jsx'
 import { truncarADosDecimales } from '@/utils/estandarizar.js'
 
 export const usePerfil = (perfilId) => {
   const { user, cerrarSesion } = useAuth()
+  const { showToast } = useToast()
   const queryClient = useQueryClient()
 
   const { data: perfil, isLoading: loading } = useQueryConError({
