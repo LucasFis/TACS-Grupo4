@@ -1,14 +1,21 @@
 package app.controllers;
 
+import app.dto.SesionDto;
 import app.dto.request.ContraseniaRequest;
 import app.dto.request.UsuarioRequest;
+import app.model.entities.Perfil;
 import app.model.entities.Rol;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioUsuario;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping
@@ -20,17 +27,34 @@ public class ControladorUsuario {
 
   /**
    * Registra un nuevo usuario con rol estándar. Crea la cuenta, una colección vacía
-   * y un perfil asociado.
+   * y un perfil asociado. Además emite la cookie de sesión para que el cliente
+   * quede autenticado de inmediato tras el registro.
    *
-   * @param request datos del usuario a registrar (nombre de usuario y contraseña)
-   * @return 204 No Content si el registro se realizó correctamente
+   * @param request  datos del usuario a registrar (nombre de usuario y contraseña)
+   * @param response respuesta HTTP sobre la que se setea la cookie de sesión
+   * @return 200 OK con los datos de sesión del usuario recién creado
    */
   @PostMapping("/usuarios")
-  public ResponseEntity<Void> registrarUsuario(
-      @Valid @RequestBody UsuarioRequest request
+  public ResponseEntity<SesionDto> registrarUsuario(
+      @Valid @RequestBody UsuarioRequest request,
+      HttpServletResponse response
   ) {
-    this.servicioUsuario.registrarUsuario(request);
-    return ResponseEntity.noContent().build();
+    Perfil perfil = this.servicioUsuario.registrarUsuario(request);
+
+    String token = this.servicioJwt.generarToken(perfil.getUsuario(), perfil);
+
+    ResponseCookie cookie = ResponseCookie.from("token", token)
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("Lax")
+        .path("/")
+        .maxAge(Duration.ofHours(12))
+        .build();
+
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+    SesionDto sesion = this.servicioJwt.obtenerSesion(token);
+    return ResponseEntity.ok(sesion);
   }
 
   /**
