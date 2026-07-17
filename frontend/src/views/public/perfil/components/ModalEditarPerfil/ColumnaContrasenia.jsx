@@ -4,6 +4,7 @@ import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import TextoInput from '@/components/ui/input-texto/input-texto.jsx'
 import ContraseniaInput from '@/components/ui/input-contrasenia/input-contrasenia.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import styles from './columna.module.css'
 
 const validarNombreUsuario = (nombre) => ({
@@ -45,6 +46,7 @@ const ColumnaContrasenia = forwardRef(({
 
   const [tocadoNombreUsuario, setTocadoNombreUsuario] = useState(false)
   const [nombreUsuarioTomado, setNombreUsuarioTomado] = useState(false)
+  const [verificandoNombre, setVerificandoNombre] = useState(false)
   const [tocadoActual, setTocadoActual] = useState(false)
   const [tocadoNueva, setTocadoNueva] = useState(false)
 
@@ -89,11 +91,14 @@ const ColumnaContrasenia = forwardRef(({
     setTocadoNombreUsuario(true)
     if (!nombreFormatoValido) return
     if (nombreUsuarioEditando === nombreUsuarioOriginal) return
+    setVerificandoNombre(true)
     try {
       const existe = await verificarNombre(nombreUsuarioEditando)
       setNombreUsuarioTomado(existe)
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
+    } finally {
+      setVerificandoNombre(false)
     }
   }
 
@@ -120,7 +125,10 @@ const ColumnaContrasenia = forwardRef(({
         tocado={tocadoNombreUsuario}
         esValido={nombreEsValido}
         error={getErrorNombreUsuario()}
-        hint='Sin espacios. Solo letras, números, "_" o ".".'
+        hint={verificandoNombre
+          ? <span className="d-flex align-items-center gap-1"><Spinner /> Verificando disponibilidad...</span>
+          : 'Sin espacios. Solo letras, números, "_" o ".".'
+        }
       />
 
       <ContraseniaInput
