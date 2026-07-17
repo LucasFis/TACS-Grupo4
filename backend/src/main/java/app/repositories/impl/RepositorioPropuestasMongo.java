@@ -186,6 +186,7 @@ public class RepositorioPropuestasMongo implements RepositorioPropuestas {
         return mongoTemplate.aggregate(
             Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("estado.0.fecha").gte(desde).lte(hasta)),
+                Aggregation.match(Criteria.where("estadoActual.valor").ne(null)),
                 Aggregation.group("$estadoActual.valor").count().as("total")
             ),
             "propuestas", Document.class

@@ -187,7 +187,10 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
     if (doc == null)
       throw new NotFoundException("Perfil no encontrado con usuario de id: " + usuarioId);
 
-    DBRef ref = (DBRef) doc.get("coleccion");
+    Object coleccionRef = doc.get("coleccion");
+    if (!(coleccionRef instanceof DBRef ref) || ref.getId() == null) {
+      throw new NotFoundException("Perfil sin colección asociada, usuario de id: " + usuarioId);
+    }
     return ref.getId().toString();
   }
 
