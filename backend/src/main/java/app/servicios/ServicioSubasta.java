@@ -303,6 +303,19 @@ public class ServicioSubasta {
     Propuesta oferta = subasta.rechazarOferta(ofertaId, perfilId);
     contarTransicion("rechazado");
 
+    String link = "/subastas/" + subastaId;
+
+    String figuritasOfrecidas = oferta.getFiguritasOfrecidas().stream()
+        .map(f -> "#" + f.getNumero() + " " + f.getJugador())
+        .collect(Collectors.joining(", "));
+
+    String cuerpo = "Tu oferta: " + figuritasOfrecidas
+        + " para la subasta de la figurita #"
+        + subasta.getFiguritaSubastada().getNumero() + " "
+        + subasta.getFiguritaSubastada().getJugador() + " fue rechazada";
+
+    notificacionService.notificarInteresados(List.of(oferta.getAutor()), cuerpo, link);
+
     CamposColeccion camposColeccion = new CamposColeccion(true, false);
     this.repositorioColecciones.guardar(oferta.getAutor().getColeccion(), camposColeccion);
 
