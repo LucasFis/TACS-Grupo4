@@ -67,7 +67,7 @@ const Repetidas = () => {
       );
 
       queryClient.setQueryData(
-        ['repetidas', { ...filtros, pagina, limite: 10 }],
+        ['repetidas', { ...filtros, pagina, limite: 12 }],
         (old) => ({
           ...old,
           contenido: old.contenido.map((item) =>
@@ -176,7 +176,7 @@ const Repetidas = () => {
 
             {isLoading ? (
                 <div className="row g-4">
-                    {[...Array(8)].map((_, i) => (
+                    {[...Array(12)].map((_, i) => (
                         <div
                             key={i}
                             className="col-12 col-md-6 col-lg-4"

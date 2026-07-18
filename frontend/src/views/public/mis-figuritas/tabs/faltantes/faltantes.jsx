@@ -53,7 +53,7 @@ const Faltantes = () => {
 
             {isLoading ? (
                 <div className="row g-4">
-                    {[...Array(10)].map((_, i) => (
+                    {[...Array(12)].map((_, i) => (
                         <div key={i} className="col-12 col-md-6 col-lg-4">
                             <div
                                 className="rounded-4 placeholder-glow border"
