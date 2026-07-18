@@ -1,4 +1,5 @@
 import styles from './ver-subasta.module.css'
+import indicatorStyles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
 import useQueryConError from '@/hooks/useQueryConError'
@@ -15,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 
 const VerSubasta = () => {
   const { subId } = useParams()
@@ -27,7 +29,7 @@ const VerSubasta = () => {
   const [procesando, setProcesando] = useState(false)
   const navigate = useNavigate()
 
-  const { data: subasta, isLoading: cargando, error, refetch } = useQueryConError({
+  const { data: subasta, isLoading: cargando, isFetching, error, refetch } = useQueryConError({
     queryKey: ['subasta', subId],
     queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
   })
@@ -113,11 +115,18 @@ const VerSubasta = () => {
         />
 
         {cargando ? (
-          <h2>Cargando subasta...</h2>
+          <Spinner />
         ) : error ? (
           <h2 className="text-center text-secondary">No se pudo cargar la información</h2>
         ) : (
           <>
+            {isFetching && (
+              <div className={indicatorStyles.actualizando}>
+                <div className={indicatorStyles.spinnerChico} />
+                <span>Actualizando...</span>
+              </div>
+            )}
+
             {/* Hero del jugador */}
             <div className={`${styles.figuritaSubastada} p-3 d-flex align-items-center gap-3 mb-3`}>
               <img

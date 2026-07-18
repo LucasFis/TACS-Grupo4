@@ -11,6 +11,7 @@ import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import styles from './editar-oferta.module.css'
 
 const obtenerBloqueadas = (repetidas, figuritasSolicitadas) => {
@@ -38,17 +39,17 @@ const EditarOferta = () => {
   const [accionProcesando, setAccionProcesando] = useState('')
   const [showEliminar, setShowEliminar] = useState(false)
 
-  const { data: subasta, isLoading: cargando } = useQueryConError({
+  const { data: subasta, isLoading: cargando, isFetching } = useQueryConError({
     queryKey: ['subasta', subId],
     queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
     showToastOnError: false,
   })
 
-  if (cargando) return <h2>Cargando...</h2>
+  if (cargando) return <Spinner />
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>
 
   const oferta = subasta.ofertas.find((o) => o.id === ofertaId)
-  if (!oferta) return <h2>No se encontró la oferta.</h2>
+  if (!oferta) return isFetching ? <Spinner /> : <h2>No se encontró la oferta.</h2>
 
   const ofrecidasAnteriores = oferta.figuritas_ofrecidas.map((f) => ({
     ...f,
@@ -68,7 +69,7 @@ const EditarOferta = () => {
       return
     }
     if (todasSeleccionadas.length === 0) {
-      showToast('Tenés que seleccionar al menos una figurita', 'warning')
+      showToast('TenÃƒÂ©s que seleccionar al menos una figurita', 'warning')
       return
     }
     try {
@@ -142,26 +143,26 @@ const EditarOferta = () => {
                   </>
                 ) : (
                   <p className={styles.sinRestriccion}>
-                    Sin restricción — el ofertante puede ofrecer cualquier figurita
+                    Sin restricciÃƒÂ³n Ã¢â‚¬â€ el ofertante puede ofrecer cualquier figurita
                   </p>
                 )}
               </div>
 
               <div className={styles.calificacionDivider}>
                 <div>
-                  <p className={styles.label}>Calificación mínima</p>
+                  <p className={styles.label}>CalificaciÃƒÂ³n mÃƒÂ­nima</p>
                   <p className={styles.hint}>
                     {calMinima <= 1
                       ? 'Cualquier usuario puede ofertar'
-                      : 'Solo usuarios con esta calificación pueden ofertar'}
+                      : 'Solo usuarios con esta calificaciÃƒÂ³n pueden ofertar'}
                   </p>
                 </div>
                 {calMinima <= 1 ? (
-                  <span className={styles.calSinMinimo}>Sin mínimo</span>
+                  <span className={styles.calSinMinimo}>Sin mÃƒÂ­nimo</span>
                 ) : (
                   <div className={styles.calBadge}>
                     <span className={styles.calBadgeNumero}>{calMinima}</span>
-                    <span className={styles.calBadgeLabel}>★ o más</span>
+                    <span className={styles.calBadgeLabel}>Ã¢Ëœâ€¦ o mÃƒÂ¡s</span>
                   </div>
                 )}
               </div>
@@ -171,10 +172,10 @@ const EditarOferta = () => {
 
         <div className="d-flex flex-column gap-3">
           <div>
-            <p className={styles.seleccionTitulo}>Editá las figuritas que querés ofrecer</p>
+            <p className={styles.seleccionTitulo}>EditÃƒÂ¡ las figuritas que querÃƒÂ©s ofrecer</p>
             {bloqueadas.length > 0 && (
               <p className={styles.seleccionHint}>
-                Las marcadas como <strong>Requerida</strong> se incluyen automáticamente.
+                Las marcadas como <strong>Requerida</strong> se incluyen automÃƒÂ¡ticamente.
               </p>
             )}
           </div>
@@ -195,7 +196,7 @@ const EditarOferta = () => {
           <div className="d-flex gap-2 justify-content-between">
             <Button label="Cancelar" variante="secundarioBorde" onClick={() => navigate(-1)} />
             <Button
-              label="Guardar cambios ↗"
+              label="Guardar cambios Ã¢â€ â€”"
               disabled={procesando}
               onClick={onEnviar}
             />
@@ -210,9 +211,9 @@ const EditarOferta = () => {
 
         <ConfirmModal
           show={showEliminar}
-          titulo="¿Eliminar oferta?"
-          mensaje="Esta acción no se puede deshacer. Tu oferta será cancelada y la subasta continuará sin tu participación."
-          labelConfirmar="Sí, eliminar"
+          titulo="Ã‚Â¿Eliminar oferta?"
+          mensaje="Esta acciÃƒÂ³n no se puede deshacer. Tu oferta serÃƒÂ¡ cancelada y la subasta continuarÃƒÂ¡ sin tu participaciÃƒÂ³n."
+          labelConfirmar="SÃƒÂ­, eliminar"
           onConfirmar={onEliminar}
           onCancelar={() => setShowEliminar(false)}
         />
