@@ -57,7 +57,7 @@ const OfertaCard = ({
 
         {puedeAdjudicar && !propuesta.seleccionada && (
           <Button
-            label="Adjudicar"
+            label="Seleccionar"
             variante="secundarioBorde"
             onClick={() => onAdjudicar(propuesta.id)}
           />

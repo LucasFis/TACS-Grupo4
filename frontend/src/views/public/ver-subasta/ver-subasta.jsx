@@ -381,7 +381,7 @@ const VerSubasta = () => {
         )}
 
         <ModalInformativo open={procesando}>
-          <h3>{accionProcesando || 'Adjudicando oferta...'}</h3>
+          <h3>{accionProcesando || 'Seleccionando oferta...'}</h3>
           <p>Esto puede tardar unos segundos</p>
         </ModalInformativo>
 

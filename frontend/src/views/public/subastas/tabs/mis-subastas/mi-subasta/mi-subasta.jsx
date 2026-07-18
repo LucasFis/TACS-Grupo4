@@ -26,10 +26,10 @@ const BADGE_ESTADO = {
 }
 
 const MODAL_CONFIG = {
-  adjudicar: {
-    titulo: 'Adjudicar oferta',
+  seleccionar: {
+    titulo: 'Seleccionar oferta',
     mensaje: '¿Querés seleccionar esta oferta? Podés cambiarla antes de cerrar la subasta.',
-    labelConfirmar: 'Adjudicar',
+    labelConfirmar: 'Seleccionar',
   },
   rechazar: {
     titulo: 'Rechazar oferta',
@@ -77,7 +77,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const config = modal ? MODAL_CONFIG[modal.tipo] : null
 
   const ACCION_LABELS = {
-    adjudicar: 'Adjudicando oferta...',
+    seleccionar: 'Seleccionando oferta...',
     rechazar: 'Rechazando oferta...',
     cancelar: 'Cancelando subasta...',
     cerrar: 'Cerrando subasta...',
@@ -89,9 +89,9 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
       setAccionProcesando(ACCION_LABELS[modal.tipo] ?? 'Procesando...')
       setModal(null)
       let mensaje
-      if (modal.tipo === 'adjudicar') {
+      if (modal.tipo === 'seleccionar') {
         await seleccionarOferta(subastaId, modal.ofertaId)
-        mensaje = "Oferta adjudicada correctamente."
+        mensaje = "Oferta seleccionada correctamente."
       } else if (modal.tipo === 'rechazar') {
         await rechazarOferta(subastaId, modal.ofertaId)
         mensaje = "Oferta rechazada correctamente."
@@ -179,7 +179,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
                 <Oferta
                   key={oferta.id}
                   oferta={oferta}
-                  onAdjudicar={() => setModal({ tipo: 'adjudicar', ofertaId: oferta.id })}
+                  onAdjudicar={() => setModal({ tipo: 'seleccionar', ofertaId: oferta.id })}
                   onRechazar={() => setModal({ tipo: 'rechazar', ofertaId: oferta.id })}
                 />
               ))
