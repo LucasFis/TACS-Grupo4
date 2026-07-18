@@ -51,4 +51,10 @@ public interface RepositorioSubastas {
      */
     int contarActivasConOfertaPendiente(String figuritaId, String perfilId);
 
+    /**
+     * Indica si existe al menos una subasta activa para la figurita indicada
+     * cuyo autor sea el perfil dado.
+     */
+    boolean existeActivaPorAutorYFigurita(String perfilId, String figuritaId);
+
 }

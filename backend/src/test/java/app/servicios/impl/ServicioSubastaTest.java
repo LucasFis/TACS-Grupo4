@@ -772,5 +772,15 @@ public class ServicioSubastaTest extends MongoTestBase {
 
       assertEquals(1, repetida.getCantidadReservada());
     }
+
+    @Test
+    void crearSubasta_duplicadaFiguritaActiva_lanzaExcepcion() {
+      service.crearSubasta("2", "ARG-10", 30, List.of(), 0);
+
+      BadRequestException ex = assertThrows(BadRequestException.class,
+          () -> service.crearSubasta("2", "ARG-10", 30, List.of(), 0));
+
+      assertTrue(ex.getMessage().contains("subasta activa para esta figurita"));
+    }
   }
 }

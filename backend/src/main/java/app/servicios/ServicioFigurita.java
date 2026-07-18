@@ -75,7 +75,7 @@ public class ServicioFigurita {
    * Solo se consideran las figuritas que tengan el método {@link MetodoIntercambio#SUBASTA}.
    *
    * @param figuritas lista de figuritas intercambiables a evaluar
-   * @return mapa de {@code idFigurita -> idSubasta} para aquellas figuritas con subasta activa
+   * @return mapa de {@code perfilId:idFigurita -> idSubasta} para aquellas figuritas con subasta activa
    */
   private Map<String, String> obtenerMapaSubastasActivas(List<FiguritaIntercambiable> figuritas) {
     List<String> figuritaIds = figuritas.stream()
@@ -87,8 +87,9 @@ public class ServicioFigurita {
 
     return repositorioSubastas.buscarActivasPorFiguritasSubastadas(figuritaIds)
         .stream()
+        .filter(s -> s.getAutor() != null)
         .collect(Collectors.toMap(
-            s -> s.getFiguritaSubastada().getId(),
+            s -> s.getAutor().getId() + ":" + s.getFiguritaSubastada().getId(),
             Subasta::getId
         ));
   }
@@ -110,11 +111,19 @@ public class ServicioFigurita {
     Map<String, String> figuritaIdASubastaId = obtenerMapaSubastasActivas(figuritas);
 
     List<FiguritaIntercambiableDto> contenido = paginaRepo.contenido().stream()
-        .map(resultado -> new FiguritaIntercambiableDto(
-            resultado.figurita(),
-            resultado.perfil(),
-            figuritaIdASubastaId.get(resultado.figurita().getFigurita().getId())
-        ))
+        .map(resultado -> {
+          String subastaId = null;
+          if (resultado.perfil() != null) {
+            subastaId = figuritaIdASubastaId.get(
+                resultado.perfil().id() + ":" + resultado.figurita().getFigurita().getId()
+            );
+          }
+          return new FiguritaIntercambiableDto(
+              resultado.figurita(),
+              resultado.perfil(),
+              subastaId
+          );
+        })
         .toList();
 
     // Cuántos matches devuelve cada consulta de intercambiables. Una distribución con muchos

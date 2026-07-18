@@ -259,14 +259,18 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
     ));
     // Solo se necesitan los IDs: leer documentos crudos evita que el mapeo a entidad
     // resuelva cada @DBRef (autor, perfil, figuritas) con un find adicional por subasta.
-    query.fields().include("figuritaSubastada");
+    query.fields().include("figuritaSubastada").include("autor");
 
     return mongoTemplate.find(query, Document.class, "subastas").stream()
         .filter(doc -> doc.get("figuritaSubastada") instanceof DBRef ref && ref.getId() != null)
+        .filter(doc -> doc.get("autor") instanceof DBRef autorRef && autorRef.getId() != null)
         .map(doc -> Subasta.builder()
             .id(doc.get("_id").toString())
             .figuritaSubastada(Figurita.builder()
                 .id(((DBRef) doc.get("figuritaSubastada")).getId().toString())
+                .build())
+            .autor(Perfil.builder()
+                .id(((DBRef) doc.get("autor")).getId().toString())
                 .build())
             .build())
         .toList();
@@ -300,6 +304,19 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
         )
     ));
     return (int) mongoTemplate.count(query, Subasta.class);
+  }
+
+  @Override
+  public boolean existeActivaPorAutorYFigurita(String perfilId, String figuritaId) {
+    Date ahora = new Date();
+    Query query = new Query();
+    query.addCriteria(new Criteria().andOperator(
+        Criteria.where("autor.id").is(perfilId),
+        Criteria.where("figuritaSubastada.$id").is(figuritaId),
+        Criteria.where("fechaInicio").lte(ahora),
+        Criteria.where("fechaCierre").gt(ahora)
+    ));
+    return mongoTemplate.count(query, Subasta.class) > 0;
   }
 
   private Subasta normalizar(Subasta subasta) {
