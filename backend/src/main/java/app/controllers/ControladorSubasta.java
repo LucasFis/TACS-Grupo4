@@ -6,6 +6,7 @@ import app.dto.request.CrearSubastaRequest;
 import app.dto.request.EditarOfertaRequest;
 import app.dto.request.OfertarEnSubastaRequest;
 import app.dto.subasta.SubastaDto;
+import app.dto.subasta.ValidarCondicionesDto;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioSubasta;
 import jakarta.validation.Valid;
@@ -211,5 +212,14 @@ public class ControladorSubasta {
     SubastaDto subasta = this.subastaService.obtenerSubasta(sub_id);
 
     return ResponseEntity.ok().body(subasta);
+    }
+
+    @GetMapping("/{sub_id}/validar-condiciones")
+    public ResponseEntity<ValidarCondicionesDto> validarCondiciones(
+        @CookieValue("token") String token,
+        @PathVariable String sub_id
+    ) {
+      String perfilId = this.servicioJwt.getPerfilId(token);
+      return ResponseEntity.ok(this.subastaService.validarCondiciones(perfilId, sub_id));
     }
 }

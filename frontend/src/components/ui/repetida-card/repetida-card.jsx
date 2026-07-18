@@ -5,6 +5,8 @@ import { resolverTipo } from '@/utils/figuritas'
 const RepetidaCard = ({ figurita, onEditar }) => {
     const { figurita_id, numero, jugador, seleccion, cantidad_existente, cantidad_reservada, metodos, imagen_url } = figurita
     const tipo = resolverTipo(metodos)
+    const disponibles = cantidad_existente - cantidad_reservada
+    const sinDisponibles = disponibles <= 0
 
     return (
         <div className={`${styles.card} ${CARD_CLASS[tipo] ?? ''}`}>
@@ -13,7 +15,12 @@ const RepetidaCard = ({ figurita, onEditar }) => {
                 <p className={styles.cardName}>{jugador}</p>
                 <div className={styles.metaRow}>
                     <p className={styles.cardSubtitle}>{seleccion}</p>
-                    <span className={styles.disponibles}>{cantidad_existente} disp.</span>
+                    <span className={`${styles.disponibles} ${sinDisponibles ? styles.sinStockDisp : ''}`}>{disponibles} disp.</span>
+                </div>
+                <div className={styles.metaRow}>
+                    <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>
+                        Existentes: {cantidad_existente}
+                    </span>
                 </div>
                 <div className={styles.metaRow}>
                     <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>

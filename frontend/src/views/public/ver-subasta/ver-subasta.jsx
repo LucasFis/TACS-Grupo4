@@ -3,7 +3,7 @@ import indicatorStyles from '@/components/ui/actualizando-indicator/actualizando
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
 import useQueryConError from '@/hooks/useQueryConError'
-import { buscarSubasta, seleccionarOferta, cancelarSubasta, cerrarSubasta } from '@/services/subastasService.js'
+import { buscarSubasta, seleccionarOferta, cancelarSubasta, cerrarSubasta, validarCondiciones } from '@/services/subastasService.js'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
@@ -13,14 +13,11 @@ import TuOfertaCard from './tu-oferta-card.jsx'
 import Button from '@/components/ui/button/button.jsx'
 import { useAuth } from '@/contexts/userContext.jsx'
 import CrearOfertaModal from './crear-oferta-modal.jsx'
-import { buscarPerfil } from '@/services/perfilService.js'
-import { buscarRepetidas } from '@/services/coleccionService.js'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
-import { validarOferta } from '@/utils/ofertas.js'
 
 const VerSubasta = () => {
   const { subId } = useParams()
@@ -48,17 +45,11 @@ const VerSubasta = () => {
   }, [subasta])
 
   const esAutor = subasta?.perfil?.id === user.perfil_id
-  const mostrarValidacion = !!subasta && subastaAbierta && !esAutor
+  const mostrarValidacion = !!subasta && !esAutor
 
-  const { data: perfil, isLoading: cargandoPerfil } = useQueryConError({
-    queryKey: ['perfil'],
-    queryFn: ({ signal }) => buscarPerfil(undefined, signal),
-    enabled: mostrarValidacion,
-  })
-
-  const { data: repetidasData, isLoading: cargandoRepetidas } = useQueryConError({
-    queryKey: ['repetidas', { pagina: 1, limite: 10 }],
-    queryFn: ({ signal }) => buscarRepetidas({ pagina: 1, limite: 10 }, signal),
+  const { data: condiciones, isLoading: cargandoCondiciones } = useQueryConError({
+    queryKey: ['validar-condiciones', subId, user?.perfil_id],
+    queryFn: ({ signal }) => validarCondiciones(subId, signal),
     enabled: mostrarValidacion,
   })
 
@@ -160,12 +151,10 @@ const VerSubasta = () => {
 
   const ofertaPropia = subasta?.ofertas.find((o) => o.autor.id === user.perfil_id)
 
-  const cargandoValidacion = mostrarValidacion && (cargandoPerfil || cargandoRepetidas)
-  const repetidas = repetidasData?.contenido ?? []
-  const calMinima = subasta?.calificacion_minima_solicitada ?? 0
-  const calificacionUsuario = perfil?.calificacion_media ?? null
-  const { cumpleCalificacion, faltantesRequeridas, tieneTodasRequeridas } =
-    validarOferta(repetidas, subasta?.figuritas_solicitadas, calMinima, calificacionUsuario)
+  const cargandoValidacion = mostrarValidacion && cargandoCondiciones
+  const validacionLista = condiciones !== undefined
+  const puedeOfertar = condiciones?.puede_ofertar ?? false
+  const motivo = condiciones?.motivo ?? null
 
   return (
     <div className="container py-4 px-3 px-md-4">
@@ -357,24 +346,21 @@ const VerSubasta = () => {
                     ) : (
                       <div className="d-flex flex-column gap-2">
                         {cargandoValidacion ? (
-                          <p className="mb-0 text-muted fst-italic" style={{ fontSize: '0.85rem' }}>
-                            Validando condiciones...
-                          </p>
+                          <>
+                            <div className={indicatorStyles.spinnerChico} />
+                            <p className="mb-0 text-muted fst-italic" style={{ fontSize: '0.85rem' }}>
+                              Validando condiciones...
+                            </p>
+                          </>
                         ) : (
                           <>
-                            {!cumpleCalificacion && (
+                            {validacionLista && !puedeOfertar && motivo && (
                               <div className="alert alert-warning mb-0">
-                                Tu calificación actual ({calificacionUsuario ?? 'sin datos'}★) es menor a la requerida ({calMinima}★). No podés ofertar en esta subasta.
+                                {motivo}
                               </div>
                             )}
-                            {cumpleCalificacion && !tieneTodasRequeridas && (
-                              <div className="alert alert-warning mb-0">
-                                No tenés todas las figuritas requeridas. Te falta{faltantesRequeridas.length > 1 ? 'n' : ''}:{' '}
-                                <strong>{faltantesRequeridas.map((f) => f.jugador).join(', ')}</strong>.
-                              </div>
-                            )}
-                            {cumpleCalificacion && tieneTodasRequeridas && (
-                              <div className="d-flex align-items-center gap-3">
+                            {validacionLista && puedeOfertar && (
+                              <div className="d-flex align-items-center justify-content-between gap-3">
                                 <p className="mb-0 text-muted">¿Aún no ofertaste?</p>
                                 <Button
                                   label="Proponer oferta"
@@ -414,6 +400,8 @@ const VerSubasta = () => {
           subId={subId}
           subasta={subasta}
           onExito={refetch}
+          puedeOfertar={puedeOfertar}
+          motivo={motivo}
         />
       </div>
     </div>

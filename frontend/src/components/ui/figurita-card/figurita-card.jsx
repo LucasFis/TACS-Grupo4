@@ -50,7 +50,7 @@ const CardBody = ({
         <span className={styles.cardExtra}>{extra}</span>
       ) : (
         cantidadExistente !== undefined && (
-          <span className={styles.disponibles}>{cantidadExistente} disponibles</span>
+          <span className={styles.disponibles}>{cantidadExistente} existentes</span>
         )
       )}
     </div>
