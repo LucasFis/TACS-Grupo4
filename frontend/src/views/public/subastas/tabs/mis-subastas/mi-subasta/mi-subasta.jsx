@@ -87,6 +87,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
     try {
       setProcesando(true)
       setAccionProcesando(ACCION_LABELS[modal.tipo] ?? 'Procesando...')
+      setModal(null)
       let mensaje
       if (modal.tipo === 'adjudicar') {
         await seleccionarOferta(subastaId, modal.ofertaId)
@@ -103,7 +104,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
         await cerrarSubasta(subastaId)
         mensaje = "Subasta cerrada correctamente."
       }
-      setModal(null)
+
       showToast(mensaje, 'success')
       onRefresh()
     } catch (error) {
@@ -116,6 +117,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
   const handleCalificar = async ({ valor, descripcion }) => {
     try {
       setProcesando(true)
+      setMostrarCalificar(false)
       await calificarPerfil({
         destinatarioId: oferta_ganadora.autor.id,
         valor,
@@ -123,7 +125,6 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
         transactionId: subastaId,
         tipoTransaccion: 'SUBASTA',
       })
-      setMostrarCalificar(false)
       onRefresh()
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
