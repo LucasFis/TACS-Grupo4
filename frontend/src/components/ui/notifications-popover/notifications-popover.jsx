@@ -15,13 +15,17 @@ const leerCache = () => {
     const raw = localStorage.getItem(CACHE_KEY)
     if (!raw) return null
     return JSON.parse(raw)
-  } catch { return null } // JSON invÃ¡lido en localStorage
+  } catch {
+    return null
+  } // JSON inválido en localStorage
 }
 
 const guardarCache = (notificaciones, noLeidas) => {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({ notificaciones, noLeidas }))
-  } catch { /* localStorage lleno o no disponible */ }
+  } catch {
+    /* localStorage lleno o no disponible */
+  }
 }
 
 const NotificationsPopover = () => {
@@ -49,13 +53,17 @@ const NotificationsPopover = () => {
       if (!cache) setCargando(true)
       try {
         const data = await obtenerNotificaciones()
-        const lista = Array.isArray(data) ? data : data?.contenido ?? []
-        const leidas = Array.isArray(data) ? 0 : data?.no_leidas ?? 0
+        const lista = Array.isArray(data) ? data : (data?.contenido ?? [])
+        const leidas = Array.isArray(data) ? 0 : (data?.no_leidas ?? 0)
         setNotificaciones(lista)
         setNoLeidas(leidas)
         guardarCache(lista, leidas)
       } catch (error) {
-        if (!cache) showToast(handleError(error, () => {}), 'error')
+        if (!cache)
+          showToast(
+            handleError(error, () => {}),
+            'error',
+          )
       } finally {
         setCargando(false)
       }
@@ -93,14 +101,18 @@ const NotificationsPopover = () => {
     try {
       const data = await obtenerNotificaciones({}, controller.signal)
       if (controller.signal.aborted) return
-      const lista = Array.isArray(data) ? data : data?.contenido ?? []
-      const leidas = Array.isArray(data) ? 0 : data?.no_leidas ?? 0
+      const lista = Array.isArray(data) ? data : (data?.contenido ?? [])
+      const leidas = Array.isArray(data) ? 0 : (data?.no_leidas ?? 0)
       setNotificaciones(lista)
       setNoLeidas(leidas)
       guardarCache(lista, leidas)
     } catch (error) {
       if (controller.signal.aborted) return
-      if (!cache) showToast(handleError(error, () => {}), 'error')
+      if (!cache)
+        showToast(
+          handleError(error, () => {}),
+          'error',
+        )
     } finally {
       if (!controller.signal.aborted) {
         setCargando(false)
@@ -117,7 +129,10 @@ const NotificationsPopover = () => {
       setNoLeidas(0)
       guardarCache(actualizadas, 0)
     } catch (error) {
-      showToast(handleError(error, () => {}), 'error')
+      showToast(
+        handleError(error, () => {}),
+        'error',
+      )
     }
   }
 
@@ -143,7 +158,10 @@ const NotificationsPopover = () => {
           setNoLeidas(0)
           guardarCache(actualizadas, 0)
         } catch (error) {
-          showToast(handleError(error, () => {}), 'error')
+          showToast(
+            handleError(error, () => {}),
+            'error',
+          )
         }
       }
     }
@@ -192,7 +210,7 @@ const NotificationsPopover = () => {
                 onClick={handleMarcarTodasLeidas}
                 type="button"
               >
-                Marcar leÃ­das
+                Marcar leídas
               </button>
             )}
           </div>
@@ -208,9 +226,11 @@ const NotificationsPopover = () => {
 
           <div className={styles.lista}>
             {cargando ? (
-              <div className={styles.cargando}><Spinner /></div>
+              <div className={styles.cargando}>
+                <Spinner />
+              </div>
             ) : notificaciones.length === 0 ? (
-              <div className={styles.empty}>No tenÃ©s notificaciones</div>
+              <div className={styles.empty}>No tenés notificaciones</div>
             ) : (
               notificaciones.map((n) => (
                 <div
@@ -221,7 +241,7 @@ const NotificationsPopover = () => {
                 >
                   <div className={styles.texto}>{n.cuerpo}</div>
                   <div className={styles.fecha}>{formatearFecha(n.fecha)}</div>
-                  {n.leida && <span className={styles.leidaBadge}>leÃ­da</span>}
+                  {n.leida && <span className={styles.leidaBadge}>leída</span>}
                 </div>
               ))
             )}
