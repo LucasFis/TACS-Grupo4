@@ -67,14 +67,17 @@ const NotificationsPopover = () => {
     })
   }
 
-  const handleClickNotificacion = (n) => {
+  const handleClickNotificacion = async (n) => {
     if (n.link) {
       setAbierto(false)
       navigate(n.link)
       if (notificaciones.length > 0) {
-        marcarTodasLeidas().then(() => {
+        try {
+          await marcarTodasLeidas()
           queryClient.invalidateQueries({ queryKey: ['notificaciones'] })
-        }).catch(() => {})
+        } catch (error) {
+          showToast(handleError(error, () => {}), 'error')
+        }
       }
     }
   }
