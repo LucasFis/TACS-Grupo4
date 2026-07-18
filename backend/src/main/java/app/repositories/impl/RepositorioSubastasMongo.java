@@ -259,7 +259,7 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
     ));
     // Solo se necesitan los IDs: leer documentos crudos evita que el mapeo a entidad
     // resuelva cada @DBRef (autor, perfil, figuritas) con un find adicional por subasta.
-    query.fields().include("figuritaSubastada");
+    query.fields().include("figuritaSubastada").include("autor");
 
     return mongoTemplate.find(query, Document.class, "subastas").stream()
         .filter(doc -> doc.get("figuritaSubastada") instanceof DBRef ref && ref.getId() != null)
@@ -268,6 +268,9 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
             .figuritaSubastada(Figurita.builder()
                 .id(((DBRef) doc.get("figuritaSubastada")).getId().toString())
                 .build())
+            .autor(doc.get("autor") instanceof DBRef autorRef && autorRef.getId() != null
+                ? Perfil.builder().id(autorRef.getId().toString()).build()
+                : null)
             .build())
         .toList();
   }

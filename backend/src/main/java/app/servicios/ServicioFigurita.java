@@ -110,13 +110,19 @@ public class ServicioFigurita {
     Map<String, String> figuritaIdASubastaId = obtenerMapaSubastasActivas(figuritas);
 
     List<FiguritaIntercambiableDto> contenido = paginaRepo.contenido().stream()
-        .map(resultado -> new FiguritaIntercambiableDto(
-            resultado.figurita(),
-            resultado.perfil(),
-            figuritaIdASubastaId.get(
+        .map(resultado -> {
+          String subastaId = null;
+          if (resultado.perfil() != null) {
+            subastaId = figuritaIdASubastaId.get(
                 resultado.perfil().id() + ":" + resultado.figurita().getFigurita().getId()
-            )
-        ))
+            );
+          }
+          return new FiguritaIntercambiableDto(
+              resultado.figurita(),
+              resultado.perfil(),
+              subastaId
+          );
+        })
         .toList();
 
     // Cuántos matches devuelve cada consulta de intercambiables. Una distribución con muchos
