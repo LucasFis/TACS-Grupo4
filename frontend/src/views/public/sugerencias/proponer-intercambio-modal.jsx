@@ -78,7 +78,6 @@ const ProponerIntercambioModal = ({
 
         <hr className={styles.divisor} />
 
-        {/* SELECCIÓN */}
         <div className={styles.seleccion}>
           <div className={styles.seleccionBloque}>
             <p className={styles.seleccionLabel}>¿Qué le vas a ofrecer?</p>

@@ -5,6 +5,8 @@ import app.exceptions.BadRequestException;
 import app.exceptions.ForbiddenException;
 import app.exceptions.NotFoundException;
 import app.exceptions.UnauthorizedException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -190,6 +192,42 @@ public class ErrorHandler {
   }
 
   /**
+   * Desenvuelve excepciones generadas por proxies CGLIB (usados por
+   * Spring Data MongoDB con {@code @DBRef(lazy = true)}). Cuando una
+   * excepción de negocio se lanza dentro de un proxy lazy, Spring la
+   * envuelve en InvocationTargetException → UndeclaredThrowableException,
+   * ocultando el tipo real al ErrorHandler. Este handler extrae la causa
+   * y delega al handler correspondiente.
+   *
+   * @param ex excepción envuelta por el proxy
+   * @return respuesta HTTP correspondiente a la excepción original
+   */
+  @ExceptionHandler(UndeclaredThrowableException.class)
+  public ResponseEntity<ErrorResponse> handleUndeclaredThrowable(
+      UndeclaredThrowableException ex
+  ) {
+    Throwable cause = ex.getUndeclaredThrowable();
+    if (cause instanceof InvocationTargetException ite) {
+      cause = ite.getTargetException();
+    }
+    return delegateToHandler(cause);
+  }
+
+  /**
+   * Desenvuelve {@link InvocationTargetException} que pueden surgir
+   * cuando una excepción se lanza a través de invocación por reflexión.
+   *
+   * @param ex InvocationTargetException
+   * @return respuesta HTTP correspondiente a la excepción envuelta
+   */
+  @ExceptionHandler(InvocationTargetException.class)
+  public ResponseEntity<ErrorResponse> handleInvocationTarget(
+      InvocationTargetException ex
+  ) {
+    return delegateToHandler(ex.getTargetException());
+  }
+
+  /**
    * Maneja cualquier excepción no capturada por los handlers específicos.
    * Retorna un error 500 genérico.
    *
@@ -210,6 +248,40 @@ public class ErrorHandler {
         LocalDateTime.now()
     );
 
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(error);
+  }
+
+  /**
+   * Delega una excepción desenvuelta al handler específico que le
+   * corresponde. Si no coincide con ningún handler conocido, retorna 500.
+   */
+  private ResponseEntity<ErrorResponse> delegateToHandler(Throwable cause) {
+    if (cause instanceof BadRequestException bre) {
+      return handleBadRequest(bre);
+    }
+    if (cause instanceof NotFoundException nfe) {
+      return handleNotFound(nfe);
+    }
+    if (cause instanceof ForbiddenException fe) {
+      return handleForbidden(fe);
+    }
+    if (cause instanceof UnauthorizedException ue) {
+      return handleUnathorized(ue);
+    }
+    if (cause instanceof IllegalArgumentException iae) {
+      return handleIllegalArgument(iae);
+    }
+    if (cause != null) {
+      cause.printStackTrace();
+    }
+    ErrorResponse error = new ErrorResponse(
+        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+        "Ocurrió un error interno del servidor",
+        Map.of(),
+        LocalDateTime.now()
+    );
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(error);
