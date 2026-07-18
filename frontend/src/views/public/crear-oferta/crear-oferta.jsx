@@ -174,25 +174,28 @@ const CrearOferta = () => {
       {/* Selección */}
       {cumpleCalificacion && tieneTodasRequeridas && (
         <div className="d-flex flex-column gap-3">
-          <div>
-            <p className={styles.crearOfertaSeleccionTitulo}>
-              Seleccioná las figuritas que querés ofrecer
-            </p>
-            {bloqueadas.length > 0 && (
-              <p className={styles.crearOfertaSeleccionHint}>
-                Las marcadas como <strong>Requerida</strong> se incluyen automáticamente. Podés
-                sumar más si querés.
-              </p>
-            )}
-          </div>
-
-          <SelectorRepetidas
-            modo="multiple"
-            bloqueadas={bloqueadas}
-            onChange={setFiguritasExtra}
-            metodoIntercambio="SUBASTA"
-            perfilId={subasta.perfil.id}
-          />
+          <SectionCard>
+            <SectionCard.Section>
+              <p className="label-seccion">Seleccioná las figuritas que querés ofrecer</p>
+              {bloqueadas.length > 0 && (
+                <p className={styles.crearOfertaSeleccionHint}>
+                  Las marcadas como <strong>Requerida</strong> se incluyen automáticamente. Podés
+                  sumar más si querés.
+                </p>
+              )}
+              <div className="mt-2">
+                <SelectorRepetidas
+                  modo="multiple"
+                  bloqueadas={bloqueadas}
+                  onChange={setFiguritasExtra}
+                  metodoIntercambio="SUBASTA"
+                  perfilId={subasta.perfil.id}
+                  mensajeVacio="No tenés repetidas publicadas para subasta que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
+                  mostrarAviso={true}
+                />
+              </div>
+            </SectionCard.Section>
+          </SectionCard>
 
           <Button
             label="Enviar oferta ↗"

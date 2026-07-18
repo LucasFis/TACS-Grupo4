@@ -53,7 +53,10 @@ const NotificationsPopover = () => {
       await marcarTodasLeidas()
       queryClient.invalidateQueries({ queryKey: ['notificaciones'] })
     } catch (error) {
-      showToast(handleError(error, () => {}), 'error')
+      showToast(
+        handleError(error, () => {}),
+        'error',
+      )
     }
   }
 
@@ -76,7 +79,10 @@ const NotificationsPopover = () => {
           await marcarTodasLeidas()
           queryClient.invalidateQueries({ queryKey: ['notificaciones'] })
         } catch (error) {
-          showToast(handleError(error, () => {}), 'error')
+          showToast(
+            handleError(error, () => {}),
+            'error',
+          )
         }
       }
     }
@@ -125,7 +131,7 @@ const NotificationsPopover = () => {
                 onClick={handleMarcarTodasLeidas}
                 type="button"
               >
-                Marcar leÃ­das
+                Marcar leídas
               </button>
             )}
           </div>
@@ -143,7 +149,7 @@ const NotificationsPopover = () => {
             {isLoading ? (
               <div className={styles.cargando}><Spinner /></div>
             ) : notificaciones.length === 0 ? (
-              <div className={styles.empty}>No tenÃ©s notificaciones</div>
+              <div className={styles.empty}>No tenés notificaciones</div>
             ) : (
               notificaciones.map((n) => (
                 <div
@@ -154,7 +160,7 @@ const NotificationsPopover = () => {
                 >
                   <div className={styles.texto}>{n.cuerpo}</div>
                   <div className={styles.fecha}>{formatearFecha(n.fecha)}</div>
-                  {n.leida && <span className={styles.leidaBadge}>leÃ­da</span>}
+                  {n.leida && <span className={styles.leidaBadge}>leída</span>}
                 </div>
               ))
             )}
