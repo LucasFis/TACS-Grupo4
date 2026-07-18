@@ -203,6 +203,7 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
                   onChange={setFiguritasExtra}
                   metodoIntercambio="SUBASTA"
                   perfilId={subasta.perfil.id}
+                  mostrarAviso={true}
                 />
               </div>
             )}
