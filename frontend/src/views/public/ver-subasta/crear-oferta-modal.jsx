@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import useQueryConError from '@/hooks/useQueryConError'
 import { crearOferta } from '@/services/subastasService.js'
-import { buscarPerfil } from '@/services/perfilService.js'
 import { buscarRepetidas } from '@/services/coleccionService.js'
 import SectionTitle from '@/components/ui/section-title/section-title.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
@@ -12,9 +11,9 @@ import { useToast } from '@/contexts/toastContext.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-oferta-modal.module.css'
-import { obtenerBloqueadas, validarOferta } from '@/utils/ofertas.js'
+import { obtenerBloqueadas } from '@/utils/ofertas.js'
 
-const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
+const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito, puedeOfertar, motivo }) => {
   const backdropRef = useRef(null)
   const [figuritasExtra, setFiguritasExtra] = useState([])
   const [procesando, setProcesando] = useState(false)
@@ -24,12 +23,6 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
   const { data: repetidasData, isLoading: cargandoRepetidas } = useQueryConError({
     queryKey: ['repetidas', { pagina: 1, limite: 10 }],
     queryFn: ({ signal }) => buscarRepetidas({ pagina: 1, limite: 10 }, signal),
-    enabled: abierto,
-  })
-
-  const { data: perfil, isLoading: cargandoPerfil } = useQueryConError({
-    queryKey: ['perfil'],
-    queryFn: ({ signal }) => buscarPerfil(undefined, signal),
     enabled: abierto,
   })
 
@@ -57,15 +50,11 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
     if (e.target === backdropRef.current) onCerrar()
   }
 
-  const cargando = cargandoRepetidas || cargandoPerfil
+  const cargando = cargandoRepetidas
 
   const repetidas = repetidasData?.contenido ?? []
-  const calificacionUsuario = perfil?.calificacion_media ?? null
-
   const calMinima = subasta?.calificacion_minima_solicitada ?? 0
   const bloqueadas = obtenerBloqueadas(repetidas, subasta?.figuritas_solicitadas)
-  const { cumpleCalificacion, faltantesRequeridas, tieneTodasRequeridas, puedeOfertar } =
-    validarOferta(repetidas, subasta?.figuritas_solicitadas, calMinima, calificacionUsuario)
 
   const onEnviar = async () => {
     try {
@@ -161,50 +150,36 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
               </SectionCard.Section>
             </SectionCard>
 
-            {/* Alerta calificación */}
-            {!cumpleCalificacion && (
-              <div className="alert alert-warning">
-                Tu calificación actual ({calificacionUsuario ?? 'sin datos'}★) es menor a la
-                requerida ({calMinima}★). No podés ofertar en esta subasta.
-              </div>
-            )}
-
-            {/* Alerta figuritas faltantes */}
-            {cumpleCalificacion && !tieneTodasRequeridas && (
-              <div className="alert alert-warning">
-                No tenés todas las figuritas requeridas. Te falta
-                {faltantesRequeridas.length > 1 ? 'n' : ''}:{' '}
-                <strong>{faltantesRequeridas.map((f) => f.jugador).join(', ')}</strong>.
-              </div>
+            {/* Alerta si no puede ofertar */}
+            {!puedeOfertar && motivo && (
+              <div className="alert alert-warning">{motivo}</div>
             )}
 
             {/* Selección */}
-            {cumpleCalificacion && tieneTodasRequeridas && (
-              <div className="d-flex flex-column gap-3">
-                <SectionCard>
-                  <SectionTitle>SELECCIONÁ LAS FIGURITAS QUE QUERÉS OFRECER</SectionTitle>
-                  <SectionCard.Section>
-                    {bloqueadas.length > 0 && (
-                      <p className={styles.seleccionHint}>
-                        Las marcadas como <strong>Requerida</strong> se incluyen automáticamente.
-                        Podés sumar más si querés.
-                      </p>
-                    )}
-                    <div className="mt-2">
-                      <SelectorRepetidas
-                        modo="multiple"
-                        bloqueadas={bloqueadas}
-                        onChange={setFiguritasExtra}
-                        metodoIntercambio="SUBASTA"
-                        perfilId={subasta.perfil.id}
-                        mensajeVacio="No tenés repetidas publicadas para subasta que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
-                        mostrarAviso={true}
-                      />
-                    </div>
-                  </SectionCard.Section>
-                </SectionCard>
-              </div>
-            )}
+            <div className="d-flex flex-column gap-3">
+              <SectionCard>
+                <SectionTitle>SELECCIONÁ LAS FIGURITAS QUE QUERÉS OFRECER</SectionTitle>
+                <SectionCard.Section>
+                  {bloqueadas.length > 0 && (
+                    <p className={styles.seleccionHint}>
+                      Las marcadas como <strong>Requerida</strong> se incluyen automáticamente.
+                      Podés sumar más si querés.
+                    </p>
+                  )}
+                  <div className="mt-2">
+                    <SelectorRepetidas
+                      modo="multiple"
+                      bloqueadas={bloqueadas}
+                      onChange={setFiguritasExtra}
+                      metodoIntercambio="SUBASTA"
+                      perfilId={subasta.perfil.id}
+                      mensajeVacio="No tenés repetidas publicadas para subasta que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
+                      mostrarAviso={true}
+                    />
+                  </div>
+                </SectionCard.Section>
+              </SectionCard>
+            </div>
 
             <hr className={styles.divisor} />
 

@@ -7,6 +7,7 @@ import app.dto.subasta.MiSubastaActivaDto;
 import app.dto.subasta.MiSubastaFinalizadaDto;
 import app.dto.subasta.SubastaDto;
 import app.dto.subasta.SubastaParticipoDto;
+import app.dto.subasta.ValidarCondicionesDto;
 import app.exceptions.BadRequestException;
 import app.exceptions.NotFoundException;
 import app.model.entities.*;
@@ -91,6 +92,52 @@ public class ServicioSubasta {
     String cuerpo = "Se publicó una subasta de la figurita que te falta: " + nuevaSubasta.getFiguritaSubastada().getJugador();
     notificacionService.notificarInteresados(interesados, cuerpo, link);
 
+  }
+
+  /**
+   * Valida si un perfil puede ofertar en una subasta, verificando que la subasta esté activa,
+   * que el perfil no sea el autor, que tenga la figurita subastada como faltante, que cumpla
+   * la calificación mínima y que posea al menos una figurita solicitada en sus repetidas.
+   *
+   * @param perfilId identificador del perfil que quiere ofertar
+   * @param subastaId identificador de la subasta
+   * @return DTO con {@code puedeOfertar} y {@code motivo} en caso de no poder
+   */
+  public ValidarCondicionesDto validarCondiciones(String perfilId, String subastaId) {
+    Subasta subasta = this.repoSubasta.buscarPorId(subastaId, new CamposSubasta(false, true));
+
+    if (!subasta.estaActivo()) {
+      return new ValidarCondicionesDto(false, "La subasta ya cerró");
+    }
+
+    if (subasta.getAutor().getId().equals(perfilId)) {
+      return new ValidarCondicionesDto(false, "No podés ofertar en tu propia subasta");
+    }
+
+    CamposPerfil conColeccion = new CamposPerfil(true);
+    Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, conColeccion);
+
+    if (!perfil.getColeccion().tieneFaltante(subasta.getFiguritaSubastada())) {
+      return new ValidarCondicionesDto(false, "No tenés la figurita subastada en tus faltantes");
+    }
+
+    int calMinima = subasta.getCalificacionMinimaSolicitada();
+    double calUsuario = perfil.getCalificacionMedia() != null ? perfil.getCalificacionMedia() : 0.0;
+    if (calMinima > 1 && calUsuario < calMinima) {
+      return new ValidarCondicionesDto(false,
+          "Tu calificación actual (" + String.format("%.1f", calUsuario) + "★) es menor a la requerida (" + calMinima + "★)");
+    }
+
+    List<Figurita> solicitadas = subasta.getFiguritasSolicitadas();
+    if (!solicitadas.isEmpty()) {
+      boolean tieneAlgunaSolicitada = solicitadas.stream()
+          .anyMatch(f -> perfil.getColeccion().tieneRepetida(f));
+      if (!tieneAlgunaSolicitada) {
+        return new ValidarCondicionesDto(false, "No contas con algunas de las figuritas requeridas");
+      }
+    }
+
+    return new ValidarCondicionesDto(true, null);
   }
 
   /**
