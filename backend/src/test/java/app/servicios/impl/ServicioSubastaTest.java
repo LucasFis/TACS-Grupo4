@@ -221,7 +221,7 @@ public class ServicioSubastaTest extends MongoTestBase {
     ValidarCondicionesDto result = service.validarCondiciones(lucas.getId(), "s-1");
 
     assertEquals(false, result.isPuedeOfertar());
-    assertTrue(result.getMotivo().contains("repetidas"));
+    assertTrue(result.getMotivo().contains("requeridas"));
   }
 
   @Test
