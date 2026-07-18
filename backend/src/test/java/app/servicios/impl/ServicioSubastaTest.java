@@ -14,10 +14,12 @@ import app.dto.request.EditarOfertaRequest;
 import app.dto.subasta.MiSubastaActivaDto;
 import app.dto.subasta.MiSubastaFinalizadaDto;
 import app.dto.subasta.SubastaParticipoDto;
+import app.dto.subasta.ValidarCondicionesDto;
 
 import app.exceptions.BadRequestException;
 import app.model.entities.*;
 import app.repositories.impl.campos.CamposColeccion;
+import app.repositories.impl.campos.CamposPerfil;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -104,6 +106,170 @@ public class ServicioSubastaTest extends MongoTestBase {
 
     service.crearSubasta("2", "ARG-11", 30, List.of(), 0);
     assertEquals(0, repositorioNotificaciones.buscarPorPerfil(lucas).size());
+  }
+
+  @Test
+  void validarCondiciones_subastaCerrada_retornaFalse() {
+    Subasta subastaCerrada = Subasta.builder()
+        .id("s-1")
+        .autor(sofia)
+        .fechaInicio(LocalDateTime.now().minusDays(3))
+        .fechaCierre(LocalDateTime.now().minusDays(1))
+        .figuritaSubastada(messi)
+        .build();
+
+    repositorioSubastas.guardar(subastaCerrada);
+
+    ValidarCondicionesDto result = service.validarCondiciones(lucas.getId(), "s-1");
+
+    assertEquals(false, result.isPuedeOfertar());
+    assertTrue(result.getMotivo().contains("cerró"));
+  }
+
+  @Test
+  void validarCondiciones_autorSubasta_retornaFalse() {
+    Coleccion coleccionSofia = repositorioColecciones.buscarPorId("c-2", new CamposColeccion(true, true));
+
+    Subasta subastaActiva = Subasta.builder()
+        .id("s-1")
+        .autor(sofia)
+        .fechaInicio(LocalDateTime.now().minusHours(1))
+        .fechaCierre(LocalDateTime.now().plusDays(1))
+        .figuritaSubastada(messi)
+        .build();
+
+    repositorioSubastas.guardar(subastaActiva);
+
+    ValidarCondicionesDto result = service.validarCondiciones(sofia.getId(), "s-1");
+
+    assertEquals(false, result.isPuedeOfertar());
+    assertTrue(result.getMotivo().contains("tu propia subasta"));
+  }
+
+  @Test
+  void validarCondiciones_sinFaltante_retornaFalse() {
+    Figurita diMaria = Figurita.builder()
+        .id("ARG-11")
+        .numero(11)
+        .jugador("Di María")
+        .seleccion(Seleccion.ARGENTINA)
+        .build();
+    repositorioFiguritas.guardar(diMaria);
+
+    Subasta subastaActiva = Subasta.builder()
+        .id("s-1")
+        .autor(sofia)
+        .fechaInicio(LocalDateTime.now().minusHours(1))
+        .fechaCierre(LocalDateTime.now().plusDays(1))
+        .figuritaSubastada(diMaria)
+        .build();
+
+    repositorioSubastas.guardar(subastaActiva);
+
+    ValidarCondicionesDto result = service.validarCondiciones(lucas.getId(), "s-1");
+
+    assertEquals(false, result.isPuedeOfertar());
+    assertTrue(result.getMotivo().contains("faltantes"));
+  }
+
+  @Test
+  void validarCondiciones_calificacionInsuficiente_retornaFalse() {
+    Perfil lucasConBajaCal = repositorioPerfiles.buscarPorId("1", new CamposPerfil(true));
+    lucasConBajaCal.setCalificacionMedia(1.0);
+    repositorioPerfiles.guardar(lucasConBajaCal);
+
+    Subasta subastaActiva = Subasta.builder()
+        .id("s-1")
+        .autor(sofia)
+        .fechaInicio(LocalDateTime.now().minusHours(1))
+        .fechaCierre(LocalDateTime.now().plusDays(1))
+        .figuritaSubastada(messi)
+        .calificacionMinimaSolicitada(3)
+        .build();
+
+    repositorioSubastas.guardar(subastaActiva);
+
+    ValidarCondicionesDto result = service.validarCondiciones(lucas.getId(), "s-1");
+
+    assertEquals(false, result.isPuedeOfertar());
+    assertTrue(result.getMotivo().contains("calificación"));
+  }
+
+  @Test
+  void validarCondiciones_sinFiguritasRequeridas_retornaFalse() {
+    Figurita diMaria = Figurita.builder()
+        .id("ARG-11")
+        .numero(11)
+        .jugador("Di María")
+        .seleccion(Seleccion.ARGENTINA)
+        .build();
+    repositorioFiguritas.guardar(diMaria);
+
+    Coleccion coleccionLucas = repositorioColecciones.buscarPorId("c-1", new CamposColeccion(true, true));
+
+    Subasta subastaActiva = Subasta.builder()
+        .id("s-1")
+        .autor(sofia)
+        .fechaInicio(LocalDateTime.now().minusHours(1))
+        .fechaCierre(LocalDateTime.now().plusDays(1))
+        .figuritaSubastada(messi)
+        .figuritasSolicitadas(List.of(diMaria))
+        .build();
+
+    repositorioSubastas.guardar(subastaActiva);
+
+    ValidarCondicionesDto result = service.validarCondiciones(lucas.getId(), "s-1");
+
+    assertEquals(false, result.isPuedeOfertar());
+    assertTrue(result.getMotivo().contains("repetidas"));
+  }
+
+  @Test
+  void validarCondiciones_todoOk_retornaTrue() {
+    Perfil lucasConBuenaCal = repositorioPerfiles.buscarPorId("1", new CamposPerfil(true));
+    lucasConBuenaCal.setCalificacionMedia(4.0);
+    repositorioPerfiles.guardar(lucasConBuenaCal);
+
+    Coleccion coleccionLucas = repositorioColecciones.buscarPorId("c-1", new CamposColeccion(true, true));
+    coleccionLucas.getRepetidas().add(
+        new FiguritaIntercambiable(messi, 2, 0, List.of(MetodoIntercambio.SUBASTA), lucas.getId())
+    );
+    repositorioColecciones.guardar(coleccionLucas, new CamposColeccion(true, true));
+
+    Subasta subastaActiva = Subasta.builder()
+        .id("s-1")
+        .autor(sofia)
+        .fechaInicio(LocalDateTime.now().minusHours(1))
+        .fechaCierre(LocalDateTime.now().plusDays(1))
+        .figuritaSubastada(messi)
+        .calificacionMinimaSolicitada(3)
+        .figuritasSolicitadas(List.of(messi))
+        .build();
+
+    repositorioSubastas.guardar(subastaActiva);
+
+    ValidarCondicionesDto result = service.validarCondiciones(lucas.getId(), "s-1");
+
+    assertEquals(true, result.isPuedeOfertar());
+    assertNull(result.getMotivo());
+  }
+
+  @Test
+  void validarCondiciones_sinFiguritasSolicitadas_retornaTrue() {
+    Subasta subastaActiva = Subasta.builder()
+        .id("s-1")
+        .autor(sofia)
+        .fechaInicio(LocalDateTime.now().minusHours(1))
+        .fechaCierre(LocalDateTime.now().plusDays(1))
+        .figuritaSubastada(messi)
+        .build();
+
+    repositorioSubastas.guardar(subastaActiva);
+
+    ValidarCondicionesDto result = service.validarCondiciones(lucas.getId(), "s-1");
+
+    assertEquals(true, result.isPuedeOfertar());
+    assertNull(result.getMotivo());
   }
 
   @Test

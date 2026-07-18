@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import app.dto.request.EditarOfertaRequest;
 import app.dto.subasta.SubastaDto;
+import app.dto.subasta.ValidarCondicionesDto;
 import app.servicios.ServicioJwt;
 import app.servicios.ServicioSubasta;
 import jakarta.servlet.http.Cookie;
@@ -219,6 +220,21 @@ class ControladorSubastaTest {
 
         verify(subastaService)
             .obtenerSubasta("s-1");
+    }
+
+    @Test
+    void validarCondiciones_retorna200() throws Exception {
+        ValidarCondicionesDto dto = new ValidarCondicionesDto(true, null);
+
+        when(subastaService.validarCondiciones("1000", "s-1")).thenReturn(dto);
+
+        mockMvc.perform(
+                get("/subastas/s-1/validar-condiciones")
+                    .cookie(cookie)
+            )
+            .andExpect(status().isOk());
+
+        verify(subastaService).validarCondiciones("1000", "s-1");
     }
 
     @Test
