@@ -189,6 +189,7 @@ const EditarOferta = () => {
             )}
             metodoIntercambio="SUBASTA"
             perfilId={subasta.perfil.id}
+            mostrarAviso={true}
           />
         </div>
 

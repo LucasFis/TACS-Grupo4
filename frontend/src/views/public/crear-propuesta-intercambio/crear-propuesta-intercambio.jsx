@@ -60,14 +60,6 @@ const CrearPropuestaIntercambio = () => {
         <SectionCard>
           <SectionCard.Section>
             <p className="label-seccion">Seleccioná las figuritas que querés ofrecer</p>
-            <div className={styles.aviso}>
-              <span className={styles.avisoIcono}>⚠️</span>
-              <p className={styles.avisoTexto}>
-                <strong>Solo aparecen tus repetidas publicadas para intercambio.</strong>{' '}
-                Si una figurita no aparece acá, probablemente la cargaste solo como <strong>subasta</strong>.
-                Podés cambiar su método en <Link to="/mis-figuritas">Mis Figuritas</Link>.
-              </p>
-            </div>
             <div className="mt-2">
               <SelectorRepetidas
                 modo="multiple"
@@ -75,6 +67,7 @@ const CrearPropuestaIntercambio = () => {
                 onChange={setSeleccionadas}
                 metodoIntercambio="INTERCAMBIO"
                 mensajeVacio="No tenés repetidas publicadas para intercambio. Publicá repetidas para poder ofrecer."
+                mostrarAviso={true}
               />
             </div>
           </SectionCard.Section>

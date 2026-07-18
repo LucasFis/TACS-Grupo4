@@ -192,6 +192,7 @@ const CrearOferta = () => {
             onChange={setFiguritasExtra}
             metodoIntercambio="SUBASTA"
             perfilId={subasta.perfil.id}
+            mostrarAviso={true}
           />
 
           <Button
