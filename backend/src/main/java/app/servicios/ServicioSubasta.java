@@ -275,8 +275,17 @@ public class ServicioSubasta {
     }
 
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
-    subasta.seleccionarOferta(ofertaId, perfilId);
+    Propuesta oferta = subasta.seleccionarOferta(ofertaId, perfilId);
     registrarTransiciones(subasta, estadosAntes);
+
+    String cuerpo = "Tu oferta para la subasta de la figurita #"
+        + subasta.getFiguritaSubastada().getNumero() + " "
+        + subasta.getFiguritaSubastada().getJugador() + " fue seleccionada temporalmente como la ganadora. "
+        + "Si no ocurren cambios, cuando se cierre la subasta, adjudicarás la figurita subastada.";
+
+    String link = "/subastas/" + subastaId;
+
+    this.notificacionService.notificarInteresados(List.of(oferta.getAutor()), cuerpo, link);
 
     this.repoSubasta.guardar(subasta, camposSubasta);
   }

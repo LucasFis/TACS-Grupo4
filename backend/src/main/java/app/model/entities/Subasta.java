@@ -113,7 +113,7 @@ public class Subasta {
      * Selecciona una oferta como ganadora. Si había una oferta previamente seleccionada,
      * la deselecciona antes de seleccionar la nueva.
      */
-    public void seleccionarOferta(String ofertaId, String perfilId){
+    public Propuesta seleccionarOferta(String ofertaId, String perfilId){
         Propuesta oferta = this.getOfertas().stream()
             .filter(p -> p.getId().equals(ofertaId))
             .findFirst()
@@ -125,6 +125,8 @@ public class Subasta {
             .ifPresent(p -> p.deseleccionar(perfilId));
 
         oferta.seleccionar(perfilId);
+
+        return oferta;
     }
     /**
      * Cancela una oferta de la subasta. Valida que {@code ofertaId} corresponda
