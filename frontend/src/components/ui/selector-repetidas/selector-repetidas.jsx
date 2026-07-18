@@ -35,7 +35,7 @@ const SelectorRepetidas = ({
         metodoIntercambio: metodoIntercambio,
         perfilId: perfilId,
       })
-      setFiguritas(payload.contenido ?? [])
+      setFiguritas(payload?.contenido ?? [])
       setTotal(payload.cantidad_de_elementos ?? null)
     } catch (e) {
       handleError(e, (err) => showToast(err.mensaje, 'error'))

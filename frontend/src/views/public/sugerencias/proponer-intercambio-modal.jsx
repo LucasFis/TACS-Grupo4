@@ -88,6 +88,7 @@ const ProponerIntercambioModal = ({
               bloqueadas={[]}
               onChange={setRepetidas}
               perfilId={perfil?.id ?? null}
+              mensajeVacio="No tenés repetidas publicadas para intercambio que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
             />
           </div>
 

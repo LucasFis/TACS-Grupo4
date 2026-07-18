@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from '@tanstack/react-query';
 import useQueryConError from '@/hooks/useQueryConError';
 import { buscarRepetidas, editarRepetida } from '@/services/coleccionService.js'
+import styles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 import RepetidaCard from "../../../../../components/ui/repetida-card/repetida-card.jsx";
 import FilterChip from "../../../../../components/ui/filter-chip/filter-chip.jsx";
 import Button from "../../../../../components/ui/button/button.jsx";
@@ -29,7 +30,7 @@ const Repetidas = () => {
     const queryClient = useQueryClient()
     const navigate = useNavigate();
 
-    const { data: repetidas, isLoading, error } = useQueryConError({
+    const { data: repetidas, isLoading, isFetching, error } = useQueryConError({
         queryKey: ['repetidas', { ...filtros, pagina, limite: 12 }],
         queryFn: ({ signal }) => buscarRepetidas({ ...filtros, pagina, limite: 12 }, signal),
     })
@@ -70,7 +71,7 @@ const Repetidas = () => {
         ['repetidas', { ...filtros, pagina, limite: 12 }],
         (old) => ({
           ...old,
-          contenido: old.contenido.map((item) =>
+          contenido: (old?.contenido ?? []).map((item) =>
             item.figurita_id === repetidaSeleccionada.figurita_id
               ? {
                 ...item,
@@ -102,6 +103,8 @@ const Repetidas = () => {
 
     return (
         <div className="container-fluid px-0 d-flex flex-column gap-4" style={showModal ? { pointerEvents: 'none' } : undefined}>
+
+            {isFetching && !isLoading && <div className={styles.actualizando}><div className={styles.spinnerChico} /><span>Actualizando…</span></div>}
 
             <div className="row g-3 justify-content-center">
                 <div className="col-6 col-md-4">

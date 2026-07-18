@@ -19,7 +19,7 @@ const SelectorFaltantes = ({ modo = 'multiple', onChange }) => {
     setLoading(true)
     try {
       const payload = await buscarFaltantes({ jugador: busqueda, pagina: 1, limite: LIMITE })
-      setFiguritas(payload.contenido ?? [])
+      setFiguritas(payload?.contenido ?? [])
       setTotal(payload.cantidad_de_elementos ?? null)
     } catch (e) {
       handleError(e, (err) => showToast(err.mensaje, 'error'))
