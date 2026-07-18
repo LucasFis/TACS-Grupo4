@@ -16,6 +16,23 @@
 
 ---
 
+## Cómo diagnosticamos los problemas
+
+En vez de leer el código a ciegas, medimos con **trazas reales de staging**. El backend exporta trazas
+distribuidas vía OpenTelemetry a Grafana Cloud (Tempo), con un span por cada operación MongoDB. Para
+analizarlas usamos **Claude conectado al MCP de Grafana**: buscar las trazas más lentas por endpoint
+(`service.name = tacs-backend`) y contar sus spans de Mongo convirtió el "está lento" en un número
+accionable — **cuántos round-trips secuenciales a la base hacía cada endpoint**.
+
+El diagnóstico fue el mismo en casi todos: un **N+1** (muchas queries triviales en cadena, no una
+pesada). Como en staging cada operación Mongo cuesta ~169 ms fijos de red (Render Oregon ↔ Atlas M0), el
+costo real era proporcional a la cantidad de idas y vueltas — un `/propuestas` de ~3,5 s eran ~19
+operaciones encadenadas. La raíz eran los `@DBRef` de Spring Data, que resuelven cada referencia con un
+find secuencial extra silencioso. Con las trazas señalando dónde estaba el N+1 de cada endpoint, la
+remediación fue dirigida; los resultados se tabulan a continuación.
+
+---
+
 ## Tabla comparativa
 
 | Endpoint                                        | developer (ms) | fix (ms) | Δ% mejora   |
@@ -148,20 +165,3 @@ en cada corrida; los valores del fix son de la corrida de las 07:03 UTC).
 > ³ Deltas dentro del ruido entre corridas: escenarios sub-1s, o endpoints que esta rama
 > no tocó (`GET /figuritas`, `GET /colecciones/faltantes` varían ±15-20% entre corridas
 > idénticas).
-
-### Lectura
-
-- **Los tres listados optimizados mejoran fuerte bajo carga**, y el Δ de p95 subestima la
-  mejora porque la corrida fix además procesó más requests en el mismo tiempo:
-  - `GET /propuestas`: p95 14,9 s → 4,0 s (**+73%**), mediana 2 915 → 271 ms (−91%), throughput ×3,7 (1 698 → 6 268 reqs).
-  - `GET /sugerencias`: p95 9,6 s → 3,8 s (**+60%**), mediana 1 607 → 242 ms (−85%), throughput ×2,4 (2 828 → 6 650 reqs).
-  - `GET /subastas`: p95 10,6 s → 5,5 s (**+48%**), mediana 2 015 → 859 ms (−57%), throughput ×2,0 (2 364 → 4 762 reqs).
-- **`patch-notificaciones` pasa de colapsar a funcionar**: en developer el escenario muere
-  en timeouts de 60 s con 38,6% de errores; en fix responde todo con p95 de 6,9 s. Sigue
-  siendo el escenario sano más lento del fix — candidato a la próxima optimización.
-- **Los PATCH de flujo completo heredan la mejora de los GETs de setup** que ejecutan
-  antes de escribir: propuestas +87,7%, subastas +84,4%, ofertas +74,6%.
-- Las escrituras puras se mantienen bajo ~600 ms de p95 en ambas ramas; el fix las mejora
-  o empata en casi todas.
-- `post-recalcular` hace timeout en ambas ramas: es un batch pesado que no está pensado
-  para 250 usuarios concurrentes y queda fuera del alcance de este fix.
