@@ -30,8 +30,8 @@ const Repetidas = () => {
     const navigate = useNavigate();
 
     const { data: repetidas, isLoading, error } = useQueryConError({
-        queryKey: ['repetidas', { ...filtros, pagina, limite: 10 }],
-        queryFn: ({ signal }) => buscarRepetidas({ ...filtros, pagina, limite: 10 }, signal),
+        queryKey: ['repetidas', { ...filtros, pagina, limite: 12 }],
+        queryFn: ({ signal }) => buscarRepetidas({ ...filtros, pagina, limite: 12 }, signal),
     })
 
     const cambiarFiltro = (nuevoTipo) => {

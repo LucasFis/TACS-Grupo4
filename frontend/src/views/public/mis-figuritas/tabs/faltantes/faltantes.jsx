@@ -14,8 +14,8 @@ const Faltantes = () => {
     const navigate = useNavigate();
 
     const { data: faltantes, isLoading } = useQueryConError({
-        queryKey: ['faltantes', { ...filtros, pagina, limite: 10 }],
-        queryFn: ({ signal }) => buscarFaltantes({ ...filtros, pagina, limite: 10 }, signal),
+        queryKey: ['faltantes', { ...filtros, pagina, limite: 12 }],
+        queryFn: ({ signal }) => buscarFaltantes({ ...filtros, pagina, limite: 12 }, signal),
     })
 
     return (
