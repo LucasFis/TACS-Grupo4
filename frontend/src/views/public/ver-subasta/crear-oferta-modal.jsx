@@ -147,12 +147,12 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
                     <div>
                       <p className={styles.label}>Calificación mínima</p>
                       <p className="mb-0 text-muted" style={{ fontSize: '0.72rem' }}>
-                        {calMinima <= 1
+                        {calMinima === 0
                           ? 'Cualquier usuario puede ofertar'
                           : 'Solo usuarios con esta calificación pueden ofertar'}
                       </p>
                     </div>
-                    {calMinima <= 1 ? (
+                    {calMinima === 0 ? (
                       <div className={styles.calSinMinimo}>Sin mínimo</div>
                     ) : (
                       <div className={`${styles.calBadge} d-flex align-items-center gap-1`}>
