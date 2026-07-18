@@ -68,7 +68,9 @@ const SelectorRepetidas = ({
     onChange?.(seleccionadas)
   }, [seleccionadas, onChange])
 
-  const todasVisibles = [...bloqueadas, ...seleccionadas]
+  const todasVisibles = [...bloqueadas, ...seleccionadas.filter(
+    (s) => !bloqueadas.some((b) => b.figurita_id === s.figurita_id),
+  )]
 
   return (
     <div className="d-flex flex-column gap-3">

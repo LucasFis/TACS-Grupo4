@@ -143,14 +143,14 @@ const EditarOferta = () => {
                   </>
                 ) : (
                   <p className={styles.sinRestriccion}>
-                    Sin restricciÃƒÂ³n Ã¢â‚¬â€ el ofertante puede ofrecer cualquier figurita
+                    Sin restriccion‚ el ofertante puede ofrecer cualquier figurita
                   </p>
                 )}
               </div>
 
               <div className={styles.calificacionDivider}>
                 <div>
-                  <p className={styles.label}>CalificaciÃƒÂ³n mÃƒÂ­nima</p>
+                  <p className={styles.label}>Calificacion minima</p>
                   <p className={styles.hint}>
                     {calMinima <= 1
                       ? 'Cualquier usuario puede ofertar'
@@ -158,7 +158,7 @@ const EditarOferta = () => {
                   </p>
                 </div>
                 {calMinima <= 1 ? (
-                  <span className={styles.calSinMinimo}>Sin mÃƒÂ­nimo</span>
+                  <span className={styles.calSinMinimo}>Sin minimo</span>
                 ) : (
                   <div className={styles.calBadge}>
                     <span className={styles.calBadgeNumero}>{calMinima}</span>
@@ -172,10 +172,10 @@ const EditarOferta = () => {
 
         <div className="d-flex flex-column gap-3">
           <div>
-            <p className={styles.seleccionTitulo}>EditÃƒÂ¡ las figuritas que querÃƒÂ©s ofrecer</p>
+            <p className={styles.seleccionTitulo}>Edita las figuritas que queres ofrecer</p>
             {bloqueadas.length > 0 && (
               <p className={styles.seleccionHint}>
-                Las marcadas como <strong>Requerida</strong> se incluyen automÃƒÂ¡ticamente.
+                Las marcadas como <strong>Requerida</strong> se incluyen automticamente.
               </p>
             )}
           </div>
@@ -184,9 +184,7 @@ const EditarOferta = () => {
             modo="multiple"
             bloqueadas={bloqueadas}
             onChange={setFiguritasExtra}
-            seleccionadasIniciales={ofrecidasAnteriores.filter(
-              (f) => !bloqueadas.some((b) => b.figurita_id === f.figurita_id),
-            )}
+            seleccionadasIniciales={ofrecidasAnteriores}
             metodoIntercambio="SUBASTA"
             perfilId={subasta.perfil.id}
           />
@@ -196,7 +194,7 @@ const EditarOferta = () => {
           <div className="d-flex gap-2 justify-content-between">
             <Button label="Cancelar" variante="secundarioBorde" onClick={() => navigate(-1)} />
             <Button
-              label="Guardar cambios Ã¢â€ â€”"
+              label="Guardar cambios"
               disabled={procesando}
               onClick={onEnviar}
             />
@@ -211,9 +209,9 @@ const EditarOferta = () => {
 
         <ConfirmModal
           show={showEliminar}
-          titulo="Ã‚Â¿Eliminar oferta?"
-          mensaje="Esta acciÃƒÂ³n no se puede deshacer. Tu oferta serÃƒÂ¡ cancelada y la subasta continuarÃƒÂ¡ sin tu participaciÃƒÂ³n."
-          labelConfirmar="SÃƒÂ­, eliminar"
+          titulo="¿Eliminar oferta?"
+          mensaje="Esta accion no se puede deshacer. Tu oferta sera cancelada y la subasta continuara sin tu participacion."
+          labelConfirmar="Si, eliminar"
           onConfirmar={onEliminar}
           onCancelar={() => setShowEliminar(false)}
         />
