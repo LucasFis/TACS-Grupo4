@@ -84,8 +84,10 @@ public class ServicioSubasta {
     List<Perfil> interesados = this.repositorioPerfiles
         .buscarPorFiguritaFaltante(figuritaSubastada, conMedio);
 
-    this.notificacionService.notificarInteresados(
-        interesados, "Encontramos una subasta de una figurita que te falta!");
+    String link = "/subastas/" + nuevaSubasta.getId();
+    String cuerpo = "Se publicó una subasta de la figurita que te falta: " + nuevaSubasta.getFiguritaSubastada().getJugador();
+    notificacionService.notificarInteresados(interesados, cuerpo, link);
+
   }
 
   /**
@@ -343,7 +345,8 @@ public class ServicioSubasta {
           notificacionService.notificarInteresados(
                   List.of(seleccionada.getAutor()),
                   "¡Felicitaciones! Ganaste la subasta de la figurita #" +
-                          subasta.getFiguritaSubastada().getNumero(),
+                          subasta.getFiguritaSubastada().getNumero() + " "
+                          + subasta.getFiguritaSubastada().getJugador(),
                   "/subastas/" + subasta.getId()
           );
       }

@@ -6,6 +6,7 @@ import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import styles from './notifications-popover.module.css'
+import indicatorStyles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 
 const CACHE_KEY = 'notificaciones_cache'
 
@@ -14,7 +15,7 @@ const leerCache = () => {
     const raw = localStorage.getItem(CACHE_KEY)
     if (!raw) return null
     return JSON.parse(raw)
-  } catch { return null } // JSON inválido en localStorage
+  } catch { return null } // JSON invÃ¡lido en localStorage
 }
 
 const guardarCache = (notificaciones, noLeidas) => {
@@ -35,6 +36,7 @@ const NotificationsPopover = () => {
   const [notificaciones, setNotificaciones] = useState([])
   const [noLeidas, setNoLeidas] = useState(0)
   const wrapperRef = useRef(null)
+  const abortRef = useRef(null)
 
   useEffect(() => {
     if (!tieneSesion) return
@@ -76,6 +78,9 @@ const NotificationsPopover = () => {
       setAbierto(false)
       return
     }
+    if (abortRef.current) abortRef.current.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
     setAbierto(true)
     const cache = leerCache()
     if (cache) {
@@ -86,17 +91,21 @@ const NotificationsPopover = () => {
       setCargando(true)
     }
     try {
-      const data = await obtenerNotificaciones()
+      const data = await obtenerNotificaciones({}, controller.signal)
+      if (controller.signal.aborted) return
       const lista = Array.isArray(data) ? data : data?.contenido ?? []
       const leidas = Array.isArray(data) ? 0 : data?.no_leidas ?? 0
       setNotificaciones(lista)
       setNoLeidas(leidas)
       guardarCache(lista, leidas)
     } catch (error) {
+      if (controller.signal.aborted) return
       if (!cache) showToast(handleError(error, () => {}), 'error')
     } finally {
-      setCargando(false)
-      setActualizando(false)
+      if (!controller.signal.aborted) {
+        setCargando(false)
+        setActualizando(false)
+      }
     }
   }
 
@@ -183,7 +192,7 @@ const NotificationsPopover = () => {
                 onClick={handleMarcarTodasLeidas}
                 type="button"
               >
-                Marcar leídas
+                Marcar leÃ­das
               </button>
             )}
           </div>
@@ -191,8 +200,8 @@ const NotificationsPopover = () => {
           <div className={styles.header}>Notificaciones</div>
 
           {actualizando && (
-            <div className={styles.actualizando}>
-              <div className={styles.spinnerChico} />
+            <div className={indicatorStyles.actualizando}>
+              <div className={indicatorStyles.spinnerChico} />
               <span>Actualizando...</span>
             </div>
           )}
@@ -201,7 +210,7 @@ const NotificationsPopover = () => {
             {cargando ? (
               <div className={styles.cargando}><Spinner /></div>
             ) : notificaciones.length === 0 ? (
-              <div className={styles.empty}>No tenés notificaciones</div>
+              <div className={styles.empty}>No tenÃ©s notificaciones</div>
             ) : (
               notificaciones.map((n) => (
                 <div
@@ -212,7 +221,7 @@ const NotificationsPopover = () => {
                 >
                   <div className={styles.texto}>{n.cuerpo}</div>
                   <div className={styles.fecha}>{formatearFecha(n.fecha)}</div>
-                  {n.leida && <span className={styles.leidaBadge}>leída</span>}
+                  {n.leida && <span className={styles.leidaBadge}>leÃ­da</span>}
                 </div>
               ))
             )}

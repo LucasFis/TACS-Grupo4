@@ -7,6 +7,7 @@ import Paginacion from '../../../../../components/ui/paginacion/paginacion.jsx'
 import FiltroSubasta from '../../filtro-subasta/filtro-subasta.jsx'
 import { useNavigate } from 'react-router'
 import { useAuth } from '@/contexts/userContext.jsx'
+import styles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 
 
 const Participo = () => {
@@ -19,7 +20,7 @@ const Participo = () => {
   const queryClient = useQueryClient()
   const queryKey = ['subastas', 'participo', { participanteId: user.perfil_id, estado, pagina, limite: 5, ...paramsFigurita }]
 
-  const { data, isLoading } = useQueryConError({
+  const { data, isLoading, isFetching } = useQueryConError({
     queryKey,
     queryFn: ({ signal }) => buscarSubastas({ participanteId: user.perfil_id, estado, pagina, limite: 5, ...paramsFigurita }, signal),
   })
@@ -39,6 +40,13 @@ const Participo = () => {
         onChangeEstado={cambiarEstado}
         onAplicarFigurita={(p) => { setParamsFigurita(p); setPagina(1) }}
       />
+
+      {isFetching && !isLoading && (
+        <div className={styles.actualizando}>
+          <div className={styles.spinnerChico} />
+          <span>Actualizando...</span>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="d-flex flex-column gap-3">

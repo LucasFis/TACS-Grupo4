@@ -69,3 +69,7 @@
 .navbar-avatar:hover {
   transform: scale(1.1);
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

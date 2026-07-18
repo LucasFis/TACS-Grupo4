@@ -9,6 +9,7 @@ import {useError} from "@/contexts/errorContext.jsx";
 import Breadcrumb from "@/components/ui/breadcrumb/breadcrumb.jsx";
 import { IconoAdvertencia } from '@/components/ui/iconos/advertencia/advertencia.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 
 const NuevaFaltante = () => {
     const [figurita, setFigurita] = useState(undefined);
@@ -17,6 +18,7 @@ const NuevaFaltante = () => {
     const [errorFormato, setErrorFormato] = useState('');
     const [tocado, setTocado] = useState(false);
     const [procesando, setProcesando] = useState(false);
+    const [buscando, setBuscando] = useState(false);
 
     const {showToast} = useToast();
     const {handleError} = useError();
@@ -41,15 +43,20 @@ const NuevaFaltante = () => {
         }
 
         setErrorFormato('');
-        const resultado = await buscarFiguritas({ id: texto });
+        setBuscando(true);
+        try {
+            const resultado = await buscarFiguritas({ id: texto });
 
-        if (resultado.length === 0) {
-            showToast('No se encontró una figurita con ese número', 'error');
-            handleSelect(undefined);
-            return;
+            if (resultado.length === 0) {
+                showToast('No se encontró una figurita con ese número', 'error');
+                handleSelect(undefined);
+                return;
+            }
+
+            handleSelect(resultado[0]);
+        } finally {
+            setBuscando(false);
         }
-
-        handleSelect(resultado[0]);
     };
 
     const ejecutarFormulario = async () => {
@@ -129,7 +136,7 @@ const NuevaFaltante = () => {
                                     }
                                 }}
                             />
-                            <Button label={"Buscar"} onClick={() => buscarPorNumero(numero)}/>
+                            <Button label={buscando ? "Buscando..." : "Buscar"} onClick={() => buscarPorNumero(numero)} disabled={buscando}/>
                         </div>
                         {tocado && errorFormato && (
                             <small className="text-danger d-flex align-items-center gap-1 mt-1" style={{ fontSize: '0.85rem' }}>
