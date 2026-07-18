@@ -87,11 +87,24 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
     try {
       setProcesando(true)
       setAccionProcesando(ACCION_LABELS[modal.tipo] ?? 'Procesando...')
-      if (modal.tipo === 'adjudicar') await seleccionarOferta(subastaId, modal.ofertaId)
-      else if (modal.tipo === 'rechazar') await rechazarOferta(subastaId, modal.ofertaId)
-      else if (modal.tipo === 'cancelar') await cancelarSubasta(subastaId)
-      else if (modal.tipo === 'cerrar') await cerrarSubasta(subastaId)
+      let mensaje
+      if (modal.tipo === 'adjudicar') {
+        await seleccionarOferta(subastaId, modal.ofertaId)
+        mensaje = "Oferta adjudicada correctamente."
+      } else if (modal.tipo === 'rechazar') {
+        await rechazarOferta(subastaId, modal.ofertaId)
+        mensaje = "Oferta rechazada correctamente."
+      }
+      else if (modal.tipo === 'cancelar') {
+        await cancelarSubasta(subastaId)
+        mensaje = "Subasta cancelada correctamente."
+      }
+      else if (modal.tipo === 'cerrar') {
+        await cerrarSubasta(subastaId)
+        mensaje = "Subasta cerrada correctamente."
+      }
       setModal(null)
+      showToast(mensaje, 'success')
       onRefresh()
     } catch (error) {
       showToast(handleError(error, () => {}), 'error')
