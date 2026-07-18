@@ -60,6 +60,10 @@ public class ServicioSubasta {
     Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, conColeccion);
     Figurita figuritaSubastada = this.repoFigurita.buscarPorId(figuritaId);
 
+    if (this.repoSubasta.existeActivaPorAutorYFigurita(perfilId, figuritaId)) {
+      throw new BadRequestException("Ya tenés una subasta activa para esta figurita");
+    }
+
     List<Figurita> figuritasDeseadas = figuritasDeseadasIds.stream()
         .map(this.repoFigurita::buscarPorId)
         .toList();

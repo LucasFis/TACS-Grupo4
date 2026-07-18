@@ -218,6 +218,19 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
     return (int) mongoTemplate.count(query, Subasta.class);
   }
 
+  @Override
+  public boolean existeActivaPorAutorYFigurita(String perfilId, String figuritaId) {
+    Date ahora = new Date();
+    Query query = new Query();
+    query.addCriteria(new Criteria().andOperator(
+        Criteria.where("autor.id").is(perfilId),
+        Criteria.where("figuritaSubastada.$id").is(figuritaId),
+        Criteria.where("fechaInicio").lte(ahora),
+        Criteria.where("fechaCierre").gt(ahora)
+    ));
+    return mongoTemplate.count(query, Subasta.class) > 0;
+  }
+
   private Subasta normalizar(Subasta subasta) {
     if(subasta.getOfertas() == null) {
       subasta.setOfertas(new ArrayList<>());
