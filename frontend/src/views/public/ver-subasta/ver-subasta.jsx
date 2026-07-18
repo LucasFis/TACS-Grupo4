@@ -12,7 +12,7 @@ import OfertaCard from './oferta-card.jsx'
 import TuOfertaCard from './tu-oferta-card.jsx'
 import Button from '@/components/ui/button/button.jsx'
 import { useAuth } from '@/contexts/userContext.jsx'
-import { useNavigate } from 'react-router-dom'
+import CrearOfertaModal from './crear-oferta-modal.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
@@ -30,7 +30,7 @@ const VerSubasta = () => {
   const [procesando, setProcesando] = useState(false)
   const [modal, setModal] = useState(null)
   const [accionProcesando, setAccionProcesando] = useState('')
-  const navigate = useNavigate()
+  const [mostrarCrearOferta, setMostrarCrearOferta] = useState(false)
 
   const { data: subasta, isLoading: cargando, isFetching, error, refetch } = useQueryConError({
     queryKey: ['subasta', subId],
@@ -336,7 +336,7 @@ const VerSubasta = () => {
                         <Button
                           label="Proponer oferta"
                           variante="terciario"
-                          onClick={() => navigate(`/subastas/${subId}/crear-oferta`)}
+                          onClick={() => setMostrarCrearOferta(true)}
                         />
                       </div>
                     )}
@@ -359,6 +359,14 @@ const VerSubasta = () => {
           labelConfirmar={configModal?.labelConfirmar}
           onConfirmar={handleConfirmar}
           onCancelar={() => setModal(null)}
+        />
+
+        <CrearOfertaModal
+          abierto={mostrarCrearOferta}
+          onCerrar={() => setMostrarCrearOferta(false)}
+          subId={subId}
+          subasta={subasta}
+          onExito={refetch}
         />
       </div>
     </div>
