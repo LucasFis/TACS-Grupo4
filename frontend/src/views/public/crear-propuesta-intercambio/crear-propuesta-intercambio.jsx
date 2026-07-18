@@ -66,6 +66,7 @@ const CrearPropuestaIntercambio = () => {
               <SelectorRepetidas
                 modo="multiple"
                 bloqueadas={[]}
+                perfilId={perfilDuenio.id}
                 onChange={setSeleccionadas}
                 metodoIntercambio="INTERCAMBIO"
                 mensajeVacio="No tenés repetidas publicadas para intercambio que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
