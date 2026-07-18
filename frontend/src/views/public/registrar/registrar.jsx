@@ -8,6 +8,7 @@ import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import TextoInput from '@/components/ui/input-texto/input-texto.jsx'
 import ContraseniaInput from '@/components/ui/input-contrasenia/input-contrasenia.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 
 function Registrar() {
   const [formData, setFormData] = useState({
@@ -22,6 +23,7 @@ function Registrar() {
   const [onSubmit, setOnSubmit] = useState(false)
 
   const [nombreTomado, setNombreTomado] = useState(false)
+  const [verificandoNombre, setVerificandoNombre] = useState(false)
 
   const [tocado, setTocado] = useState({
     nombre: false,
@@ -114,6 +116,7 @@ function Registrar() {
   const handleBlurNombre = async (e) => {
     handleBlur(e)
     if (!nombreFormatoValido) return
+    setVerificandoNombre(true)
     try {
       const existe = await verificarNombre(formData.nombre)
       setNombreTomado(existe)
@@ -122,6 +125,8 @@ function Registrar() {
         handleError(error, () => {}),
         'error',
       )
+    } finally {
+      setVerificandoNombre(false)
     }
   }
 
@@ -222,7 +227,10 @@ function Registrar() {
             tocado={tocado.nombre}
             esValido={nombreEsValido}
             error={errorNombre}
-            hint='Debe ser único, sin espacios. Solo letras, números, "_" o ".".'
+            hint={verificandoNombre
+              ? <span className="d-flex align-items-center gap-1"><Spinner /> Verificando disponibilidad...</span>
+              : 'Debe ser único, sin espacios. Solo letras, números, "_" o ".".'
+            }
           />
 
           <ContraseniaInput

@@ -4,6 +4,7 @@ import useQueryConError from '@/hooks/useQueryConError'
 import IntercambioCard from './intercambio-card/intercambio-card.jsx'
 import { buscarPropuestas } from '@/services/propuestasService.js'
 import Paginacion from '@/components/ui/paginacion/paginacion.jsx'
+import styles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 
 import FiltroIntercambio from '../filtro-intercambio/filtro-intercambio.jsx'
 
@@ -22,7 +23,7 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
   const queryClient = useQueryClient()
   const queryKey = ['propuestas', { pagina, limite: 10, estado, tipo, ...paramsFigurita }]
 
-  const { data: propuestas, isLoading } = useQueryConError({
+  const { data: propuestas, isLoading, isFetching } = useQueryConError({
     queryKey,
     queryFn: ({ signal }) => buscarPropuestas({ pagina, limite: 10, estado, tipo, ...paramsFigurita }, signal),
   })
@@ -48,6 +49,13 @@ const PropuestasTab = ({ tipo, estadoInicial = '' }) => {
         onChangeEstado={cambiarFiltro}
         onAplicarFigurita={handleAplicarFigurita}
       />
+
+      {isFetching && !isLoading && (
+        <div className={styles.actualizando}>
+          <div className={styles.spinnerChico} />
+          <span>Actualizando...</span>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="d-flex flex-column gap-3">

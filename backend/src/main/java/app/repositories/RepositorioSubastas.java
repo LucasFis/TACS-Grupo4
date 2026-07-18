@@ -42,6 +42,8 @@ public interface RepositorioSubastas {
      * Devuelve todas las subastas que actualmente se encuentran activas.
      */
     List<Subasta> buscarActivas();
+
+    long contarSubastasActivas();
     
     /**
      * Cuenta subastas activas donde el usuario tiene una oferta pendiente o seleccionada

@@ -3,6 +3,7 @@ import { buscarRepetidas } from '@/services/coleccionService.js'
 import ScrollFiguritas from './scroll-figuritas/scroll-figuritas.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import AvisoRepetidas from './aviso-repetidas/aviso-repetidas.jsx'
 import styles from './selector-repetidas.module.css'
 
 const LIMITE = 10
@@ -15,6 +16,7 @@ const SelectorRepetidas = ({
   metodoIntercambio = null,
   perfilId = null,
   mensajeVacio = null,
+  mostrarAviso = false,
 }) => {
   const [figuritas, setFiguritas] = useState([])
   const [loading, setLoading] = useState(false)
@@ -72,6 +74,10 @@ const SelectorRepetidas = ({
 
   return (
     <div className="d-flex flex-column gap-3">
+      {mostrarAviso && metodoIntercambio && (
+        <AvisoRepetidas metodo={metodoIntercambio.toLowerCase()} />
+      )}
+
       <ScrollFiguritas
         figuritas={figuritas}
         seleccionadasIniciales={seleccionadasIniciales}

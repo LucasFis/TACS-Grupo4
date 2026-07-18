@@ -4,19 +4,35 @@ import app.dto.filtros.SubastasFiltro;
 import app.dto.paginacion.PaginaResultado;
 import app.exceptions.NotFoundException;
 import app.model.entities.EstadoProceso;
+import app.model.entities.EstadoPropuesta;
+import app.model.entities.Figurita;
+import app.model.entities.MedioDeContacto;
 import app.model.entities.Perfil;
+import app.model.entities.Propuesta;
 import app.model.entities.Subasta;
+import app.model.entities.Usuario;
 import app.repositories.RepositorioSubastas;
 import app.repositories.impl.campos.CamposSubasta;
+import com.mongodb.DBRef;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Repository
 public class RepositorioSubastasMongo implements RepositorioSubastas {
@@ -77,66 +93,123 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
 
   @Override
   public PaginaResultado<Subasta> buscarTodos(SubastasFiltro filtros, CamposSubasta campos) {
-    Query query = new Query();
-
-    this.conCamposCargados(query, campos);
-
-    if (filtros.autorId() != null) {
-      query.addCriteria(
-          Criteria.where("autor.id").is(filtros.autorId())
-      );
+    List<AggregationOperation> ops = new ArrayList<>();
+    List<Criteria> criterios = buildCriterios(filtros);
+    if (!criterios.isEmpty()) {
+      ops.add(Aggregation.match(new Criteria().andOperator(criterios.toArray(Criteria[]::new))));
     }
 
-    if ("ACTIVA".equals(filtros.estado())) {
-      Date ahora = new Date();
-      query.addCriteria(
-          new Criteria().andOperator(
-              Criteria.where("fechaInicio").lte(ahora),
-              Criteria.where("fechaCierre").gt(ahora)
-          )
-      );
+    long skip = Math.max(0L, (long) (filtros.pagina() - 1) * filtros.limite());
+    List<AggregationOperation> paginaOps = new ArrayList<>();
+    paginaOps.add(Aggregation.skip(skip));
+    paginaOps.add(Aggregation.limit(filtros.limite()));
+    if (!campos.getFiguritasSolicitadas()) {
+      paginaOps.add(ctx -> new Document("$unset", "figuritasSolicitadas"));
+    }
+    paginaOps.add(Aggregation.lookup("perfiles", "autor.$id", "_id", "_autorDoc"));
+    paginaOps.add(Aggregation.unwind("_autorDoc", true));
+    paginaOps.add(Aggregation.lookup("usuarios", "_autorDoc.usuario.$id", "_id", "_autorUsuDoc"));
+    paginaOps.add(Aggregation.unwind("_autorUsuDoc", true));
+    paginaOps.add(Aggregation.lookup("figuritas", "figuritaSubastada.$id", "_id", "_figSubastadaDoc"));
+    paginaOps.add(Aggregation.unwind("_figSubastadaDoc", true));
+    // Los $lookup de ofertas hacen $map sobre $ofertas; si el campo fue removido (ofertas=false)
+    // ese $map produce null y el $in posterior falla. Por eso solo se agregan con ofertas cargadas.
+    if (campos.getOfertas()) {
+      agregarLookupsDeOfertas(paginaOps);
+    } else {
+      paginaOps.add(ctx -> new Document("$unset", "ofertas"));
     }
 
-    if ("FINALIZADA".equals(filtros.estado())) {
-      Date ahora = new Date();
-      query.addCriteria(
-          Criteria.where("fechaCierre").lte(ahora)
-      );
-    }
-    if (filtros.participanteId() != null) {
-      query.addCriteria(
-          Criteria.where("ofertas").elemMatch(
-              Criteria.where("autor.id").is(filtros.participanteId())
-                  .and("estadoActual.valor").ne(EstadoProceso.CANCELADO)
-          )
-      );
-    }
+    ops.add(Aggregation.facet()
+        .and(Aggregation.count().as("n")).as("total")
+        .and(paginaOps.toArray(AggregationOperation[]::new)).as("pagina")
+    );
 
-    if (filtros.idFiguritaSubastada() != null) {
-      query.addCriteria(
-          Criteria.where("figuritaSubastada.$id").is(filtros.idFiguritaSubastada())
-      );
-    }
+    Document result = mongoTemplate.aggregate(
+        Aggregation.newAggregation(ops), Subasta.class, Document.class
+    ).getMappedResults().stream().findFirst().orElse(new Document());
 
-    if (filtros.idFiguritaOfertada() != null) {
-      query.addCriteria(
-          Criteria.where("ofertas.figuritasOfrecidas.$id").is(filtros.idFiguritaOfertada())
-      );
-    }
+    List<Document> totalDocs = result.getList("total", Document.class);
+    long count = totalDocs != null && !totalDocs.isEmpty()
+        ? ((Number) totalDocs.get(0).get("n")).longValue()
+        : 0L;
 
-    long count = mongoTemplate.count(query, Subasta.class);
-
-    query.skip((long) (filtros.pagina() - 1) * filtros.limite());
-    query.limit(filtros.limite());
-
-    List<Subasta> contenido = mongoTemplate.find(query, Subasta.class).stream().map(this::normalizar).toList();
+    MongoConverter converter = mongoTemplate.getConverter();
+    List<Document> paginaDocs = result.getList("pagina", Document.class);
+    List<Subasta> contenido = paginaDocs != null
+        ? paginaDocs.stream().map(d -> hydrateSubasta(d, converter)).toList()
+        : List.of();
 
     return new PaginaResultado<>(
-        contenido,
-        count,
+        contenido, count,
         (int) Math.ceil((double) count / filtros.limite()),
         filtros.pagina()
     );
+  }
+
+  private void agregarLookupsDeOfertas(List<AggregationOperation> paginaOps) {
+    paginaOps.add(ctx -> new Document("$lookup", new Document()
+        .append("from", "perfiles")
+        .append("let", new Document("ids", new Document("$map",
+            new Document("input", "$ofertas").append("as", "o")
+                .append("in", new Document("$getField",
+                    new Document("field", new Document("$literal", "$id")).append("input", "$$o.autor"))))))
+        .append("pipeline", List.of(new Document("$match",
+            new Document("$expr", new Document("$in", List.of("$_id", "$$ids"))))))
+        .append("as", "_ofertaAutoresDocs")));
+    paginaOps.add(ctx -> new Document("$lookup", new Document()
+        .append("from", "usuarios")
+        .append("let", new Document("ids", new Document("$map",
+            new Document("input", "$_ofertaAutoresDocs").append("as", "p")
+                .append("in", new Document("$getField",
+                    new Document("field", new Document("$literal", "$id")).append("input", "$$p.usuario"))))))
+        .append("pipeline", List.of(new Document("$match",
+            new Document("$expr", new Document("$in", List.of("$_id", "$$ids"))))))
+        .append("as", "_ofertaUsuariosDocs")));
+    paginaOps.add(ctx -> new Document("$lookup", new Document()
+        .append("from", "figuritas")
+        .append("let", new Document("ids", new Document("$reduce",
+            new Document("input", new Document("$map",
+                new Document("input", "$ofertas").append("as", "o")
+                    .append("in", new Document("$map",
+                        new Document("input", "$$o.figuritasOfrecidas").append("as", "f")
+                            .append("in", new Document("$getField",
+                                new Document("field", new Document("$literal", "$id")).append("input", "$$f")))))))
+                .append("initialValue", List.of())
+                .append("in", new Document("$concatArrays", List.of("$$value", "$$this"))))))
+        .append("pipeline", List.of(new Document("$match",
+            new Document("$expr", new Document("$in", List.of("$_id", "$$ids"))))))
+        .append("as", "_ofertaFigsDocs")));
+  }
+
+  private List<Criteria> buildCriterios(SubastasFiltro filtros) {
+    List<Criteria> criterios = new ArrayList<>();
+    if (filtros.autorId() != null) {
+      criterios.add(Criteria.where("autor.id").is(filtros.autorId()));
+    }
+    if ("ACTIVA".equals(filtros.estado())) {
+      Date ahora = new Date();
+      criterios.add(new Criteria().andOperator(
+          Criteria.where("fechaInicio").lte(ahora),
+          Criteria.where("fechaCierre").gt(ahora)
+      ));
+    }
+    if ("FINALIZADA".equals(filtros.estado())) {
+      criterios.add(Criteria.where("fechaCierre").lte(new Date()));
+    }
+    if (filtros.participanteId() != null) {
+      criterios.add(Criteria.where("ofertas").elemMatch(
+          Criteria.where("autor.id").is(filtros.participanteId())
+              .and("estadoActual.valor").ne(EstadoProceso.CANCELADO)
+      ));
+    }
+    if (filtros.idFiguritaSubastada() != null) {
+      criterios.add(Criteria.where("figuritaSubastada.$id").is(filtros.idFiguritaSubastada()));
+    }
+    if (filtros.idFiguritaOfertada() != null) {
+      criterios.add(Criteria.where("ofertas.figuritasOfrecidas.$id").is(filtros.idFiguritaOfertada()));
+    }
+    return criterios;
   }
 
   @Override
@@ -184,8 +257,19 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
         Criteria.where("fechaInicio").lte(ahora),
         Criteria.where("fechaCierre").gt(ahora)
     ));
+    // Solo se necesitan los IDs: leer documentos crudos evita que el mapeo a entidad
+    // resuelva cada @DBRef (autor, perfil, figuritas) con un find adicional por subasta.
+    query.fields().include("figuritaSubastada");
 
-    return mongoTemplate.find(query, Subasta.class);
+    return mongoTemplate.find(query, Document.class, "subastas").stream()
+        .filter(doc -> doc.get("figuritaSubastada") instanceof DBRef ref && ref.getId() != null)
+        .map(doc -> Subasta.builder()
+            .id(doc.get("_id").toString())
+            .figuritaSubastada(Figurita.builder()
+                .id(((DBRef) doc.get("figuritaSubastada")).getId().toString())
+                .build())
+            .build())
+        .toList();
   }
 
   private void conCamposCargados(Query query, CamposSubasta campos) {
@@ -241,6 +325,130 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
     return subasta;
   }
 
+  private Subasta hydrateSubasta(Document doc, MongoConverter converter) {
+    String id = doc.get("_id") != null ? doc.get("_id").toString() : null;
+    LocalDateTime fechaInicio = toLocalDateTime(doc.get("fechaInicio"));
+    LocalDateTime fechaCierre = toLocalDateTime(doc.get("fechaCierre"));
+    Perfil autor = hydratePerfil(
+        doc.get("_autorDoc", Document.class),
+        doc.get("_autorUsuDoc", Document.class),
+        converter);
+    Document figSubDoc = doc.get("_figSubastadaDoc", Document.class);
+    Figurita figuritaSubastada = figSubDoc != null ? converter.read(Figurita.class, figSubDoc) : null;
+    Map<String, Perfil> autoresPorId = buildPerfilesMap(
+        doc.getList("_ofertaAutoresDocs", Document.class),
+        doc.getList("_ofertaUsuariosDocs", Document.class),
+        converter);
+    Map<String, Figurita> figsPorId = buildFiguritasMap(
+        doc.getList("_ofertaFigsDocs", Document.class), converter);
+    ArrayList<Propuesta> ofertas = buildOfertas(
+        doc.getList("ofertas", Document.class),
+        autor, figuritaSubastada, autoresPorId, figsPorId, converter);
+    // Solo se reconstruyen los IDs desde los DBRef: este pipeline no hace $lookup de
+    // figuritasSolicitadas (evita costo extra), pero refleja los reales en vez de una lista vacía.
+    List<Object> figSolRefs = doc.getList("figuritasSolicitadas", Object.class);
+    List<Figurita> figuritasSolicitadas = figSolRefs != null
+        ? figSolRefs.stream()
+            .map(RepositorioSubastasMongo::dbRefId)
+            .filter(Objects::nonNull)
+            .map(figId -> Figurita.builder().id(figId).build())
+            .collect(Collectors.toList())
+        : new ArrayList<>();
+    return Subasta.builder()
+        .id(id)
+        .fechaInicio(fechaInicio)
+        .fechaCierre(fechaCierre)
+        .autor(autor)
+        .figuritaSubastada(figuritaSubastada)
+        .figuritasSolicitadas(figuritasSolicitadas)
+        .calificacionMinimaSolicitada(doc.getInteger("calificacionMinimaSolicitada", 1))
+        .avisoFinalEnviado(Boolean.TRUE.equals(doc.getBoolean("avisoFinalEnviado")))
+        .ofertas(ofertas)
+        .build();
+  }
+
+  private static LocalDateTime toLocalDateTime(Object value) {
+    if (value instanceof Date d) return d.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
+    if (value instanceof LocalDateTime ldt) return ldt;
+    return null;
+  }
+
+  private static String dbRefId(Object dbRefValue) {
+    if (dbRefValue instanceof DBRef dbRef) return dbRef.getId() != null ? dbRef.getId().toString() : null;
+    if (dbRefValue instanceof Document doc) { Object id = doc.get("$id"); return id != null ? id.toString() : null; }
+    return null;
+  }
+
+  private Map<String, Perfil> buildPerfilesMap(
+      List<Document> perfilDocs, List<Document> usuarioDocs, MongoConverter converter) {
+    if (perfilDocs == null) return Map.of();
+    Map<String, Document> ususPorId = new HashMap<>();
+    if (usuarioDocs != null) {
+      for (Document u : usuarioDocs) {
+        Object uid = u.get("_id");
+        if (uid != null) ususPorId.put(uid.toString(), u);
+      }
+    }
+    Map<String, Perfil> result = new HashMap<>();
+    for (Document p : perfilDocs) {
+      Object pid = p.get("_id");
+      if (pid == null) continue;
+      String usuId = dbRefId(p.get("usuario"));
+      result.put(pid.toString(), hydratePerfil(p, ususPorId.get(usuId), converter));
+    }
+    return result;
+  }
+
+  private Map<String, Figurita> buildFiguritasMap(List<Document> figDocs, MongoConverter converter) {
+    if (figDocs == null) return Map.of();
+    Map<String, Figurita> result = new HashMap<>();
+    for (Document d : figDocs) {
+      Object id = d.get("_id");
+      if (id != null) result.put(id.toString(), converter.read(Figurita.class, d));
+    }
+    return result;
+  }
+
+  private ArrayList<Propuesta> buildOfertas(
+      List<Document> ofertaDocs, Perfil subastaAutor, Figurita figuritaSubastada,
+      Map<String, Perfil> autoresPorId, Map<String, Figurita> figsPorId,
+      MongoConverter converter) {
+    if (ofertaDocs == null) return new ArrayList<>();
+    return new ArrayList<>(ofertaDocs.stream().map(of -> {
+      String ofId = of.get("_id") != null ? of.get("_id").toString() : null;
+      Perfil autorOferta = autoresPorId.get(dbRefId(of.get("autor")));
+      List<Object> figRefs = of.getList("figuritasOfrecidas", Object.class);
+      List<Figurita> figsOfrecidas = figRefs != null
+          ? figRefs.stream().map(r -> figsPorId.get(dbRefId(r))).filter(Objects::nonNull).collect(Collectors.toList())
+          : List.of();
+      List<Document> estadoDocs = of.getList("estado", Document.class);
+      List<EstadoPropuesta> estados = estadoDocs != null
+          ? estadoDocs.stream().map(d -> converter.read(EstadoPropuesta.class, d)).collect(Collectors.toList())
+          : new ArrayList<>();
+      Document estadoActualDoc = of.get("estadoActual", Document.class);
+      EstadoPropuesta estadoActual = estadoActualDoc != null
+          ? converter.read(EstadoPropuesta.class, estadoActualDoc)
+          : (estados.isEmpty() ? null : estados.get(estados.size() - 1));
+      return new Propuesta(ofId, autorOferta, subastaAutor,
+          figsOfrecidas, figuritaSubastada, new ArrayList<>(estados), estadoActual);
+    }).toList());
+  }
+
+  private Perfil hydratePerfil(Document perfilDoc, Document usuarioDoc, MongoConverter converter) {
+    if (perfilDoc == null) return null;
+    String id = perfilDoc.get("_id") != null ? perfilDoc.get("_id").toString() : null;
+    String nombre = perfilDoc.getString("nombre");
+    Number calMed = perfilDoc.get("calificacionMedia", Number.class);
+    double calificacionMedia = calMed != null ? calMed.doubleValue() : 0.0;
+    int cantidadCalificaciones = perfilDoc.getInteger("cantidadCalificaciones", 0);
+    List<Document> mediosDocs = perfilDoc.getList("mediosDeContacto", Document.class);
+    List<MedioDeContacto> medios = mediosDocs != null
+        ? mediosDocs.stream().map(d -> converter.read(MedioDeContacto.class, d)).toList()
+        : List.of();
+    Usuario usuario = usuarioDoc != null ? converter.read(Usuario.class, usuarioDoc) : null;
+    return new Perfil(id, usuario, nombre, null, medios, calificacionMedia, cantidadCalificaciones);
+  }
+
   @Override
   public List<Subasta> buscarActivas() {
 
@@ -256,5 +464,15 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
               .stream()
               .map(this::normalizar)
               .toList();
+  }
+
+  @Override
+  public long contarSubastasActivas() {
+      Date ahora = new Date();
+      Query query = new Query(new Criteria().andOperator(
+          Criteria.where("fechaInicio").lte(ahora),
+          Criteria.where("fechaCierre").gt(ahora)
+      ));
+      return mongoTemplate.count(query, Subasta.class);
   }
 }

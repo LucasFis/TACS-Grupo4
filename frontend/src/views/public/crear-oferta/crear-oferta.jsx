@@ -10,6 +10,7 @@ import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repet
 import Button from '@/components/ui/button/button.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-oferta.module.css'
 
@@ -53,7 +54,7 @@ const CrearOferta = () => {
 
   const cargando = cargandoSubasta || cargandoRepetidas || cargandoPerfil
 
-  if (cargando) return <h2>Cargando...</h2>
+  if (cargando) return <Spinner />
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>
 
   const repetidas = repetidasData?.contenido ?? []
@@ -173,25 +174,28 @@ const CrearOferta = () => {
       {/* Selección */}
       {cumpleCalificacion && tieneTodasRequeridas && (
         <div className="d-flex flex-column gap-3">
-          <div>
-            <p className={styles.crearOfertaSeleccionTitulo}>
-              Seleccioná las figuritas que querés ofrecer
-            </p>
-            {bloqueadas.length > 0 && (
-              <p className={styles.crearOfertaSeleccionHint}>
-                Las marcadas como <strong>Requerida</strong> se incluyen automáticamente. Podés
-                sumar más si querés.
-              </p>
-            )}
-          </div>
-
-          <SelectorRepetidas
-            modo="multiple"
-            bloqueadas={bloqueadas}
-            onChange={setFiguritasExtra}
-            metodoIntercambio="SUBASTA"
-            perfilId={subasta.perfil.id}
-          />
+          <SectionCard>
+            <SectionCard.Section>
+              <p className="label-seccion">Seleccioná las figuritas que querés ofrecer</p>
+              {bloqueadas.length > 0 && (
+                <p className={styles.crearOfertaSeleccionHint}>
+                  Las marcadas como <strong>Requerida</strong> se incluyen automáticamente. Podés
+                  sumar más si querés.
+                </p>
+              )}
+              <div className="mt-2">
+                <SelectorRepetidas
+                  modo="multiple"
+                  bloqueadas={bloqueadas}
+                  onChange={setFiguritasExtra}
+                  metodoIntercambio="SUBASTA"
+                  perfilId={subasta.perfil.id}
+                  mensajeVacio="No tenés repetidas publicadas para subasta que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
+                  mostrarAviso={true}
+                />
+              </div>
+            </SectionCard.Section>
+          </SectionCard>
 
           <Button
             label="Enviar oferta ↗"

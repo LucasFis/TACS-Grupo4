@@ -28,7 +28,7 @@ public class Perfil {
 
     private String nombre;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Builder.Default
     private Coleccion coleccion = new Coleccion();
 
