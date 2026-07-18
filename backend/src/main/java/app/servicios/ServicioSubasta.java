@@ -188,6 +188,14 @@ public class ServicioSubasta {
     subasta.agregarOferta(nuevaPropuesta);
     meterRegistry.counter("propuestas_creadas_total", "metodo", "subasta").increment();
 
+    String cuerpo = "Recibiste una nueva oferta para tu subasta de #"
+        + subasta.getFiguritaSubastada().getNumero() + " "
+        + subasta.getFiguritaSubastada().getJugador();
+
+    String link = "/subastas/" + subastaId;
+
+    this.notificacionService.notificarInteresados(List.of(subasta.getAutor()), cuerpo, link);
+
     this.repositorioColecciones.guardar(autor.getColeccion(), new CamposColeccion(true, false));
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
@@ -222,6 +230,14 @@ public class ServicioSubasta {
     List<Figurita> nuevasFiguritas = this.repoFigurita.buscarPorIds(body.getFiguritasOfrecidasId());
     subasta.modificarFiguritasDeOferta(ofertaId, perfilId, nuevasFiguritas);
     contarTransicion("pendiente");
+
+    String cuerpo = "Se modificó una oferta existente de tu subasta de #"
+        + subasta.getFiguritaSubastada().getNumero() + " "
+        + subasta.getFiguritaSubastada().getJugador();
+
+    String link = "/subastas/" + subastaId;
+
+    this.notificacionService.notificarInteresados(List.of(subasta.getAutor()), cuerpo, link);
 
     this.repositorioColecciones.guardar(coleccion, camposColeccion);
     this.repoSubasta.guardar(subasta, camposSubasta);
