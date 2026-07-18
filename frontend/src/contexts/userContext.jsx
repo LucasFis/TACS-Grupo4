@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {buscarUsuario, logout} from "../services/sesionService.js";
 import {useNavigate} from "react-router-dom";
+import {queryClient} from "../queryClient.js";
 
 const AuthContext = createContext(null)
 
@@ -38,6 +39,7 @@ export const AuthProvider = ({ children }) => {
             setUser(undefined);
             localStorage.removeItem("sesion");
             localStorage.removeItem("notificaciones_cache");
+            queryClient.clear();
             navigate("/")
         };
 
@@ -66,6 +68,7 @@ export const AuthProvider = ({ children }) => {
         setUser(undefined)
         localStorage.removeItem("sesion")
         localStorage.removeItem("notificaciones_cache")
+        queryClient.clear()
 
         await logout()
 
