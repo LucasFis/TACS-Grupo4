@@ -21,7 +21,6 @@ import AccesoDenegado from '@/views/public/errores/acceso-denegado/acceso-denega
 import RutaProtegida from '@/components/autenticacion/ruta-protegida.jsx'
 import ServidorCaido from '@/views/public/errores/servidor-caido/servidor-caido.jsx'
 import ErrorInterno from '@/views/public/errores/error-interno/error-interno.jsx'
-import CrearOferta from './views/public/crear-oferta/crear-oferta.jsx'
 import EditarOferta from './views/public/editar-oferta/editar-oferta.jsx'
 import VerIntercambio from './views/public/ver-intercambio/ver-intercambio.jsx'
 import Administrador from './views/public/administrador/administrador.jsx'
@@ -54,7 +53,6 @@ const privadas = [
   { path: '/intercambios/:intercambioId', element: <VerIntercambio /> },
   { path: '/subastas/:subId', element: <VerSubasta /> },
   { path: '/subastas', element: <Subastas /> },
-  { path: '/subastas/:subId/crear-oferta', element: <CrearOferta /> },
   { path: '/subastas/:subId/ofertas/:ofertaId/editar', element: <EditarOferta /> },
   { path: '/perfil/:perfilId', element: <Perfil /> },
   { path: '/notificaciones', element: <Notificaciones /> },

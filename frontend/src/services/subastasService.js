@@ -97,3 +97,12 @@ export const cerrarSubasta = async (subastaId) => {
     handleAxiosError(error)
   }
 }
+
+export const validarCondiciones = async (subastaId, signal) => {
+  try {
+    const { data } = await api.get(`${SUBASTAS_URL}/${subastaId}/validar-condiciones`, { signal })
+    return data
+  } catch (error) {
+    handleAxiosError(error)
+  }
+}

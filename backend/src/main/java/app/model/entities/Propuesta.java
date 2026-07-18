@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.AccessLevel;
@@ -24,6 +25,8 @@ import lombok.AccessLevel;
 @Setter
 @Document(collection = "propuestas")
 @Builder
+@CompoundIndex(name = "propuesta_destinatario_estado", def = "{'destinatario.$id': 1, 'estadoActual.valor': 1}")
+@CompoundIndex(name = "propuesta_autor_estado", def = "{'autor.$id': 1, 'estadoActual.valor': 1}")
 public class Propuesta {
 
     @Id

@@ -11,15 +11,9 @@ import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import styles from './editar-oferta.module.css'
-
-const obtenerBloqueadas = (repetidas, figuritasSolicitadas) => {
-  if (!figuritasSolicitadas?.length) return []
-  const idsRepetidas = new Set(repetidas.map((r) => r.figurita_id))
-  return figuritasSolicitadas
-    .filter((sol) => idsRepetidas.has(sol.id))
-    .map((sol) => repetidas.find((r) => r.figurita_id === sol.id))
-}
+import { obtenerBloqueadas } from '@/utils/ofertas.js'
 
 const mismasFiguritas = (anteriores, actuales) => {
   if (anteriores.length !== actuales.length) return false
@@ -38,17 +32,21 @@ const EditarOferta = () => {
   const [accionProcesando, setAccionProcesando] = useState('')
   const [showEliminar, setShowEliminar] = useState(false)
 
-  const { data: subasta, isLoading: cargando } = useQueryConError({
+  const {
+    data: subasta,
+    isLoading: cargando,
+    isFetching,
+  } = useQueryConError({
     queryKey: ['subasta', subId],
     queryFn: ({ signal }) => buscarSubasta({ subId }, signal),
     showToastOnError: false,
   })
 
-  if (cargando) return <h2>Cargando...</h2>
+  if (cargando) return <Spinner />
   if (!subasta) return <h2>No se pudo cargar la subasta.</h2>
 
   const oferta = subasta.ofertas.find((o) => o.id === ofertaId)
-  if (!oferta) return <h2>No se encontró la oferta.</h2>
+  if (!oferta) return isFetching ? <Spinner /> : <h2>No se encontró la oferta.</h2>
 
   const ofrecidasAnteriores = oferta.figuritas_ofrecidas.map((f) => ({
     ...f,
@@ -169,36 +167,35 @@ const EditarOferta = () => {
           </SectionCard.Section>
         </SectionCard>
 
-        <div className="d-flex flex-column gap-3">
-          <div>
-            <p className={styles.seleccionTitulo}>Editá las figuritas que querés ofrecer</p>
+        <SectionCard>
+          <SectionTitle>Editá las figuritas que querés ofrecer</SectionTitle>
+          <SectionCard.Section>
             {bloqueadas.length > 0 && (
               <p className={styles.seleccionHint}>
                 Las marcadas como <strong>Requerida</strong> se incluyen automáticamente.
               </p>
             )}
-          </div>
-
-          <SelectorRepetidas
-            modo="multiple"
-            bloqueadas={bloqueadas}
-            onChange={setFiguritasExtra}
-            seleccionadasIniciales={ofrecidasAnteriores.filter(
-              (f) => !bloqueadas.some((b) => b.figurita_id === f.figurita_id),
-            )}
-            metodoIntercambio="SUBASTA"
-            perfilId={subasta.perfil.id}
-          />
-        </div>
+            <div className="mt-2">
+              <SelectorRepetidas
+                modo="multiple"
+                bloqueadas={bloqueadas}
+                onChange={setFiguritasExtra}
+                seleccionadasIniciales={ofrecidasAnteriores.filter(
+                  (f) => !bloqueadas.some((b) => b.figurita_id === f.figurita_id),
+                )}
+                metodoIntercambio="SUBASTA"
+                perfilId={subasta.perfil.id}
+                mensajeVacio="No tenés repetidas publicadas para subasta que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
+                mostrarAviso={true}
+              />
+            </div>
+          </SectionCard.Section>
+        </SectionCard>
 
         <div className="d-flex flex-column gap-2">
           <div className="d-flex gap-2 justify-content-between">
             <Button label="Cancelar" variante="secundarioBorde" onClick={() => navigate(-1)} />
-            <Button
-              label="Guardar cambios ↗"
-              disabled={procesando}
-              onClick={onEnviar}
-            />
+            <Button label="Guardar cambios ↗" disabled={procesando} onClick={onEnviar} />
           </div>
           <Button
             label="Eliminar oferta"

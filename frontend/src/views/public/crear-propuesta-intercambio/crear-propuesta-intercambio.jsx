@@ -5,6 +5,7 @@ import Button from '@/components/ui/button/button.jsx'
 import useCrearPropuesta from './useCrearPropuesta'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import SectionTitle from '@/components/ui/section-title/section-title.jsx'
 import styles from './crear-propuesta-intercambio.module.css'
 
 const calcularIniciales = (nombre) => {
@@ -20,7 +21,8 @@ const calcularIniciales = (nombre) => {
 const CrearPropuestaIntercambio = () => {
   const { state } = useLocation()
   const figurita = state?.figurita
-  const { seleccionadas, setSeleccionadas, enviar, enviando, validando } = useCrearPropuesta(figurita)
+  const { seleccionadas, setSeleccionadas, enviar, enviando, validando } =
+    useCrearPropuesta(figurita)
 
   if (!figurita) return <h2>No se pudo cargar la figurita.</h2>
   if (validando) return null
@@ -58,23 +60,17 @@ const CrearPropuestaIntercambio = () => {
         </SectionCard>
 
         <SectionCard>
+          <SectionTitle>SELECCIONÁ LAS FIGURITAS QUE QUERÉS OFRECER</SectionTitle>
           <SectionCard.Section>
-            <p className="label-seccion">Seleccioná las figuritas que querés ofrecer</p>
-            <div className={styles.aviso}>
-              <span className={styles.avisoIcono}>⚠️</span>
-              <p className={styles.avisoTexto}>
-                <strong>Solo aparecen tus repetidas publicadas para intercambio.</strong>{' '}
-                Si una figurita no aparece acá, probablemente la cargaste solo como <strong>subasta</strong>.
-                Podés cambiar su método en <Link to="/mis-figuritas">Mis Figuritas</Link>.
-              </p>
-            </div>
             <div className="mt-2">
               <SelectorRepetidas
                 modo="multiple"
                 bloqueadas={[]}
+                perfilId={perfilDuenio.id}
                 onChange={setSeleccionadas}
                 metodoIntercambio="INTERCAMBIO"
-                mensajeVacio="No tenés repetidas publicadas para intercambio. Publicá repetidas para poder ofrecer."
+                mensajeVacio="No tenés repetidas publicadas para intercambio que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
+                mostrarAviso={true}
               />
             </div>
           </SectionCard.Section>

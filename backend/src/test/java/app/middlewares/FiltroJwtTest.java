@@ -199,4 +199,85 @@ class FiltroJwtTest {
         any(UnauthorizedException.class)
     );
   }
+
+  @Test
+  void doFilter_tokenInvalido_originNoPermitido_noSeteaHeaders() throws Exception {
+    Cookie cookie = new Cookie("token", "bad-token");
+
+    when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+    when(request.getHeader("Origin")).thenReturn("http://evil.com");
+
+    CorsConfiguration corsConfig = mock(CorsConfiguration.class);
+    when(corsConfigurationSource.getCorsConfiguration(request))
+        .thenReturn(corsConfig);
+    when(corsConfig.checkOrigin("http://evil.com"))
+        .thenReturn(null);
+
+    when(servicioJwt.validarToken("bad-token"))
+        .thenThrow(new JwtException("invalid"));
+
+    jwtFilter.doFilterInternal(request, response, filterChain);
+
+    verify(response, never()).setHeader(eq("Access-Control-Allow-Origin"), anyString());
+
+    verify(errorHandler).resolveException(
+        eq(request),
+        eq(response),
+        isNull(),
+        any(UnauthorizedException.class)
+    );
+  }
+
+  @Test
+  void doFilter_tokenInvalido_unauthorizedException_manejaError() throws Exception {
+    Cookie cookie = new Cookie("token", "expired-token");
+
+    when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+    when(corsConfigurationSource.getCorsConfiguration(request))
+        .thenReturn(null);
+
+    when(servicioJwt.validarToken("expired-token"))
+        .thenThrow(new UnauthorizedException("Token expirado"));
+
+    jwtFilter.doFilterInternal(request, response, filterChain);
+
+    verify(errorHandler).resolveException(
+        eq(request),
+        eq(response),
+        isNull(),
+        any(UnauthorizedException.class)
+    );
+  }
+
+  @Test
+  void shouldNotFilter_rutaUsuarios_devuelveTrue() {
+    when(request.getMethod()).thenReturn("GET");
+    when(request.getServletPath()).thenReturn("/usuarios/123");
+
+    assertTrue(jwtFilter.shouldNotFilter(request));
+  }
+
+  @Test
+  void shouldNotFilter_rutaFiguritas_devuelveTrue() {
+    when(request.getMethod()).thenReturn("GET");
+    when(request.getServletPath()).thenReturn("/figuritas");
+
+    assertTrue(jwtFilter.shouldNotFilter(request));
+  }
+
+  @Test
+  void shouldNotFilter_rutaPing_devuelveTrue() {
+    when(request.getMethod()).thenReturn("GET");
+    when(request.getServletPath()).thenReturn("/ping");
+
+    assertTrue(jwtFilter.shouldNotFilter(request));
+  }
+
+  @Test
+  void shouldNotFilter_rutaSesion_devuelveTrue() {
+    when(request.getMethod()).thenReturn("GET");
+    when(request.getServletPath()).thenReturn("/sesion");
+
+    assertTrue(jwtFilter.shouldNotFilter(request));
+  }
 }

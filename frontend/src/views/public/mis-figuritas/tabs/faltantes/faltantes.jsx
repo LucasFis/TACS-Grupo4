@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useQueryConError from '@/hooks/useQueryConError';
 import { buscarFaltantes } from "@/services/coleccionService.js";
+import styles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 import FaltanteCard from "../../../../../components/ui/faltante-card/faltante-card.jsx";
 import Paginacion from "../../../../../components/ui/paginacion/paginacion.jsx";
 import { useNavigate } from "react-router";
@@ -13,15 +14,17 @@ const Faltantes = () => {
     const [pagina, setPagina] = useState(1);
     const navigate = useNavigate();
 
-    const { data: faltantes, isLoading } = useQueryConError({
-        queryKey: ['faltantes', { ...filtros, pagina, limite: 10 }],
-        queryFn: ({ signal }) => buscarFaltantes({ ...filtros, pagina, limite: 10 }, signal),
+    const { data: faltantes, isLoading, isFetching } = useQueryConError({
+        queryKey: ['faltantes', { ...filtros, pagina, limite: 12 }],
+        queryFn: ({ signal }) => buscarFaltantes({ ...filtros, pagina, limite: 12 }, signal),
     })
 
     return (
         <div className="container-fluid px-0 d-flex flex-column gap-4">
 
           <SugerenciasBanner />
+
+          {isFetching && !isLoading && <div className={styles.actualizando}><div className={styles.spinnerChico} /><span>Actualizando…</span></div>}
 
             <div className="row justify-content-center">
                 <div className="col-12 col-sm-8 col-md-6 col-lg-4">
@@ -53,7 +56,7 @@ const Faltantes = () => {
 
             {isLoading ? (
                 <div className="row g-4">
-                    {[...Array(10)].map((_, i) => (
+                    {[...Array(12)].map((_, i) => (
                         <div key={i} className="col-12 col-md-6 col-lg-4">
                             <div
                                 className="rounded-4 placeholder-glow border"

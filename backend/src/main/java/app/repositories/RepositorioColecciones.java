@@ -133,4 +133,16 @@ public interface RepositorioColecciones {
    * @return total de ejemplares repetidos que cumplen los criterios
    */
   long contarRepetidas(List<MetodoIntercambio> filtros);
+
+  /**
+   * Carga múltiples colecciones por sus IDs en una sola query con {@code $in}.
+   * Útil para evitar N+1 cuando se necesitan las colecciones de varios ofertantes.
+   */
+  List<Coleccion> buscarPorIds(List<String> ids, CamposColeccion campos);
+
+  /**
+   * Devuelve todas las figuritas faltantes de una colección usando {@code $lookup}
+   * en lugar de resolver los DBRefs uno a uno.
+   */
+  List<Figurita> buscarTodosFaltantes(String colId);
 }

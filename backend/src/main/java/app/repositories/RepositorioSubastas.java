@@ -42,11 +42,19 @@ public interface RepositorioSubastas {
      * Devuelve todas las subastas que actualmente se encuentran activas.
      */
     List<Subasta> buscarActivas();
+
+    long contarSubastasActivas();
     
     /**
      * Cuenta subastas activas donde el usuario tiene una oferta pendiente o seleccionada
      * y la figurita subastada coincide con la indicada.
      */
     int contarActivasConOfertaPendiente(String figuritaId, String perfilId);
+
+    /**
+     * Indica si existe al menos una subasta activa para la figurita indicada
+     * cuyo autor sea el perfil dado.
+     */
+    boolean existeActivaPorAutorYFigurita(String perfilId, String figuritaId);
 
 }

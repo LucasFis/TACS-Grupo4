@@ -8,6 +8,15 @@ import { useError } from '@/contexts/errorContext.jsx'
 import { buscarPerfil } from '@/services/perfilService.js'
 import NotificationsPopover from '@/components/ui/notifications-popover/notifications-popover.jsx'
 
+const avatarSpinner = {
+  width: '14px',
+  height: '14px',
+  borderRadius: '50%',
+  border: '2px solid var(--color-primary)',
+  borderTop: '2px solid var(--color-terciary)',
+  animation: 'spin 0.8s linear infinite',
+}
+
 const Navbar = () => {
   const { showToast } = useToast()
   const { handleError } = useError()
@@ -62,7 +71,7 @@ const Navbar = () => {
               <NotificationsPopover />
               <Link to="/perfil" className="navbar-avatar-link">
                 <div className="rounded-circle d-flex align-items-center justify-content-center fw-bold navbar-avatar">
-                  {iniciales}
+                  {iniciales ?? <div style={avatarSpinner} />}
                 </div>
               </Link>
             </>
@@ -108,7 +117,7 @@ const Navbar = () => {
               <NotificationsPopover />
               <Link to="/perfil" className="navbar-avatar-link">
                 <div className="rounded-circle d-flex align-items-center justify-content-center fw-bold navbar-avatar">
-                  {iniciales}
+                  {iniciales ?? <div style={avatarSpinner} />}
                 </div>
               </Link>
             </>

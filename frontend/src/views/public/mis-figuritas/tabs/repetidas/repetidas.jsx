@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from '@tanstack/react-query';
 import useQueryConError from '@/hooks/useQueryConError';
 import { buscarRepetidas, editarRepetida } from '@/services/coleccionService.js'
+import styles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
 import RepetidaCard from "../../../../../components/ui/repetida-card/repetida-card.jsx";
 import FilterChip from "../../../../../components/ui/filter-chip/filter-chip.jsx";
 import Button from "../../../../../components/ui/button/button.jsx";
@@ -29,9 +30,9 @@ const Repetidas = () => {
     const queryClient = useQueryClient()
     const navigate = useNavigate();
 
-    const { data: repetidas, isLoading, error } = useQueryConError({
-        queryKey: ['repetidas', { ...filtros, pagina, limite: 10 }],
-        queryFn: ({ signal }) => buscarRepetidas({ ...filtros, pagina, limite: 10 }, signal),
+    const { data: repetidas, isLoading, isFetching, error } = useQueryConError({
+        queryKey: ['repetidas', { ...filtros, pagina, limite: 12 }],
+        queryFn: ({ signal }) => buscarRepetidas({ ...filtros, pagina, limite: 12 }, signal),
     })
 
     const cambiarFiltro = (nuevoTipo) => {
@@ -67,10 +68,10 @@ const Repetidas = () => {
       );
 
       queryClient.setQueryData(
-        ['repetidas', { ...filtros, pagina, limite: 10 }],
+        ['repetidas', { ...filtros, pagina, limite: 12 }],
         (old) => ({
           ...old,
-          contenido: old.contenido.map((item) =>
+          contenido: (old?.contenido ?? []).map((item) =>
             item.figurita_id === repetidaSeleccionada.figurita_id
               ? {
                 ...item,
@@ -102,6 +103,8 @@ const Repetidas = () => {
 
     return (
         <div className="container-fluid px-0 d-flex flex-column gap-4" style={showModal ? { pointerEvents: 'none' } : undefined}>
+
+            {isFetching && !isLoading && <div className={styles.actualizando}><div className={styles.spinnerChico} /><span>Actualizando…</span></div>}
 
             <div className="row g-3 justify-content-center">
                 <div className="col-6 col-md-4">
@@ -176,7 +179,7 @@ const Repetidas = () => {
 
             {isLoading ? (
                 <div className="row g-4">
-                    {[...Array(8)].map((_, i) => (
+                    {[...Array(12)].map((_, i) => (
                         <div
                             key={i}
                             className="col-12 col-md-6 col-lg-4"

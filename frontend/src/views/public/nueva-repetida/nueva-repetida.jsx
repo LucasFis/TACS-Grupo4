@@ -19,6 +19,7 @@ const NuevaRepetida = () => {
   const [errorFormato, setErrorFormato] = useState('')
   const [tocado, setTocado] = useState(false)
   const [procesando, setProcesando] = useState(false)
+  const [buscando, setBuscando] = useState(false)
   const { showToast } = useToast()
   const { handleError } = useError()
 
@@ -42,15 +43,20 @@ const NuevaRepetida = () => {
     }
 
     setErrorFormato('')
-    const resultado = await buscarFiguritas({ id: texto })
+    setBuscando(true)
+    try {
+      const resultado = await buscarFiguritas({ id: texto })
 
-    if (resultado.length === 0) {
-      showToast('No se encontró una figurita con ese número', 'error')
-      handleSelect(undefined)
-      return
+      if (resultado.length === 0) {
+        showToast('No se encontró una figurita con ese número', 'error')
+        handleSelect(undefined)
+        return
+      }
+
+      handleSelect(resultado[0])
+    } finally {
+      setBuscando(false)
     }
-
-    handleSelect(resultado[0])
   }
 
   const toggleMetodo = (metodo) => {
@@ -161,7 +167,7 @@ const NuevaRepetida = () => {
                     }
                   }}
                 />
-                <Button label={'Buscar'} onClick={() => buscarPorNumero(numero)} />
+                <Button label={buscando ? 'Buscando...' : 'Buscar'} onClick={() => buscarPorNumero(numero)} disabled={buscando} />
               </div>
               {tocado && errorFormato && (
                 <small className="text-danger d-flex align-items-center gap-1 mt-1" style={{ fontSize: '0.85rem' }}>

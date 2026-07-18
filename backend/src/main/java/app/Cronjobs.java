@@ -72,7 +72,8 @@ public class Cronjobs implements ApplicationRunner {
                     notificacionService.notificarInteresados(
                             interesados,
                             "La subasta de la figurita #" +
-                                    subasta.getFiguritaSubastada().getNumero() +
+                                    subasta.getFiguritaSubastada().getNumero() + " " +
+                                subasta.getFiguritaSubastada().getJugador() +
                                     " finaliza en menos de una hora.",
                             "/subastas/" + subasta.getId()
                     );

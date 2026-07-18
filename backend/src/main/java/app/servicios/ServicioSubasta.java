@@ -7,6 +7,7 @@ import app.dto.subasta.MiSubastaActivaDto;
 import app.dto.subasta.MiSubastaFinalizadaDto;
 import app.dto.subasta.SubastaDto;
 import app.dto.subasta.SubastaParticipoDto;
+import app.dto.subasta.ValidarCondicionesDto;
 import app.exceptions.BadRequestException;
 import app.exceptions.NotFoundException;
 import app.model.entities.*;
@@ -19,6 +20,7 @@ import app.repositories.impl.campos.CamposColeccion;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import app.repositories.impl.campos.CamposPerfil;
@@ -60,9 +62,11 @@ public class ServicioSubasta {
     Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, conColeccion);
     Figurita figuritaSubastada = this.repoFigurita.buscarPorId(figuritaId);
 
-    List<Figurita> figuritasDeseadas = figuritasDeseadasIds.stream()
-        .map(this.repoFigurita::buscarPorId)
-        .toList();
+    if (this.repoSubasta.existeActivaPorAutorYFigurita(perfilId, figuritaId)) {
+      throw new BadRequestException("Ya tenés una subasta activa para esta figurita");
+    }
+
+    List<Figurita> figuritasDeseadas = this.repoFigurita.buscarPorIds(figuritasDeseadasIds);
 
     LocalDateTime fechaInicio = LocalDateTime.now();
     LocalDateTime fechaFin = fechaInicio.plusHours(duracionEnHoras.longValue());
@@ -84,8 +88,56 @@ public class ServicioSubasta {
     List<Perfil> interesados = this.repositorioPerfiles
         .buscarPorFiguritaFaltante(figuritaSubastada, conMedio);
 
-    this.notificacionService.notificarInteresados(
-        interesados, "Encontramos una subasta de una figurita que te falta!");
+    String link = "/subastas/" + nuevaSubasta.getId();
+    String cuerpo = "Se publicó una subasta de la figurita que te falta: " + nuevaSubasta.getFiguritaSubastada().getJugador();
+    notificacionService.notificarInteresados(interesados, cuerpo, link);
+
+  }
+
+  /**
+   * Valida si un perfil puede ofertar en una subasta, verificando que la subasta esté activa,
+   * que el perfil no sea el autor, que tenga la figurita subastada como faltante, que cumpla
+   * la calificación mínima y que posea al menos una figurita solicitada en sus repetidas.
+   *
+   * @param perfilId identificador del perfil que quiere ofertar
+   * @param subastaId identificador de la subasta
+   * @return DTO con {@code puedeOfertar} y {@code motivo} en caso de no poder
+   */
+  public ValidarCondicionesDto validarCondiciones(String perfilId, String subastaId) {
+    Subasta subasta = this.repoSubasta.buscarPorId(subastaId, new CamposSubasta(false, true));
+
+    if (!subasta.estaActivo()) {
+      return new ValidarCondicionesDto(false, "La subasta ya cerró");
+    }
+
+    if (subasta.getAutor().getId().equals(perfilId)) {
+      return new ValidarCondicionesDto(false, "No podés ofertar en tu propia subasta");
+    }
+
+    CamposPerfil conColeccion = new CamposPerfil(true);
+    Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, conColeccion);
+
+    if (!perfil.getColeccion().tieneFaltante(subasta.getFiguritaSubastada())) {
+      return new ValidarCondicionesDto(false, "No tenés la figurita subastada en tus faltantes");
+    }
+
+    int calMinima = subasta.getCalificacionMinimaSolicitada();
+    double calUsuario = perfil.getCalificacionMedia() != null ? perfil.getCalificacionMedia() : 0.0;
+    if (calMinima > 1 && calUsuario < calMinima) {
+      return new ValidarCondicionesDto(false,
+          "Tu calificación actual (" + String.format("%.1f", calUsuario) + "★) es menor a la requerida (" + calMinima + "★)");
+    }
+
+    List<Figurita> solicitadas = subasta.getFiguritasSolicitadas();
+    if (!solicitadas.isEmpty()) {
+      boolean tieneAlgunaSolicitada = solicitadas.stream()
+          .anyMatch(f -> perfil.getColeccion().tieneRepetida(f));
+      if (!tieneAlgunaSolicitada) {
+        return new ValidarCondicionesDto(false, "No contas con algunas de las figuritas requeridas");
+      }
+    }
+
+    return new ValidarCondicionesDto(true, null);
   }
 
   /**
@@ -120,9 +172,10 @@ public class ServicioSubasta {
       throw new BadRequestException("Figuritas ofrecidas repetidas");
     }
 
-    List<Figurita> figuritasOfrecidas = rawFiguritasId.stream()
-        .map(this.repoFigurita::buscarPorId)
-        .toList();
+    List<Figurita> figuritasOfrecidas = this.repoFigurita.buscarPorIds(rawFiguritasId);
+    if (figuritasOfrecidas.size() != rawFiguritasId.size()) {
+      throw new NotFoundException("Una o más figuritas ofrecidas no existen");
+    }
 
     Propuesta nuevaPropuesta = Propuesta.builder()
         .id(UUID.randomUUID().toString())
@@ -323,15 +376,29 @@ public class ServicioSubasta {
       seleccionada.getDestinatario().setColeccion(colAutor); // misma instancia
     }
 
-    // cargar colecciones de los ofertantes rechazados
-    subasta.getOfertas().stream()
+    // cargar colecciones de los ofertantes rechazados en batch
+    List<Propuesta> ofertasARechazar = subasta.getOfertas().stream()
         .filter(o -> o.getEstadoActual().getValor() != EstadoProceso.CANCELADO)
         .filter(o -> seleccionada == null || !o.getId().equals(seleccionada.getId()))
-        .forEach(o -> {
-          Coleccion col = repositorioColecciones.buscarPorId(
-              o.getAutor().getColeccion().getId(), soloRepetidas);
-          o.getAutor().setColeccion(col);
-        });
+        .toList();
+
+    if (!ofertasARechazar.isEmpty()) {
+      List<String> colIds = ofertasARechazar
+          .stream()
+          .map(o -> o.getAutor().getColeccion().getId())
+          .distinct()
+          .toList();
+
+      Map<String, Coleccion> colecciones = repositorioColecciones
+          .buscarPorIds(colIds, soloRepetidas)
+          .stream()
+          .collect(Collectors.toMap(Coleccion::getId, c -> c));
+
+      ofertasARechazar.forEach(oferta -> {
+        Coleccion coleccion = colecciones.get(oferta.getAutor().getColeccion().getId());
+        oferta.getAutor().setColeccion(coleccion);
+      });
+    }
 
     Map<String, EstadoProceso> estadosAntes = snapshotEstados(subasta);
     subasta.cerrar(perfilId);
@@ -343,7 +410,8 @@ public class ServicioSubasta {
           notificacionService.notificarInteresados(
                   List.of(seleccionada.getAutor()),
                   "¡Felicitaciones! Ganaste la subasta de la figurita #" +
-                          subasta.getFiguritaSubastada().getNumero(),
+                          subasta.getFiguritaSubastada().getNumero() + " "
+                          + subasta.getFiguritaSubastada().getJugador(),
                   "/subastas/" + subasta.getId()
           );
       }
@@ -363,58 +431,43 @@ public class ServicioSubasta {
     this.repoSubasta.guardar(subasta, camposSubasta);
   }
 
-  /**
-   * Obtiene las subastas del sistema según los filtros aplicados. El tipo de DTO
-   * varía según el contexto:
-   * <ul>
-   *   <li>Si {@code filtros.participanteId()} no es {@code null}, devuelve subastas
-   *       en las que el perfil participó como {@link app.dto.subasta.SubastaParticipoDto}.</li>
-   *   <li>Si el estado es {@code ACTIVA}, devuelve las subastas activas del perfil
-   *       como {@link app.dto.subasta.MiSubastaActivaDto}.</li>
-   *   <li>En caso contrario, devuelve las subastas finalizadas del perfil como
-   *       {@link app.dto.subasta.MiSubastaFinalizadaDto}.</li>
-   * </ul>
-   *
-   * @param perfilId identificador del perfil que solicita las subastas
-   * @param filtros  criterios de filtrado (estado, participante, paginación)
-   * @return página de subastas según el tipo de vista solicitada
-   */
-    public PaginaResultado<?> obtenerSubastas(String perfilId, SubastasFiltro filtros) {
-      PaginaResultado<Subasta> resultado = this.repoSubasta.buscarTodos(filtros, new CamposSubasta(true, true));
+  public PaginaResultado<?> obtenerSubastas(String perfilId, SubastasFiltro filtros) {
+    PaginaResultado<Subasta> resultado = this.repoSubasta.buscarTodos(filtros, new CamposSubasta(true, true));
 
-      if (filtros.participanteId() != null) {
-        return resultado.mapearA(s -> {
-          boolean yaCalifico = this.repoCalificacion.yaCalifico(
-              s.getAutor().getId(),
-              perfilId,
-              s.getId(),
-              MetodoIntercambio.SUBASTA
-          );
-          return new SubastaParticipoDto(s, obtenerOferta(perfilId, s), yaCalifico);
-        });
-
-      } else if ("ACTIVA".equals(filtros.estado())) {
-        return resultado.mapearA(MiSubastaActivaDto::new);
-
-      } else {
-        return resultado.mapearA(s -> {
-          String ganadorId = s.getOfertas().stream()
-              .filter(o -> o.getEstadoActual().getValor() == EstadoProceso.ACEPTADO)
-              .findFirst()
-              .map(o -> o.getAutor().getId())
-              .orElse(null);
-
-          boolean yaCalifico = ganadorId != null && this.repoCalificacion.yaCalifico(
-              ganadorId,
-              perfilId,
-              s.getId(),
-              MetodoIntercambio.SUBASTA
-          );
-
-          return new MiSubastaFinalizadaDto(s, yaCalifico);
-        });
-      }
+    if (filtros.participanteId() != null) {
+      return mapearComoParticipante(perfilId, resultado);
     }
+
+    if ("ACTIVA".equals(filtros.estado())) {
+      return resultado.mapearA(MiSubastaActivaDto::new);
+    }
+
+    return mapearComoFinalizadas(perfilId, resultado);
+  }
+
+  private PaginaResultado<SubastaParticipoDto> mapearComoParticipante(String perfilId, PaginaResultado<Subasta> resultado) {
+    Set<String> yaCalificadas = obtenerCalificadas(perfilId, resultado);
+    return resultado.mapearA(s ->
+        new SubastaParticipoDto(s, obtenerOferta(perfilId, s), yaCalificadas.contains(s.getId()))
+    );
+  }
+
+  private PaginaResultado<MiSubastaFinalizadaDto> mapearComoFinalizadas(String perfilId, PaginaResultado<Subasta> resultado) {
+    Set<String> yaCalificadas = obtenerCalificadas(perfilId, resultado);
+    return resultado.mapearA(s -> {
+      boolean tieneGanador = s
+          .getOfertas()
+          .stream()
+          .anyMatch(o -> o.getEstadoActual().getValor() == EstadoProceso.ACEPTADO);
+
+      return new MiSubastaFinalizadaDto(s, tieneGanador && yaCalificadas.contains(s.getId()));
+    });
+  }
+
+  private Set<String> obtenerCalificadas(String perfilId, PaginaResultado<Subasta> resultado) {
+    Set<String> ids = resultado.contenido().stream().map(Subasta::getId).collect(Collectors.toSet());
+    return this.repoCalificacion.obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.SUBASTA, ids);
+  }
 
   /**
    * Busca la oferta realizada por un perfil dentro de una subasta específica.

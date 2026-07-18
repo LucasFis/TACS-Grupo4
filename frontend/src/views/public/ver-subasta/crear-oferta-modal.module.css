@@ -1,0 +1,233 @@
+/* =============================================
+   BACKDROP
+   ============================================= */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* =============================================
+   MODAL
+   ============================================= */
+.modal {
+  background: var(--color-primary);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* =============================================
+   HEADER
+   ============================================= */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h5 {
+  color: var(--color-secondary);
+  font-weight: 700;
+}
+
+.cerrar {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--color-subtitle);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cerrar:hover {
+  background-color: var(--color-primary-acent);
+  color: var(--color-secondary);
+}
+
+/* =============================================
+   DIVISOR
+   ============================================= */
+.divisor {
+  border: none;
+  border-top: 0.5px solid var(--color-subtitle);
+  margin: 1rem 0;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cancelar {
+  background: none;
+  border: 0.5px solid var(--border-color-light);
+  color: var(--color-subtitle);
+  padding: 0.45rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cancelar:hover {
+  background-color: var(--color-primary-acent);
+  color: var(--color-secondary);
+}
+
+/* =============================================
+   CONDICIONES PARA OFERTAR (contenido)
+   ============================================= */
+.label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-subtitle);
+  margin: 0;
+}
+
+.hint {
+  font-size: 0.72rem;
+  color: var(--color-subtitle);
+  margin: 0;
+}
+
+.sinRestriccion {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--color-subtitle);
+  margin: 0;
+}
+
+.figRequerida {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  background-color: color-mix(in srgb, var(--color-secondary-acent) 40%, transparent);
+}
+
+.figNumero {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-secondary);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--color-secondary-acent);
+}
+
+.figJugador {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+  margin: 0;
+}
+
+.figSeleccion {
+  font-size: 0.72rem;
+  color: var(--color-secondary);
+  margin: 0;
+}
+
+.calificacionDivider {
+  border-top: 0.5px solid var(--color-secondary-acent);
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+  background-color: color-mix(in srgb, var(--color-secondary-acent) 40%, transparent);
+}
+
+.calBadgeNumero {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+}
+
+.calBadgeLabel {
+  font-size: 0.82rem;
+  color: var(--color-secondary);
+}
+
+.calSinMinimo {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+  background-color: var(--color-primary-acent);
+  border: 0.5px solid var(--border-color-light);
+  font-size: 0.82rem;
+  color: var(--color-subtitle);
+}
+
+.seleccionHint {
+  font-size: 0.78rem;
+  color: var(--color-subtitle);
+  margin: 0;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 576px) {
+  .modal {
+    padding: 1rem;
+    border-radius: 1rem 1rem 0 0;
+    max-height: 95vh;
+    align-self: flex-end;
+    margin: 0;
+    max-width: 100%;
+  }
+
+  .backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+}

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Document(collection = "sugerencias")
 @Builder
+@CompoundIndex(name = "sugerencia_autor_favorito", def = "{'autor.$id': 1, 'favorito': 1}")
 public class Sugerencia {
   @Id
   private String id;

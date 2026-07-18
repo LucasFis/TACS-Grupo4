@@ -54,6 +54,7 @@ const ProponerIntercambioModal = ({
     setEnviando(true)
     try {
       await onProponer?.({ repetidas, faltantes })
+      setEnviando(false)
       onCerrar()
     } catch {
       setEnviando(false)
@@ -77,7 +78,6 @@ const ProponerIntercambioModal = ({
 
         <hr className={styles.divisor} />
 
-        {/* SELECCIÓN */}
         <div className={styles.seleccion}>
           <div className={styles.seleccionBloque}>
             <p className={styles.seleccionLabel}>¿Qué le vas a ofrecer?</p>
@@ -87,6 +87,7 @@ const ProponerIntercambioModal = ({
               bloqueadas={[]}
               onChange={setRepetidas}
               perfilId={perfil?.id ?? null}
+              mensajeVacio="No tenés repetidas publicadas para intercambio que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
             />
           </div>
 

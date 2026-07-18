@@ -1,4 +1,5 @@
 import Estrellas from '@/components/ui/estrellas/estrellas.jsx'
+import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import { useAuth } from '@/contexts/userContext.jsx'
 import styles from './PerfilHeader.module.css'
 
@@ -33,7 +34,7 @@ const PerfilHeader = ({
 
           <div>
             {loading ? (
-              <h2>Cargando datos...</h2>
+              <Spinner />
             ) : (
               <>
                 <h2 className={`mb-0 fw-bold ${styles.nombre}`}>{perfil?.nombre}</h2>

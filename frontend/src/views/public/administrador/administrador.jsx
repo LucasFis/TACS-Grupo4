@@ -24,7 +24,7 @@ const Administrador = () => {
   const {
     stats, cargando, recargando, error,
     desde, setDesde, hasta, setHasta,
-    rangoInvalido, aplicar,
+    rangoInvalido, aplicar, refrescar,
   } = useEstadisticasAdmin()
 
   return (
@@ -37,15 +37,27 @@ const Administrador = () => {
           </div>
           <p className={styles.heroSubtitulo}>Estadísticas de la plataforma Figus Mundial 2026</p>
 
-          <FiltroPeriodo
-            desde={desde}
-            setDesde={setDesde}
-            hasta={hasta}
-            setHasta={setHasta}
-            rangoInvalido={rangoInvalido}
-            aplicar={aplicar}
-            recargando={recargando}
-          />
+          <div className={styles.heroFilaFiltros}>
+            <FiltroPeriodo
+              desde={desde}
+              setDesde={setDesde}
+              hasta={hasta}
+              setHasta={setHasta}
+              rangoInvalido={rangoInvalido}
+              aplicar={aplicar}
+              recargando={recargando}
+            />
+            <button
+              className={styles.refrescarBtn}
+              onClick={() => refrescar()}
+              disabled={recargando}
+            >
+              {recargando
+                ? <span className="spinner-border spinner-border-sm" role="status" />
+                : <i className="bi bi-arrow-clockwise" />}
+              {' '}Actualizar estadísticas
+            </button>
+          </div>
         </div>
       </div>
 
