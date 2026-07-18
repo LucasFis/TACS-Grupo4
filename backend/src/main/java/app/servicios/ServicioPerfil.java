@@ -20,6 +20,7 @@ import app.model.entities.Perfil;
 import app.model.entities.Sugerencia;
 import app.model.entities.Usuario;
 import app.repositories.RepositorioCalificacion;
+import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioNotificaciones;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioUsuarios;
@@ -27,6 +28,7 @@ import app.repositories.impl.campos.CamposPerfil;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ public class ServicioPerfil {
 
   private final RepositorioCalificacion repositorioCalificacion;
   private final RepositorioPerfiles repositorioPerfiles;
+  private final RepositorioColecciones repositorioColecciones;
   private final RepositorioNotificaciones repositorioNotificaciones;
   private final ServicioNotificacion servicioNotificacion;
   private final RepositorioUsuarios repositorioUsuarios;
@@ -52,10 +55,8 @@ public class ServicioPerfil {
    * @throws app.exceptions.NotFoundException si no se encuentra un perfil para el {@code userId} indicado
    */
   public List<FiguritaDto> obtenerFaltantes(String userId) {
-    CamposPerfil campos = new CamposPerfil(false);
-
-    Perfil perfil = repositorioPerfiles.buscarPorUsuarioId(userId, campos);
-    return perfil.getColeccion().getFaltantes().stream()
+    String colId = repositorioPerfiles.obtenerColIdPorUsuarioId(userId);
+    return repositorioColecciones.buscarTodosFaltantes(colId).stream()
         .map(FiguritaDto::new)
         .toList();
   }
@@ -129,15 +130,11 @@ public class ServicioPerfil {
    * @throws app.exceptions.NotFoundException si no se encuentra el perfil indicado
    */
   public List<ContadorDto> obtenerContadores(String perfilId) {
-    CamposPerfil campos = new CamposPerfil(false);
-    Perfil perfil = this.repositorioPerfiles.buscarPorId(perfilId, campos);
-
-    List<ContadorDto> contadores = new ArrayList<>();
-
-    contadores.add(new ContadorDto("repetidas",perfil.getColeccion().getRepetidas().size()));
-    contadores.add(new ContadorDto("faltantes",perfil.getColeccion().getFaltantes().size()));
-
-    return contadores;
+    Map<String, Integer> contadores = this.repositorioPerfiles.contarElementosColeccion(perfilId);
+    return List.of(
+        new ContadorDto("repetidas", contadores.get("repetidas")),
+        new ContadorDto("faltantes", contadores.get("faltantes"))
+    );
   }
 
   /**

@@ -39,7 +39,7 @@ class ServicioPerfilTest extends MongoTestBase {
 
   @BeforeEach
   void setUp() {
-    service = new ServicioPerfil(repositorioCalificacion, repositorioPerfiles, repositorioNotificaciones, servicioNotificacion, repositorioUsuarios, new SimpleMeterRegistry());
+    service = new ServicioPerfil(repositorioCalificacion, repositorioPerfiles, repositorioColecciones, repositorioNotificaciones, servicioNotificacion, repositorioUsuarios, new SimpleMeterRegistry());
 
     Usuario user = new Usuario("u-1", Rol.USUARIO, "lucas", "fiscella");
     Coleccion colec = new Coleccion("c-1");
