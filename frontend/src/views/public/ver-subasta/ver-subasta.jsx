@@ -20,6 +20,7 @@ import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
+import { validarOferta } from '@/utils/ofertas.js'
 
 const VerSubasta = () => {
   const { subId } = useParams()
@@ -84,53 +85,53 @@ const VerSubasta = () => {
     return `${dia} ${mes}, ${horas}:${minutos}`
   }
 
-    const adjudicarOferta = async (ofertaId) => {
-      try {
-        setProcesando(true)
-        await seleccionarOferta(subId, ofertaId)
-        refetch()
-      } catch (err) {
-        showToast(handleError(err, () =>{}), 'error')
-      } finally {
-        setProcesando(false)
-      }
+  const adjudicarOferta = async (ofertaId) => {
+    try {
+      setProcesando(true)
+      await seleccionarOferta(subId, ofertaId)
+      refetch()
+    } catch (err) {
+      showToast(handleError(err, () =>{}), 'error')
+    } finally {
+      setProcesando(false)
     }
+  }
 
-    const MODAL_CONFIG = {
-      cancelar: {
-        titulo: 'Cancelar subasta',
-        mensaje: '¿Querés cancelar esta subasta? Todas las ofertas serán rechazadas. Esta acción no se puede deshacer.',
-        labelConfirmar: 'Cancelar subasta',
-      },
-      cerrar: {
-        titulo: 'Cerrar subasta',
-        mensaje: '¿Querés cerrar esta subasta? La oferta seleccionada será aceptada y el resto rechazadas.',
-        labelConfirmar: 'Cerrar subasta',
-      },
+  const MODAL_CONFIG = {
+    cancelar: {
+      titulo: 'Cancelar subasta',
+      mensaje: '¿Querés cancelar esta subasta? Todas las ofertas serán rechazadas. Esta acción no se puede deshacer.',
+      labelConfirmar: 'Cancelar subasta',
+    },
+    cerrar: {
+      titulo: 'Cerrar subasta',
+      mensaje: '¿Querés cerrar esta subasta? La oferta seleccionada será aceptada y el resto rechazadas.',
+      labelConfirmar: 'Cerrar subasta',
+    },
+  }
+
+  const ACCION_LABELS = {
+    cancelar: 'Cancelando subasta...',
+    cerrar: 'Cerrando subasta...',
+  }
+
+  const haySeleccionada = subasta?.ofertas?.some((o) => o.seleccionada)
+  const configModal = modal ? MODAL_CONFIG[modal] : null
+
+  const handleConfirmar = async () => {
+    try {
+      setProcesando(true)
+      setAccionProcesando(ACCION_LABELS[modal] ?? 'Procesando...')
+      if (modal === 'cancelar') await cancelarSubasta(subId)
+      else if (modal === 'cerrar') await cerrarSubasta(subId)
+      setModal(null)
+      refetch()
+    } catch (err) {
+      showToast(handleError(err, () => {}), 'error')
+    } finally {
+      setProcesando(false)
     }
-
-    const ACCION_LABELS = {
-      cancelar: 'Cancelando subasta...',
-      cerrar: 'Cerrando subasta...',
-    }
-
-    const haySeleccionada = subasta?.ofertas?.some((o) => o.seleccionada)
-    const configModal = modal ? MODAL_CONFIG[modal] : null
-
-    const handleConfirmar = async () => {
-      try {
-        setProcesando(true)
-        setAccionProcesando(ACCION_LABELS[modal] ?? 'Procesando...')
-        if (modal === 'cancelar') await cancelarSubasta(subId)
-        else if (modal === 'cerrar') await cerrarSubasta(subId)
-        setModal(null)
-        refetch()
-      } catch (err) {
-        showToast(handleError(err, () => {}), 'error')
-      } finally {
-        setProcesando(false)
-      }
-    }
+  }
 
   useEffect(() => {
     if (tiempo <= 0) {
@@ -163,12 +164,8 @@ const VerSubasta = () => {
   const repetidas = repetidasData?.contenido ?? []
   const calMinima = subasta?.calificacion_minima_solicitada ?? 0
   const calificacionUsuario = perfil?.calificacion_media ?? null
-  const cumpleCalificacion =
-    calMinima === 0 || (calificacionUsuario !== null && calificacionUsuario >= calMinima)
-  const faltantesRequeridas = (subasta?.figuritas_solicitadas ?? []).filter(
-    (sol) => !new Set(repetidas.map((r) => r.figurita_id)).has(sol.id)
-  )
-  const tieneTodasRequeridas = faltantesRequeridas.length === 0
+  const { cumpleCalificacion, faltantesRequeridas, tieneTodasRequeridas } =
+    validarOferta(repetidas, subasta?.figuritas_solicitadas, calMinima, calificacionUsuario)
 
   return (
     <div className="container py-4 px-3 px-md-4">

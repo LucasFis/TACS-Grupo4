@@ -11,20 +11,7 @@ import { useToast } from '@/contexts/toastContext.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
 import styles from './crear-oferta-modal.module.css'
-
-const obtenerBloqueadas = (repetidas, figuritasSolicitadas) => {
-  if (!figuritasSolicitadas?.length) return []
-  const idsRepetidas = new Set(repetidas.map((r) => r.figurita_id))
-  return figuritasSolicitadas
-    .filter((sol) => idsRepetidas.has(sol.id))
-    .map((sol) => repetidas.find((r) => r.figurita_id === sol.id))
-}
-
-const obtenerFaltantesRequeridas = (repetidas, figuritasSolicitadas) => {
-  if (!figuritasSolicitadas?.length) return []
-  const idsRepetidas = new Set(repetidas.map((r) => r.figurita_id))
-  return figuritasSolicitadas.filter((sol) => !idsRepetidas.has(sol.id))
-}
+import { obtenerBloqueadas, validarOferta } from '@/utils/ofertas.js'
 
 const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
   const backdropRef = useRef(null)
@@ -71,12 +58,9 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
   const calificacionUsuario = perfil?.calificacion_media ?? null
 
   const calMinima = subasta?.calificacion_minima_solicitada ?? 0
-  const cumpleCalificacion =
-    calMinima === 0 || (calificacionUsuario !== null && calificacionUsuario >= calMinima)
   const bloqueadas = obtenerBloqueadas(repetidas, subasta?.figuritas_solicitadas)
-  const faltantesRequeridas = obtenerFaltantesRequeridas(repetidas, subasta?.figuritas_solicitadas)
-  const tieneTodasRequeridas = faltantesRequeridas.length === 0
-  const puedeOfertar = cumpleCalificacion && tieneTodasRequeridas
+  const { cumpleCalificacion, faltantesRequeridas, tieneTodasRequeridas, puedeOfertar } =
+    validarOferta(repetidas, subasta?.figuritas_solicitadas, calMinima, calificacionUsuario)
 
   const onEnviar = async () => {
     try {
