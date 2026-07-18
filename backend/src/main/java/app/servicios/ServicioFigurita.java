@@ -87,6 +87,7 @@ public class ServicioFigurita {
 
     return repositorioSubastas.buscarActivasPorFiguritasSubastadas(figuritaIds)
         .stream()
+        .filter(s -> s.getAutor() != null)
         .collect(Collectors.toMap(
             s -> s.getAutor().getId() + ":" + s.getFiguritaSubastada().getId(),
             Subasta::getId

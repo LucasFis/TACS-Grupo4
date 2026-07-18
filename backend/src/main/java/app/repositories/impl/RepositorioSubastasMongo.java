@@ -263,14 +263,15 @@ public class RepositorioSubastasMongo implements RepositorioSubastas {
 
     return mongoTemplate.find(query, Document.class, "subastas").stream()
         .filter(doc -> doc.get("figuritaSubastada") instanceof DBRef ref && ref.getId() != null)
+        .filter(doc -> doc.get("autor") instanceof DBRef autorRef && autorRef.getId() != null)
         .map(doc -> Subasta.builder()
             .id(doc.get("_id").toString())
             .figuritaSubastada(Figurita.builder()
                 .id(((DBRef) doc.get("figuritaSubastada")).getId().toString())
                 .build())
-            .autor(doc.get("autor") instanceof DBRef autorRef && autorRef.getId() != null
-                ? Perfil.builder().id(autorRef.getId().toString()).build()
-                : null)
+            .autor(Perfil.builder()
+                .id(((DBRef) doc.get("autor")).getId().toString())
+                .build())
             .build())
         .toList();
   }

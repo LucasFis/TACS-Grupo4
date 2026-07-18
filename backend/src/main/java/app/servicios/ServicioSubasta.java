@@ -65,9 +65,7 @@ public class ServicioSubasta {
       throw new BadRequestException("Ya tenés una subasta activa para esta figurita");
     }
 
-    List<Figurita> figuritasDeseadas = figuritasDeseadasIds.stream()
-        .map(this.repoFigurita::buscarPorId)
-        .toList();
+    List<Figurita> figuritasDeseadas = this.repoFigurita.buscarPorIds(figuritasDeseadasIds);
 
     LocalDateTime fechaInicio = LocalDateTime.now();
     LocalDateTime fechaFin = fechaInicio.plusHours(duracionEnHoras.longValue());

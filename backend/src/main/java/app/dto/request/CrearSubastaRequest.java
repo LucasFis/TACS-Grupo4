@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
@@ -23,6 +24,7 @@ public class CrearSubastaRequest {
   @NotNull
   private Integer duracionEnHoras;
 
+  @Size(max=10, message="El maximo de figuritas deseadas es hasta 10.")
   private List<String> figuritasDeseadasIds = new ArrayList<>();
 
   @Min(0)
@@ -30,7 +32,7 @@ public class CrearSubastaRequest {
   @NotNull
   private Integer calificacionMinima = 0;
 
-  @AssertTrue(message = "La lista de figuritas deseadas no puede contener nulls")
+  @AssertTrue(message = "La lista de figuritas deseadas no puede contener nulls.")
   private boolean isFiguritasDeseadasIdsValid() {
     return figuritasDeseadasIds == null || figuritasDeseadasIds.stream().noneMatch(Objects::isNull);
   }
