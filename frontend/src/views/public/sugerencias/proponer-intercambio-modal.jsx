@@ -54,6 +54,7 @@ const ProponerIntercambioModal = ({
     setEnviando(true)
     try {
       await onProponer?.({ repetidas, faltantes })
+      setEnviando(false)
       onCerrar()
     } catch {
       setEnviando(false)
