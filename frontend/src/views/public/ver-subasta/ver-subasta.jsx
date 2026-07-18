@@ -3,7 +3,7 @@ import indicatorStyles from '@/components/ui/actualizando-indicator/actualizando
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
 import useQueryConError from '@/hooks/useQueryConError'
-import { buscarSubasta, seleccionarOferta } from '@/services/subastasService.js'
+import { buscarSubasta, seleccionarOferta, cancelarSubasta, cerrarSubasta } from '@/services/subastasService.js'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
@@ -12,11 +12,15 @@ import OfertaCard from './oferta-card.jsx'
 import TuOfertaCard from './tu-oferta-card.jsx'
 import Button from '@/components/ui/button/button.jsx'
 import { useAuth } from '@/contexts/userContext.jsx'
-import { useNavigate } from 'react-router-dom'
+import CrearOfertaModal from './crear-oferta-modal.jsx'
+import { buscarPerfil } from '@/services/perfilService.js'
+import { buscarRepetidas } from '@/services/coleccionService.js'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
+import { validarOferta } from '@/utils/ofertas.js'
 
 const VerSubasta = () => {
   const { subId } = useParams()
@@ -27,7 +31,9 @@ const VerSubasta = () => {
   const [tiempo, setTiempo] = useState(0)
   const [subastaAbierta, setSubastaAbierta] = useState(false)
   const [procesando, setProcesando] = useState(false)
-  const navigate = useNavigate()
+  const [modal, setModal] = useState(null)
+  const [accionProcesando, setAccionProcesando] = useState('')
+  const [mostrarCrearOferta, setMostrarCrearOferta] = useState(false)
 
   const { data: subasta, isLoading: cargando, isFetching, error, refetch } = useQueryConError({
     queryKey: ['subasta', subId],
@@ -40,6 +46,21 @@ const VerSubasta = () => {
       setTiempo(subasta.tiempo_restante)
     }
   }, [subasta])
+
+  const esAutor = subasta?.perfil?.id === user.perfil_id
+  const mostrarValidacion = !!subasta && subastaAbierta && !esAutor
+
+  const { data: perfil, isLoading: cargandoPerfil } = useQueryConError({
+    queryKey: ['perfil'],
+    queryFn: ({ signal }) => buscarPerfil(undefined, signal),
+    enabled: mostrarValidacion,
+  })
+
+  const { data: repetidasData, isLoading: cargandoRepetidas } = useQueryConError({
+    queryKey: ['repetidas', { pagina: 1, limite: 10 }],
+    queryFn: ({ signal }) => buscarRepetidas({ pagina: 1, limite: 10 }, signal),
+    enabled: mostrarValidacion,
+  })
 
   const procesarDuracion = () => {
     const horas = Math.floor(tiempo / 3600)
@@ -64,17 +85,53 @@ const VerSubasta = () => {
     return `${dia} ${mes}, ${horas}:${minutos}`
   }
 
-    const adjudicarOferta = async (ofertaId) => {
-      try {
-        setProcesando(true)
-        await seleccionarOferta(subId, ofertaId)
-        refetch()
-      } catch (err) {
-        showToast(handleError(err, () =>{}), 'error')
-      } finally {
-        setProcesando(false)
-      }
+  const adjudicarOferta = async (ofertaId) => {
+    try {
+      setProcesando(true)
+      await seleccionarOferta(subId, ofertaId)
+      refetch()
+    } catch (err) {
+      showToast(handleError(err, () =>{}), 'error')
+    } finally {
+      setProcesando(false)
     }
+  }
+
+  const MODAL_CONFIG = {
+    cancelar: {
+      titulo: 'Cancelar subasta',
+      mensaje: '¿Querés cancelar esta subasta? Todas las ofertas serán rechazadas. Esta acción no se puede deshacer.',
+      labelConfirmar: 'Cancelar subasta',
+    },
+    cerrar: {
+      titulo: 'Cerrar subasta',
+      mensaje: '¿Querés cerrar esta subasta? La oferta seleccionada será aceptada y el resto rechazadas.',
+      labelConfirmar: 'Cerrar subasta',
+    },
+  }
+
+  const ACCION_LABELS = {
+    cancelar: 'Cancelando subasta...',
+    cerrar: 'Cerrando subasta...',
+  }
+
+  const haySeleccionada = subasta?.ofertas?.some((o) => o.seleccionada)
+  const configModal = modal ? MODAL_CONFIG[modal] : null
+
+  const handleConfirmar = async () => {
+    try {
+      setProcesando(true)
+      setAccionProcesando(ACCION_LABELS[modal] ?? 'Procesando...')
+      if (modal === 'cancelar') await cancelarSubasta(subId)
+      else if (modal === 'cerrar') await cerrarSubasta(subId)
+      setModal(null)
+      refetch()
+    } catch (err) {
+      showToast(handleError(err, () => {}), 'error')
+    } finally {
+      setProcesando(false)
+    }
+  }
 
   useEffect(() => {
     if (tiempo <= 0) {
@@ -102,7 +159,13 @@ const VerSubasta = () => {
   })
 
   const ofertaPropia = subasta?.ofertas.find((o) => o.autor.id === user.perfil_id)
-  const esAutor = subasta?.perfil.id === user.perfil_id
+
+  const cargandoValidacion = mostrarValidacion && (cargandoPerfil || cargandoRepetidas)
+  const repetidas = repetidasData?.contenido ?? []
+  const calMinima = subasta?.calificacion_minima_solicitada ?? 0
+  const calificacionUsuario = perfil?.calificacion_media ?? null
+  const { cumpleCalificacion, faltantesRequeridas, tieneTodasRequeridas } =
+    validarOferta(repetidas, subasta?.figuritas_solicitadas, calMinima, calificacionUsuario)
 
   return (
     <div className="container py-4 px-3 px-md-4">
@@ -113,6 +176,25 @@ const VerSubasta = () => {
             { name: `#${subId}`, to: `/subastas/${subId}` },
           ]}
         />
+
+        {esAutor && subastaAbierta && (
+          <div className="d-flex gap-2 mb-3">
+            <Button
+              label="Cancelar subasta"
+              variante="peligroBorde"
+              className="flex-fill"
+              onClick={() => setModal('cancelar')}
+            />
+            {haySeleccionada && (
+              <Button
+                label="Cerrar subasta"
+                variante="exito"
+                className="flex-fill"
+                onClick={() => setModal('cerrar')}
+              />
+            )}
+          </div>
+        )}
 
         {cargando ? (
           <Spinner />
@@ -273,13 +355,36 @@ const VerSubasta = () => {
                     {ofertaPropia ? (
                       <TuOfertaCard oferta={ofertaPropia} subasta={subasta} subastaAbierta={subastaAbierta} />
                     ) : (
-                      <div className="d-flex align-items-center gap-3">
-                        <p className="mb-0 text-muted">¿Aún no ofertaste?</p>
-                        <Button
-                          label="Proponer oferta"
-                          variante="terciario"
-                          onClick={() => navigate(`/subastas/${subId}/crear-oferta`)}
-                        />
+                      <div className="d-flex flex-column gap-2">
+                        {cargandoValidacion ? (
+                          <p className="mb-0 text-muted fst-italic" style={{ fontSize: '0.85rem' }}>
+                            Validando condiciones...
+                          </p>
+                        ) : (
+                          <>
+                            {!cumpleCalificacion && (
+                              <div className="alert alert-warning mb-0">
+                                Tu calificación actual ({calificacionUsuario ?? 'sin datos'}★) es menor a la requerida ({calMinima}★). No podés ofertar en esta subasta.
+                              </div>
+                            )}
+                            {cumpleCalificacion && !tieneTodasRequeridas && (
+                              <div className="alert alert-warning mb-0">
+                                No tenés todas las figuritas requeridas. Te falta{faltantesRequeridas.length > 1 ? 'n' : ''}:{' '}
+                                <strong>{faltantesRequeridas.map((f) => f.jugador).join(', ')}</strong>.
+                              </div>
+                            )}
+                            {cumpleCalificacion && tieneTodasRequeridas && (
+                              <div className="d-flex align-items-center gap-3">
+                                <p className="mb-0 text-muted">¿Aún no ofertaste?</p>
+                                <Button
+                                  label="Proponer oferta"
+                                  variante="terciario"
+                                  onClick={() => setMostrarCrearOferta(true)}
+                                />
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
@@ -290,9 +395,26 @@ const VerSubasta = () => {
         )}
 
         <ModalInformativo open={procesando}>
-          <h3>Adjudicando oferta...</h3>
+          <h3>{accionProcesando || 'Adjudicando oferta...'}</h3>
           <p>Esto puede tardar unos segundos</p>
         </ModalInformativo>
+
+        <ConfirmModal
+          show={modal !== null}
+          titulo={configModal?.titulo}
+          mensaje={configModal?.mensaje}
+          labelConfirmar={configModal?.labelConfirmar}
+          onConfirmar={handleConfirmar}
+          onCancelar={() => setModal(null)}
+        />
+
+        <CrearOfertaModal
+          abierto={mostrarCrearOferta}
+          onCerrar={() => setMostrarCrearOferta(false)}
+          subId={subId}
+          subasta={subasta}
+          onExito={refetch}
+        />
       </div>
     </div>
   )

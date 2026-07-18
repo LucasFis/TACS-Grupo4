@@ -5,6 +5,7 @@ import Button from '@/components/ui/button/button.jsx'
 import useCrearPropuesta from './useCrearPropuesta'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import SectionTitle from '@/components/ui/section-title/section-title.jsx'
 import styles from './crear-propuesta-intercambio.module.css'
 
 const calcularIniciales = (nombre) => {
@@ -59,8 +60,8 @@ const CrearPropuestaIntercambio = () => {
         </SectionCard>
 
         <SectionCard>
+          <SectionTitle>SELECCIONÁ LAS FIGURITAS QUE QUERÉS OFRECER</SectionTitle>
           <SectionCard.Section>
-            <p className="label-seccion">Seleccioná las figuritas que querés ofrecer</p>
             <div className="mt-2">
               <SelectorRepetidas
                 modo="multiple"

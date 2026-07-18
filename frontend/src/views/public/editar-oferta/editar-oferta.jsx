@@ -13,14 +13,7 @@ import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import styles from './editar-oferta.module.css'
-
-const obtenerBloqueadas = (repetidas, figuritasSolicitadas) => {
-  if (!figuritasSolicitadas?.length) return []
-  const idsRepetidas = new Set(repetidas.map((r) => r.figurita_id))
-  return figuritasSolicitadas
-    .filter((sol) => idsRepetidas.has(sol.id))
-    .map((sol) => repetidas.find((r) => r.figurita_id === sol.id))
-}
+import { obtenerBloqueadas } from '@/utils/ofertas.js'
 
 const mismasFiguritas = (anteriores, actuales) => {
   if (anteriores.length !== actuales.length) return false
@@ -175,8 +168,8 @@ const EditarOferta = () => {
         </SectionCard>
 
         <SectionCard>
+          <SectionTitle>Editá las figuritas que querés ofrecer</SectionTitle>
           <SectionCard.Section>
-            <p className="label-seccion">Editá las figuritas que querés ofrecer</p>
             {bloqueadas.length > 0 && (
               <p className={styles.seleccionHint}>
                 Las marcadas como <strong>Requerida</strong> se incluyen automáticamente.

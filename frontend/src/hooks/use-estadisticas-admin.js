@@ -18,7 +18,7 @@ const useEstadisticasAdmin = () => {
   const [pendingDesde, setPendingDesde] = useState(defaultRange.desde)
   const [pendingHasta, setPendingHasta] = useState(defaultRange.hasta)
 
-  const { data: stats, isLoading, isFetching, error } = useQuery({
+  const { data: stats, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ['estadisticas', { desde, hasta }],
     queryFn: ({ signal }) => obtenerEstadisticas(desde, hasta, signal),
     enabled: !!desde && !!hasta && desde <= hasta,
@@ -41,6 +41,7 @@ const useEstadisticasAdmin = () => {
     setHasta: setPendingHasta,
     rangoInvalido: pendingDesde && pendingHasta && pendingDesde > pendingHasta,
     aplicar,
+    refrescar: refetch,
   }
 }
 
