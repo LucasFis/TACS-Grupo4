@@ -3,8 +3,9 @@ import useQueryConError from '@/hooks/useQueryConError'
 import { crearOferta } from '@/services/subastasService.js'
 import { buscarPerfil } from '@/services/perfilService.js'
 import { buscarRepetidas } from '@/services/coleccionService.js'
+import SectionTitle from '@/components/ui/section-title/section-title.jsx'
+import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import SelectorRepetidas from '@/components/ui/selector-repetidas/selector-repetidas.jsx'
-import FiguritaChip from '@/components/ui/figurita-chip/figurita-chip.jsx'
 import Button from '@/components/ui/button/button.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
@@ -34,14 +35,18 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
 
   useEffect(() => {
     if (!abierto) return
-    const handler = (e) => { if (e.key === 'Escape') onCerrar() }
+    const handler = (e) => {
+      if (e.key === 'Escape') onCerrar()
+    }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [abierto, onCerrar])
 
   useEffect(() => {
     document.body.style.overflow = abierto ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [abierto])
 
   useEffect(() => {
@@ -89,10 +94,11 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
       aria-label="Proponer oferta"
     >
       <div className={styles.modal}>
-
         <div className={styles.header}>
           <h5 className="mb-0">Proponer oferta</h5>
-          <button className={styles.cerrar} onClick={onCerrar}>✕</button>
+          <button className={styles.cerrar} onClick={onCerrar}>
+            ✕
+          </button>
         </div>
 
         <hr className={styles.divisor} />
@@ -102,58 +108,64 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
             <Spinner />
           </div>
         ) : (
-          <>
-            {/* Condiciones */}
-            <div className={styles.seleccion}>
-              <div className={styles.seleccionBloque}>
-                <p className={styles.seleccionLabel}>Condiciones para ofertar</p>
-
+          <div className="d-flex flex-column gap-3">
+            <SectionCard>
+              <SectionTitle>CONDICIONES PARA OFERTAR</SectionTitle>
+              <SectionCard.Section>
                 <div className="d-flex flex-column gap-3">
                   <div className="d-flex flex-column gap-2">
                     <p className={styles.label}>Figuritas requeridas</p>
                     {subasta.figuritas_solicitadas.length > 0 ? (
                       <>
-                        {subasta.figuritas_solicitadas.map((fig, i) => (
-                          <FiguritaChip key={i} fig={fig} variante="verde" />
-                        ))}
-                        <p className="mb-0 text-muted" style={{ fontSize: '0.72rem' }}>
+                        <div className="d-flex flex-column gap-2">
+                          {subasta.figuritas_solicitadas.map((fig, i) => (
+                            <div key={i} className={styles.figRequerida}>
+                              <div className={styles.figNumero}>{fig.numero}</div>
+                              <div>
+                                <p className={styles.figJugador}>{fig.jugador}</p>
+                                <p className={styles.figSeleccion}>{fig.seleccion}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className={styles.hint}>
                           El ofertante debe incluir al menos una de estas figuritas
                         </p>
                       </>
                     ) : (
-                      <p className="mb-0 fst-italic text-muted" style={{ fontSize: '0.85rem' }}>
+                      <p className={styles.sinRestriccion}>
                         Sin restricción — el ofertante puede ofrecer cualquier figurita
                       </p>
                     )}
                   </div>
 
-                  <div className={`${styles.calificacionDivider} d-flex align-items-center justify-content-between`}>
+                  <div className={styles.calificacionDivider}>
                     <div>
                       <p className={styles.label}>Calificación mínima</p>
-                      <p className="mb-0 text-muted" style={{ fontSize: '0.72rem' }}>
-                        {calMinima === 0
+                      <p className={styles.hint}>
+                        {calMinima <= 1
                           ? 'Cualquier usuario puede ofertar'
                           : 'Solo usuarios con esta calificación pueden ofertar'}
                       </p>
                     </div>
-                    {calMinima === 0 ? (
-                      <div className={styles.calSinMinimo}>Sin mínimo</div>
+                    {calMinima <= 1 ? (
+                      <span className={styles.calSinMinimo}>Sin mínimo</span>
                     ) : (
-                      <div className={`${styles.calBadge} d-flex align-items-center gap-1`}>
+                      <div className={styles.calBadge}>
                         <span className={styles.calBadgeNumero}>{calMinima}</span>
                         <span className={styles.calBadgeLabel}>★ o más</span>
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
-            </div>
+              </SectionCard.Section>
+            </SectionCard>
 
             {/* Alerta calificación */}
             {!cumpleCalificacion && (
               <div className="alert alert-warning">
-                Tu calificación actual ({calificacionUsuario ?? 'sin datos'}★) es menor a la requerida (
-                {calMinima}★). No podés ofertar en esta subasta.
+                Tu calificación actual ({calificacionUsuario ?? 'sin datos'}★) es menor a la
+                requerida ({calMinima}★). No podés ofertar en esta subasta.
               </div>
             )}
 
@@ -169,40 +181,44 @@ const CrearOfertaModal = ({ abierto, onCerrar, subId, subasta, onExito }) => {
             {/* Selección */}
             {cumpleCalificacion && tieneTodasRequeridas && (
               <div className="d-flex flex-column gap-3">
-                <div>
-                  <p className={styles.seleccionTitulo}>
-                    Seleccioná las figuritas que querés ofrecer
-                  </p>
-                  {bloqueadas.length > 0 && (
-                    <p className={styles.seleccionHint}>
-                      Las marcadas como <strong>Requerida</strong> se incluyen automáticamente. Podés
-                      sumar más si querés.
-                    </p>
-                  )}
-                </div>
-
-                <SelectorRepetidas
-                  modo="multiple"
-                  bloqueadas={bloqueadas}
-                  onChange={setFiguritasExtra}
-                  metodoIntercambio="SUBASTA"
-                  perfilId={subasta.perfil.id}
-                  mostrarAviso={true}
-                />
+                <SectionCard>
+                  <SectionTitle>SELECCIONÁ LAS FIGURITAS QUE QUERÉS OFRECER</SectionTitle>
+                  <SectionCard.Section>
+                    {bloqueadas.length > 0 && (
+                      <p className={styles.seleccionHint}>
+                        Las marcadas como <strong>Requerida</strong> se incluyen automáticamente.
+                        Podés sumar más si querés.
+                      </p>
+                    )}
+                    <div className="mt-2">
+                      <SelectorRepetidas
+                        modo="multiple"
+                        bloqueadas={bloqueadas}
+                        onChange={setFiguritasExtra}
+                        metodoIntercambio="SUBASTA"
+                        perfilId={subasta.perfil.id}
+                        mensajeVacio="No tenés repetidas publicadas para subasta que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
+                        mostrarAviso={true}
+                      />
+                    </div>
+                  </SectionCard.Section>
+                </SectionCard>
               </div>
             )}
 
             <hr className={styles.divisor} />
 
             <div className={styles.footer}>
-              <button className={styles.cancelar} onClick={onCerrar}>Cancelar</button>
+              <button className={styles.cancelar} onClick={onCerrar}>
+                Cancelar
+              </button>
               <Button
                 label="Enviar oferta"
                 disabled={!puedeOfertar || [...bloqueadas, ...figuritasExtra].length === 0}
                 onClick={onEnviar}
               />
             </div>
-          </>
+          </div>
         )}
       </div>
 
