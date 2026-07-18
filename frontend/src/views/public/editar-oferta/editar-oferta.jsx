@@ -174,28 +174,30 @@ const EditarOferta = () => {
           </SectionCard.Section>
         </SectionCard>
 
-        <div className="d-flex flex-column gap-3">
-          <div>
-            <p className={styles.seleccionTitulo}>Editá las figuritas que querés ofrecer</p>
+        <SectionCard>
+          <SectionCard.Section>
+            <p className="label-seccion">Editá las figuritas que querés ofrecer</p>
             {bloqueadas.length > 0 && (
               <p className={styles.seleccionHint}>
                 Las marcadas como <strong>Requerida</strong> se incluyen automáticamente.
               </p>
             )}
-          </div>
-
-          <SelectorRepetidas
-            modo="multiple"
-            bloqueadas={bloqueadas}
-            onChange={setFiguritasExtra}
-            seleccionadasIniciales={ofrecidasAnteriores.filter(
-              (f) => !bloqueadas.some((b) => b.figurita_id === f.figurita_id),
-            )}
-            metodoIntercambio="SUBASTA"
-            perfilId={subasta.perfil.id}
-            mostrarAviso={true}
-          />
-        </div>
+            <div className="mt-2">
+              <SelectorRepetidas
+                modo="multiple"
+                bloqueadas={bloqueadas}
+                onChange={setFiguritasExtra}
+                seleccionadasIniciales={ofrecidasAnteriores.filter(
+                  (f) => !bloqueadas.some((b) => b.figurita_id === f.figurita_id),
+                )}
+                metodoIntercambio="SUBASTA"
+                perfilId={subasta.perfil.id}
+                mensajeVacio="No tenés repetidas publicadas para subasta que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
+                mostrarAviso={true}
+              />
+            </div>
+          </SectionCard.Section>
+        </SectionCard>
 
         <div className="d-flex flex-column gap-2">
           <div className="d-flex gap-2 justify-content-between">

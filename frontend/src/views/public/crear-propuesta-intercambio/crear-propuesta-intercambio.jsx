@@ -20,7 +20,8 @@ const calcularIniciales = (nombre) => {
 const CrearPropuestaIntercambio = () => {
   const { state } = useLocation()
   const figurita = state?.figurita
-  const { seleccionadas, setSeleccionadas, enviar, enviando, validando } = useCrearPropuesta(figurita)
+  const { seleccionadas, setSeleccionadas, enviar, enviando, validando } =
+    useCrearPropuesta(figurita)
 
   if (!figurita) return <h2>No se pudo cargar la figurita.</h2>
   if (validando) return null
@@ -66,7 +67,7 @@ const CrearPropuestaIntercambio = () => {
                 bloqueadas={[]}
                 onChange={setSeleccionadas}
                 metodoIntercambio="INTERCAMBIO"
-                mensajeVacio="No tenés repetidas publicadas para intercambio. Publicá repetidas para poder ofrecer."
+                mensajeVacio="No tenés repetidas publicadas para intercambio que coincidan con las faltantes del perfil. Publicá repetidas para poder ofrecer."
                 mostrarAviso={true}
               />
             </div>
