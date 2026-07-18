@@ -1,7 +1,7 @@
 # Documentación de Endpoints — TACS-Grupo4
 
 **Stack:** Java 17 + Spring Boot 3.2.5 · MongoDB
-**Total:** 37 endpoints · 9 controladores
+**Total:** 47 endpoints · 9 controladores
 
 ## Información general
 
@@ -10,7 +10,7 @@
 | Base URL | No especificada explícitamente (depende del deploy) |
 | Formato request/response | JSON |
 | Autenticación | JWT vía cookie `httpOnly` llamada `token` (expiración 12h) |
-| Rutas públicas | `/login`, `/usuarios`, `/figuritas`, `/ping`, `/sesion`, `OPTIONS` |
+| Rutas públicas | `/login`, `/usuarios`, `/figuritas`, `/perfil/{perfilId}`, `/ping`, `/sesion`, `/subastas/{sub_id}`, `OPTIONS` |
 
 ---
 
@@ -329,6 +329,22 @@
 
 - **Response:** `200 OK`
 
+### `GET /perfil/{perfilId}`
+- **Auth:** No
+- **Descripción:** Datos públicos de un perfil por ID.
+- **Response `200 OK`:** `PerfilDto`
+
+### `GET /perfil/{perfilId}/calificaciones`
+- **Auth:** No
+- **Descripción:** Calificaciones de un perfil específico, paginadas.
+- **Query params:** `pagina` (int, requerido) · `limite` (int, requerido)
+- **Response `200 OK`:** `PaginaResultado<CalificacionDto>`
+
+### `GET /perfil/{perfilId}/contadores`
+- **Auth:** No
+- **Descripción:** Contadores de figuritas de un perfil específico.
+- **Response `200 OK`:** `List<ContadorDto>`
+
 ---
 
 ## 7. ControladorPropuesta
@@ -493,6 +509,12 @@
 - **Descripción:** Obtiene una subasta por ID con todas sus ofertas.
 - **Response `200 OK`:** `SubastaDto`
 
+### `GET /subastas/{sub_id}/validar-condiciones`
+- **Auth:** Sí
+- **Descripción:** Valida condiciones para ofertar en una subasta (calificación mínima, no ser el autor).
+- **Cookie:** `token`
+- **Response `200 OK`:** `ValidarCondicionesDto`
+
 ---
 
 ## 9. ControladorSugerencia
@@ -507,6 +529,12 @@
 ### `PATCH /sugerencias/{sugerenciaId}/favorito`
 - **Auth:** Sí
 - **Descripción:** Alterna el estado de favorito de una sugerencia.
+- **Cookie:** `token`
+- **Response:** `204 No Content`
+
+### `POST /sugerencias/recalcular`
+- **Auth:** Sí
+- **Descripción:** Recalcula las sugerencias de intercambio para el perfil autenticado.
 - **Cookie:** `token`
 - **Response:** `204 No Content`
 
@@ -550,7 +578,7 @@
 ## Resumen de rutas públicas
 
 | Verbo | Ruta |
-|---|---|
+|---|---|---|
 | `GET` | `/ping` |
 | `POST` | `/login` |
 | `DELETE` | `/sesion` |
@@ -558,9 +586,12 @@
 | `HEAD` | `/usuarios/{nombre}` |
 | `GET` | `/figuritas` |
 | `GET` | `/figuritas/intercambiables` |
+| `GET` | `/perfil/{perfilId}` |
+| `GET` | `/perfil/{perfilId}/calificaciones` |
+| `GET` | `/perfil/{perfilId}/contadores` |
 | `GET` | `/subastas/{sub_id}` |
 | `OPTIONS` | *(preflight CORS)* |
 
 ---
 
-**Total:** 37 endpoints · 9 controladores · Java 17 + Spring Boot 3.2.5 · MongoDB
+**Total:** 47 endpoints · 9 controladores · Java 17 + Spring Boot 3.2.5 · MongoDB
