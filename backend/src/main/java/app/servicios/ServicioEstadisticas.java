@@ -1,19 +1,14 @@
 package app.servicios;
 
 import app.dto.*;
-import app.dto.filtros.SubastasFiltro;
-import app.dto.paginacion.PaginaResultado;
 import app.exceptions.ForbiddenException;
 import app.model.entities.EstadoProceso;
 import app.model.entities.MetodoIntercambio;
-import app.model.entities.Propuesta;
-import app.model.entities.Subasta;
 import app.repositories.RepositorioColecciones;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.RepositorioPropuestas;
 import app.repositories.RepositorioRankings;
 import app.repositories.RepositorioSubastas;
-import app.repositories.impl.campos.CamposSubasta;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +18,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,16 +57,24 @@ public class ServicioEstadisticas {
 
         long totalFiguritasPublicadas = this.repositorioColecciones.contarRepetidas(new ArrayList<>());
 
-        List<Propuesta> propuestasPeriodo =
-            repositorioPropuestas.buscarEstadisticasPorRango(desdeDateTime, hastaDateTime);
+        Map<EstadoProceso, Long> propuestasPeriodo = repositorioPropuestas
+            .contarPorEstadoEnRango(desdeDateTime, hastaDateTime);
 
-        int totalPropuestas = propuestasPeriodo.size();
+        int totalPropuestas = (int) propuestasPeriodo
+            .values()
+            .stream()
+            .mapToLong(Long::longValue)
+            .sum();
 
-        SubastasFiltro filtros = new SubastasFiltro(0, 20, null, null, "ACTIVA", null, null);
+        int totalSubastasActivas = (int) repositorioSubastas.contarSubastasActivas();
 
-        PaginaResultado<Subasta> totalSubastasActivas = repositorioSubastas.buscarTodos(filtros, new CamposSubasta(false, false));
-
-        PropuestasPorEstadoDto propuestasPorEstado = calcularPropuestasPorEstado(propuestasPeriodo);
+        PropuestasPorEstadoDto propuestasPorEstado = new PropuestasPorEstadoDto(
+            propuestasPeriodo.getOrDefault(EstadoProceso.PENDIENTE, 0L).intValue(),
+            propuestasPeriodo.getOrDefault(EstadoProceso.SELECCIONADO, 0L).intValue(),
+            propuestasPeriodo.getOrDefault(EstadoProceso.ACEPTADO, 0L).intValue(),
+            propuestasPeriodo.getOrDefault(EstadoProceso.RECHAZADO, 0L).intValue(),
+            propuestasPeriodo.getOrDefault(EstadoProceso.CANCELADO, 0L).intValue()
+        );
 
         FiguritasPorModalidadDto figuritasPorModalidad = calcularFiguritasPorModalidad();
 
@@ -82,7 +84,7 @@ public class ServicioEstadisticas {
             totalUsuarios,
             totalFiguritasPublicadas,
             totalPropuestas,
-            (int) totalSubastasActivas.cantidadDeElementos(),
+            totalSubastasActivas,
             propuestasPorEstado,
             figuritasPorModalidad,
             rankings
@@ -102,26 +104,6 @@ public class ServicioEstadisticas {
             repositorioRankings.topSubastadores(desde, hasta, TOP),
             repositorioRankings.mejorReputacion(MINIMO_CALIFICACIONES, TOP),
             repositorioRankings.topColeccionistas(TOP)
-        );
-    }
-
-  /**
-   * Calcula la cantidad de propuestas agrupadas según su estado actual
-   * (pendiente, aceptada o rechazada).
-   *
-   * @return un {@link PropuestasPorEstadoDto} con la cantidad de propuestas
-   *         en cada uno de los estados posibles
-   */
-    private PropuestasPorEstadoDto calcularPropuestasPorEstado(List<Propuesta> propuestas) {
-        Map<EstadoProceso, Long> porEstado = propuestas.stream()
-            .collect(Collectors.groupingBy(p -> p.getEstadoActual().getValor(), Collectors.counting()));
-
-        return new PropuestasPorEstadoDto(
-            porEstado.getOrDefault(EstadoProceso.PENDIENTE, 0L).intValue(),
-            porEstado.getOrDefault(EstadoProceso.SELECCIONADO, 0L).intValue(),
-            porEstado.getOrDefault(EstadoProceso.ACEPTADO, 0L).intValue(),
-            porEstado.getOrDefault(EstadoProceso.RECHAZADO, 0L).intValue(),
-            porEstado.getOrDefault(EstadoProceso.CANCELADO, 0L).intValue()
         );
     }
 

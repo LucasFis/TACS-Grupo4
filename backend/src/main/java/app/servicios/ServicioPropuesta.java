@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import app.repositories.impl.campos.CamposPerfil;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -73,10 +75,11 @@ public class ServicioPropuesta {
       throw new BadRequestException("La figurita #" + figuritaBuscada.getNumero() + " no está en tus faltantes");
     }
 
-    List<Figurita> figuritasOfrecidas = request.getFiguritasOfrecidasIds()
-        .stream()
-        .map(repositorioFiguritas::buscarPorId)
-        .toList();
+    List<String> figuritasOfrecidasIds = request.getFiguritasOfrecidasIds();
+    List<Figurita> figuritasOfrecidas = repositorioFiguritas.buscarPorIds(figuritasOfrecidasIds);
+    if (figuritasOfrecidas.size() != figuritasOfrecidasIds.size()) {
+      throw new NotFoundException("Una o más figuritas ofrecidas no existen");
+    }
 
 
     autor.getColeccion().reservarRepetidas(figuritasOfrecidas, MetodoIntercambio.INTERCAMBIO);
@@ -257,22 +260,16 @@ public class ServicioPropuesta {
   public PaginaResultado<IntercambioDto> buscarPropuestas(String perfilId, PropuestasFiltro filtros) {
     PaginaResultado<Propuesta> resultado = this.repositorioPropuestas.buscarTodos(perfilId, filtros);
 
-    return resultado.mapearA(p -> {
-      boolean esEnviada = Objects.equals(filtros.tipo(), "ENVIADAS");
+    Set<String> ids = resultado
+        .contenido()
+        .stream()
+        .map(Propuesta::getId)
+        .collect(Collectors.toSet());
 
-      String perfilCalificado = esEnviada
-          ? p.getDestinatario().getId()
-          : p.getAutor().getId();
+    Set<String> yaCalificadas = this.repositorioCalificacion
+        .obtenerTransaccionesCalificadas(perfilId, MetodoIntercambio.INTERCAMBIO, ids);
 
-      boolean yaCalificado = this.repositorioCalificacion.yaCalifico(
-          perfilCalificado,
-          perfilId,
-          p.getId(),
-          MetodoIntercambio.INTERCAMBIO
-      );
-
-      return new IntercambioDto(p, yaCalificado);
-    });
+    return resultado.mapearA(p -> new IntercambioDto(p, yaCalificadas.contains(p.getId())));
   }
 
   /**

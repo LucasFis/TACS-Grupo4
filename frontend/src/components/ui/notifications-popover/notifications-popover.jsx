@@ -1,67 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { obtenerNotificaciones, marcarTodasLeidas } from '@/services/notificacionesService.js'
 import { useAuth } from '@/contexts/userContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
+import useQueryConError from '@/hooks/useQueryConError'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 import styles from './notifications-popover.module.css'
 import indicatorStyles from '@/components/ui/actualizando-indicator/actualizando-indicator.module.css'
-
-const CACHE_KEY = 'notificaciones_cache'
-
-const leerCache = () => {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY)
-    if (!raw) return null
-    return JSON.parse(raw)
-  } catch { return null } // JSON invÃ¡lido en localStorage
-}
-
-const guardarCache = (notificaciones, noLeidas) => {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ notificaciones, noLeidas }))
-  } catch { /* localStorage lleno o no disponible */ }
-}
 
 const NotificationsPopover = () => {
   const { tieneSesion } = useAuth()
   const { handleError } = useError()
   const { showToast } = useToast()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const [abierto, setAbierto] = useState(false)
-  const [cargando, setCargando] = useState(false)
-  const [actualizando, setActualizando] = useState(false)
-  const [notificaciones, setNotificaciones] = useState([])
-  const [noLeidas, setNoLeidas] = useState(0)
   const wrapperRef = useRef(null)
-  const abortRef = useRef(null)
 
-  useEffect(() => {
-    if (!tieneSesion) return
-    const cache = leerCache()
-    if (cache) {
-      setNotificaciones(cache.notificaciones)
-      setNoLeidas(cache.noLeidas)
-    }
-    const cargar = async () => {
-      if (!cache) setCargando(true)
-      try {
-        const data = await obtenerNotificaciones()
-        const lista = Array.isArray(data) ? data : data?.contenido ?? []
-        const leidas = Array.isArray(data) ? 0 : data?.no_leidas ?? 0
-        setNotificaciones(lista)
-        setNoLeidas(leidas)
-        guardarCache(lista, leidas)
-      } catch (error) {
-        if (!cache) showToast(handleError(error, () => {}), 'error')
-      } finally {
-        setCargando(false)
-      }
-    }
-    cargar()
-  }, [tieneSesion])
+  const { data, isLoading, isFetching, refetch } = useQueryConError({
+    queryKey: ['notificaciones'],
+    queryFn: ({ signal }) => obtenerNotificaciones({}, signal),
+    enabled: tieneSesion,
+  })
+
+  const notificaciones = Array.isArray(data) ? data : data?.contenido ?? []
+  const noLeidas = Array.isArray(data) ? 0 : data?.no_leidas ?? 0
 
   useEffect(() => {
     const handleClickFuera = (e) => {
@@ -71,53 +37,26 @@ const NotificationsPopover = () => {
     }
     document.addEventListener('mousedown', handleClickFuera)
     return () => document.removeEventListener('mousedown', handleClickFuera)
-  }, [abierto])
+  }, [])
 
-  const toggleNotificaciones = async () => {
+  const toggleNotificaciones = () => {
     if (abierto) {
       setAbierto(false)
       return
     }
-    if (abortRef.current) abortRef.current.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
     setAbierto(true)
-    const cache = leerCache()
-    if (cache) {
-      setNotificaciones(cache.notificaciones)
-      setNoLeidas(cache.noLeidas)
-      setActualizando(true)
-    } else {
-      setCargando(true)
-    }
-    try {
-      const data = await obtenerNotificaciones({}, controller.signal)
-      if (controller.signal.aborted) return
-      const lista = Array.isArray(data) ? data : data?.contenido ?? []
-      const leidas = Array.isArray(data) ? 0 : data?.no_leidas ?? 0
-      setNotificaciones(lista)
-      setNoLeidas(leidas)
-      guardarCache(lista, leidas)
-    } catch (error) {
-      if (controller.signal.aborted) return
-      if (!cache) showToast(handleError(error, () => {}), 'error')
-    } finally {
-      if (!controller.signal.aborted) {
-        setCargando(false)
-        setActualizando(false)
-      }
-    }
+    refetch()
   }
 
   const handleMarcarTodasLeidas = async () => {
     try {
       await marcarTodasLeidas()
-      const actualizadas = notificaciones.map((n) => ({ ...n, leida: true }))
-      setNotificaciones(actualizadas)
-      setNoLeidas(0)
-      guardarCache(actualizadas, 0)
+      queryClient.invalidateQueries({ queryKey: ['notificaciones'] })
     } catch (error) {
-      showToast(handleError(error, () => {}), 'error')
+      showToast(
+        handleError(error, () => {}),
+        'error',
+      )
     }
   }
 
@@ -138,12 +77,12 @@ const NotificationsPopover = () => {
       if (notificaciones.length > 0) {
         try {
           await marcarTodasLeidas()
-          const actualizadas = notificaciones.map((x) => ({ ...x, leida: true }))
-          setNotificaciones(actualizadas)
-          setNoLeidas(0)
-          guardarCache(actualizadas, 0)
+          queryClient.invalidateQueries({ queryKey: ['notificaciones'] })
         } catch (error) {
-          showToast(handleError(error, () => {}), 'error')
+          showToast(
+            handleError(error, () => {}),
+            'error',
+          )
         }
       }
     }
@@ -192,14 +131,14 @@ const NotificationsPopover = () => {
                 onClick={handleMarcarTodasLeidas}
                 type="button"
               >
-                Marcar leidas
+                Marcar leídas
               </button>
             )}
           </div>
 
           <div className={styles.header}>Notificaciones</div>
 
-          {actualizando && (
+          {isFetching && !isLoading && (
             <div className={indicatorStyles.actualizando}>
               <div className={indicatorStyles.spinnerChico} />
               <span>Actualizando...</span>
@@ -207,10 +146,10 @@ const NotificationsPopover = () => {
           )}
 
           <div className={styles.lista}>
-            {cargando ? (
+            {isLoading ? (
               <div className={styles.cargando}><Spinner /></div>
             ) : notificaciones.length === 0 ? (
-              <div className={styles.empty}>No tenes notificaciones</div>
+              <div className={styles.empty}>No tenés notificaciones</div>
             ) : (
               notificaciones.map((n) => (
                 <div
@@ -221,7 +160,7 @@ const NotificationsPopover = () => {
                 >
                   <div className={styles.texto}>{n.cuerpo}</div>
                   <div className={styles.fecha}>{formatearFecha(n.fecha)}</div>
-                  {n.leida && <span className={styles.leidaBadge}>leida</span>}
+                  {n.leida && <span className={styles.leidaBadge}>leída</span>}
                 </div>
               ))
             )}
