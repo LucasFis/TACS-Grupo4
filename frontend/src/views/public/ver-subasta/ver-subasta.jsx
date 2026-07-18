@@ -2,7 +2,7 @@ import styles from './ver-subasta.module.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
 import useQueryConError from '@/hooks/useQueryConError'
-import { buscarSubasta, seleccionarOferta } from '@/services/subastasService.js'
+import { buscarSubasta, seleccionarOferta, cancelarSubasta, cerrarSubasta } from '@/services/subastasService.js'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 
 const VerSubasta = () => {
   const { subId } = useParams()
@@ -25,6 +26,8 @@ const VerSubasta = () => {
   const [tiempo, setTiempo] = useState(0)
   const [subastaAbierta, setSubastaAbierta] = useState(false)
   const [procesando, setProcesando] = useState(false)
+  const [modal, setModal] = useState(null)
+  const [accionProcesando, setAccionProcesando] = useState('')
   const navigate = useNavigate()
 
   const { data: subasta, isLoading: cargando, error, refetch } = useQueryConError({
@@ -74,6 +77,42 @@ const VerSubasta = () => {
       }
     }
 
+    const MODAL_CONFIG = {
+      cancelar: {
+        titulo: 'Cancelar subasta',
+        mensaje: '¿Querés cancelar esta subasta? Todas las ofertas serán rechazadas. Esta acción no se puede deshacer.',
+        labelConfirmar: 'Cancelar subasta',
+      },
+      cerrar: {
+        titulo: 'Cerrar subasta',
+        mensaje: '¿Querés cerrar esta subasta? La oferta seleccionada será aceptada y el resto rechazadas.',
+        labelConfirmar: 'Cerrar subasta',
+      },
+    }
+
+    const ACCION_LABELS = {
+      cancelar: 'Cancelando subasta...',
+      cerrar: 'Cerrando subasta...',
+    }
+
+    const haySeleccionada = subasta?.ofertas?.some((o) => o.seleccionada)
+    const configModal = modal ? MODAL_CONFIG[modal] : null
+
+    const handleConfirmar = async () => {
+      try {
+        setProcesando(true)
+        setAccionProcesando(ACCION_LABELS[modal] ?? 'Procesando...')
+        if (modal === 'cancelar') await cancelarSubasta(subId)
+        else if (modal === 'cerrar') await cerrarSubasta(subId)
+        setModal(null)
+        refetch()
+      } catch (err) {
+        showToast(handleError(err, () => {}), 'error')
+      } finally {
+        setProcesando(false)
+      }
+    }
+
   useEffect(() => {
     if (tiempo <= 0) {
       setSubastaAbierta(false)
@@ -111,6 +150,25 @@ const VerSubasta = () => {
             { name: `#${subId}`, to: `/subastas/${subId}` },
           ]}
         />
+
+        {esAutor && subastaAbierta && (
+          <div className="d-flex gap-2 mb-3">
+            <Button
+              label="Cancelar subasta"
+              variante="peligroBorde"
+              className="flex-fill"
+              onClick={() => setModal('cancelar')}
+            />
+            {haySeleccionada && (
+              <Button
+                label="Cerrar subasta"
+                variante="exito"
+                className="flex-fill"
+                onClick={() => setModal('cerrar')}
+              />
+            )}
+          </div>
+        )}
 
         {cargando ? (
           <h2>Cargando subasta...</h2>
@@ -281,9 +339,18 @@ const VerSubasta = () => {
         )}
 
         <ModalInformativo open={procesando}>
-          <h3>Adjudicando oferta...</h3>
+          <h3>{accionProcesando || 'Adjudicando oferta...'}</h3>
           <p>Esto puede tardar unos segundos</p>
         </ModalInformativo>
+
+        <ConfirmModal
+          show={modal !== null}
+          titulo={configModal?.titulo}
+          mensaje={configModal?.mensaje}
+          labelConfirmar={configModal?.labelConfirmar}
+          onConfirmar={handleConfirmar}
+          onCancelar={() => setModal(null)}
+        />
       </div>
     </div>
   )
