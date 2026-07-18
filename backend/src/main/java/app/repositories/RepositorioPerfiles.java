@@ -9,6 +9,7 @@ import app.model.entities.Sugerencia;
 import app.repositories.impl.campos.CamposPerfil;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RepositorioPerfiles {
 
@@ -81,4 +82,17 @@ public interface RepositorioPerfiles {
      * @return lista de perfiles que tienen la figurita como faltante
      */
     List<Perfil> buscarPorFiguritaFaltante(Figurita figurita, CamposPerfil campos);
+
+    /**
+     * Devuelve el ID de la colección del perfil asociado a un usuario,
+     * sin cargar la cadena de DBRefs.
+     */
+    String obtenerColIdPorUsuarioId(String usuarioId);
+
+    /**
+     * Cuenta los elementos de las listas {@code repetidas} y {@code faltantes}
+     * de la colección de un perfil mediante aggregation, sin cargar los arrays.
+     * Devuelve un mapa con claves {@code "repetidas"} y {@code "faltantes"}.
+     */
+    Map<String, Integer> contarElementosColeccion(String perfilId);
 }

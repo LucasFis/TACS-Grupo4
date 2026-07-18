@@ -10,7 +10,9 @@ import app.model.entities.Perfil;
 import app.model.entities.Sugerencia;
 import app.repositories.RepositorioPerfiles;
 import app.repositories.impl.campos.CamposPerfil;
+import com.mongodb.DBRef;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -23,6 +25,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Repository
@@ -111,23 +114,21 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
 
   @Override
   public List<Perfil> buscarPorFiguritaFaltante(Figurita figurita, CamposPerfil campos) {
-    Query queryColecciones = new Query(
-        Criteria.where("faltantes").is(figurita.getId())
-    );
-    List<String> idsColecciones = mongoTemplate.findDistinct(
-            queryColecciones,
-            "_id",
-            Coleccion.class,
-            Object.class
-        ).stream()
-        .map(Object::toString)
-        .toList();
+    List<AggregationOperation> ops = new ArrayList<>();
+    ops.add(Aggregation.match(Criteria.where("faltantes.$id").is(figurita.getId())));
+    ops.add(Aggregation.lookup("perfiles", "_id", "coleccion.$id", "perfil"));
+    ops.add(Aggregation.unwind("perfil"));
+    ops.add(Aggregation.replaceRoot("perfil"));
+    if (!campos.getConMedioDeContacto()) {
+      ops.add(context -> new Document("$project", new Document("mediosDeContacto", 0)));
+    }
 
-    Query queryPerfiles = new Query(
-        Criteria.where("coleccion").in(idsColecciones)
-    );
-    this.conCamposCargados(queryPerfiles, campos);
-    return mongoTemplate.find(queryPerfiles, Perfil.class).stream().map(this::normalizar).toList();
+    MongoConverter converter = mongoTemplate.getConverter();
+    return mongoTemplate.aggregate(Aggregation.newAggregation(ops), "colecciones", Document.class)
+        .getMappedResults().stream()
+        .map(doc -> converter.read(Perfil.class, doc))
+        .map(this::normalizar)
+        .toList();
   }
 
   @Override
@@ -168,6 +169,53 @@ public class RepositorioPerfilesMongo implements RepositorioPerfiles {
       perfil.setMediosDeContacto(new ArrayList<>());
     }
     return perfil;
+  }
+
+  @Override
+  public String obtenerColIdPorUsuarioId(String usuarioId) {
+    Object idValue;
+    try {
+      idValue = new ObjectId(usuarioId);
+    } catch (IllegalArgumentException e) {
+      idValue = usuarioId;
+    }
+
+    Query query = new Query(Criteria.where("usuario.$id").is(idValue));
+    query.fields().include("coleccion");
+    Document doc = mongoTemplate.findOne(query, Document.class, "perfiles");
+
+    if (doc == null)
+      throw new NotFoundException("Perfil no encontrado con usuario de id: " + usuarioId);
+
+    Object coleccionRef = doc.get("coleccion");
+    if (!(coleccionRef instanceof DBRef ref) || ref.getId() == null) {
+      throw new NotFoundException("Perfil sin colección asociada, usuario de id: " + usuarioId);
+    }
+    return ref.getId().toString();
+  }
+
+  @Override
+  public Map<String, Integer> contarElementosColeccion(String perfilId) {
+    List<AggregationOperation> ops = new ArrayList<>();
+    ops.add(Aggregation.match(Criteria.where("_id").is(perfilId)));
+    ops.add(Aggregation.lookup("colecciones", "coleccion.$id", "_id", "col"));
+    ops.add(Aggregation.unwind("col", true));
+    ops.add(context -> new Document("$project", new Document()
+        .append("repetidas", new Document("$size", new Document("$ifNull", List.of("$col.repetidas", List.of()))))
+        .append("faltantes", new Document("$size", new Document("$ifNull", List.of("$col.faltantes", List.of()))))
+    ));
+
+    Document doc = mongoTemplate
+        .aggregate(Aggregation.newAggregation(ops), "perfiles", Document.class)
+        .getUniqueMappedResult();
+
+    if (doc == null)
+      return Map.of("repetidas", 0, "faltantes", 0);
+
+    return Map.of(
+        "repetidas", doc.getInteger("repetidas", 0),
+        "faltantes", doc.getInteger("faltantes", 0)
+    );
   }
 }
 
