@@ -85,7 +85,7 @@ public class ServicioSubasta {
         .buscarPorFiguritaFaltante(figuritaSubastada, conMedio);
 
     String link = "/subastas/" + nuevaSubasta.getId();
-    String cuerpo = "Se publicó una subasta de la figurita que te falta: " + nuevaSubasta.getFiguritaSubastada();
+    String cuerpo = "Se publicó una subasta de la figurita que te falta: " + nuevaSubasta.getFiguritaSubastada().getJugador();
     notificacionService.notificarInteresados(interesados, cuerpo, link);
 
   }
