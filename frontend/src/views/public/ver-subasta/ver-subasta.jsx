@@ -13,6 +13,8 @@ import TuOfertaCard from './tu-oferta-card.jsx'
 import Button from '@/components/ui/button/button.jsx'
 import { useAuth } from '@/contexts/userContext.jsx'
 import CrearOfertaModal from './crear-oferta-modal.jsx'
+import { buscarPerfil } from '@/services/perfilService.js'
+import { buscarRepetidas } from '@/services/coleccionService.js'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { useError } from '@/contexts/errorContext.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
@@ -43,6 +45,21 @@ const VerSubasta = () => {
       setTiempo(subasta.tiempo_restante)
     }
   }, [subasta])
+
+  const esAutor = subasta?.perfil?.id === user.perfil_id
+  const mostrarValidacion = !!subasta && subastaAbierta && !esAutor
+
+  const { data: perfil, isLoading: cargandoPerfil } = useQueryConError({
+    queryKey: ['perfil'],
+    queryFn: ({ signal }) => buscarPerfil(undefined, signal),
+    enabled: mostrarValidacion,
+  })
+
+  const { data: repetidasData, isLoading: cargandoRepetidas } = useQueryConError({
+    queryKey: ['repetidas', { pagina: 1, limite: 10 }],
+    queryFn: ({ signal }) => buscarRepetidas({ pagina: 1, limite: 10 }, signal),
+    enabled: mostrarValidacion,
+  })
 
   const procesarDuracion = () => {
     const horas = Math.floor(tiempo / 3600)
@@ -141,7 +158,17 @@ const VerSubasta = () => {
   })
 
   const ofertaPropia = subasta?.ofertas.find((o) => o.autor.id === user.perfil_id)
-  const esAutor = subasta?.perfil.id === user.perfil_id
+
+  const cargandoValidacion = mostrarValidacion && (cargandoPerfil || cargandoRepetidas)
+  const repetidas = repetidasData?.contenido ?? []
+  const calMinima = subasta?.calificacion_minima_solicitada ?? 0
+  const calificacionUsuario = perfil?.calificacion_media ?? null
+  const cumpleCalificacion =
+    calMinima === 0 || (calificacionUsuario !== null && calificacionUsuario >= calMinima)
+  const faltantesRequeridas = (subasta?.figuritas_solicitadas ?? []).filter(
+    (sol) => !new Set(repetidas.map((r) => r.figurita_id)).has(sol.id)
+  )
+  const tieneTodasRequeridas = faltantesRequeridas.length === 0
 
   return (
     <div className="container py-4 px-3 px-md-4">
@@ -331,13 +358,36 @@ const VerSubasta = () => {
                     {ofertaPropia ? (
                       <TuOfertaCard oferta={ofertaPropia} subasta={subasta} subastaAbierta={subastaAbierta} />
                     ) : (
-                      <div className="d-flex align-items-center gap-3">
-                        <p className="mb-0 text-muted">¿Aún no ofertaste?</p>
-                        <Button
-                          label="Proponer oferta"
-                          variante="terciario"
-                          onClick={() => setMostrarCrearOferta(true)}
-                        />
+                      <div className="d-flex flex-column gap-2">
+                        {cargandoValidacion ? (
+                          <p className="mb-0 text-muted fst-italic" style={{ fontSize: '0.85rem' }}>
+                            Validando condiciones...
+                          </p>
+                        ) : (
+                          <>
+                            {!cumpleCalificacion && (
+                              <div className="alert alert-warning mb-0">
+                                Tu calificación actual ({calificacionUsuario ?? 'sin datos'}★) es menor a la requerida ({calMinima}★). No podés ofertar en esta subasta.
+                              </div>
+                            )}
+                            {cumpleCalificacion && !tieneTodasRequeridas && (
+                              <div className="alert alert-warning mb-0">
+                                No tenés todas las figuritas requeridas. Te falta{faltantesRequeridas.length > 1 ? 'n' : ''}:{' '}
+                                <strong>{faltantesRequeridas.map((f) => f.jugador).join(', ')}</strong>.
+                              </div>
+                            )}
+                            {cumpleCalificacion && tieneTodasRequeridas && (
+                              <div className="d-flex align-items-center gap-3">
+                                <p className="mb-0 text-muted">¿Aún no ofertaste?</p>
+                                <Button
+                                  label="Proponer oferta"
+                                  variante="terciario"
+                                  onClick={() => setMostrarCrearOferta(true)}
+                                />
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
