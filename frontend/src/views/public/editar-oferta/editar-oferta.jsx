@@ -168,8 +168,8 @@ const EditarOferta = () => {
         </SectionCard>
 
         <SectionCard>
+          <SectionTitle>Editá las figuritas que querés ofrecer</SectionTitle>
           <SectionCard.Section>
-            <p className="label-seccion">Editá las figuritas que querés ofrecer</p>
             {bloqueadas.length > 0 && (
               <p className={styles.seleccionHint}>
                 Las marcadas como <strong>Requerida</strong> se incluyen automáticamente.
