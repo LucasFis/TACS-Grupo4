@@ -31,3 +31,17 @@
     background-color: rgba(144, 238, 144, 0.2);
     border: 3px solid rgba(144, 238, 144, 0.5);
 }
+
+.acciones {
+    display: flex;
+    gap: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .acciones {
+        flex-wrap: wrap;
+    }
+    .acciones > * {
+        flex: 1;
+    }
+}

@@ -3,7 +3,7 @@ import indicatorStyles from '@/components/ui/actualizando-indicator/actualizando
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
 import useQueryConError from '@/hooks/useQueryConError'
-import { buscarSubasta, seleccionarOferta, cancelarSubasta, cerrarSubasta, validarCondiciones } from '@/services/subastasService.js'
+import { buscarSubasta, seleccionarOferta, cancelarSubasta, cerrarSubasta, validarCondiciones, rechazarOferta } from '@/services/subastasService.js'
 import Breadcrumb from '@/components/ui/breadcrumb/breadcrumb.jsx'
 import SectionCard from '@/components/ui/section-card/section-card.jsx'
 import PerfilSimple from '@/components/ui/perfil-simple/perfil-simple.jsx'
@@ -88,6 +88,27 @@ const VerSubasta = () => {
     }
   }
 
+  const [rechazarId, setRechazarId] = useState(null)
+
+  const handleRechazarOferta = (ofertaId) => {
+    setRechazarId(ofertaId)
+  }
+
+  const ejecutarRechazar = async () => {
+    try {
+      setProcesando(true)
+      setAccionProcesando('Rechazando oferta...')
+      await rechazarOferta(subId, rechazarId)
+      setRechazarId(null)
+      showToast('Oferta rechazada correctamente.', 'success')
+      refetch()
+    } catch (err) {
+      showToast(handleError(err, () => {}), 'error')
+    } finally {
+      setProcesando(false)
+    }
+  }
+
   const MODAL_CONFIG = {
     cancelar: {
       titulo: 'Cancelar subasta',
@@ -104,6 +125,7 @@ const VerSubasta = () => {
   const ACCION_LABELS = {
     cancelar: 'Cancelando subasta...',
     cerrar: 'Cerrando subasta...',
+    rechazar: 'Rechazando oferta...',
   }
 
   const haySeleccionada = subasta?.ofertas?.some((o) => o.seleccionada)
@@ -308,6 +330,7 @@ const VerSubasta = () => {
                         propuesta={oferta}
                         puedeAdjudicar={esAutor && subastaAbierta}
                         onAdjudicar={adjudicarOferta}
+                        onRechazar={handleRechazarOferta}
                       />
                     ))
                   ) : (
@@ -392,6 +415,15 @@ const VerSubasta = () => {
           labelConfirmar={configModal?.labelConfirmar}
           onConfirmar={handleConfirmar}
           onCancelar={() => setModal(null)}
+        />
+
+        <ConfirmModal
+          show={rechazarId !== null}
+          titulo="Rechazar oferta"
+          mensaje="¿Querés rechazar esta oferta? Esta acción no se puede deshacer."
+          labelConfirmar="Rechazar"
+          onConfirmar={ejecutarRechazar}
+          onCancelar={() => setRechazarId(null)}
         />
 
         <CrearOfertaModal
