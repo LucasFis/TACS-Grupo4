@@ -1,1 +1,10 @@
+@media (max-width: 576px) {
+  .statusRow {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .statusButtons {
+    width: 100%;
+  }
+}
 
