@@ -25,3 +25,20 @@
 .btnAdjudicar {
   font-size: 0.78rem;
 }
+
+.ofertaActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 576px) {
+  .ofertaRow {
+    flex-wrap: wrap;
+  }
+
+  .ofertaActions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-left: calc(32px + 0.5rem);
+  }
+}

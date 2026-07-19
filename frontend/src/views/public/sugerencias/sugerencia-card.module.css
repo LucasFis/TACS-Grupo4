@@ -67,3 +67,14 @@
 .botonFavorito:hover {
     transform: scale(1.2);
 }
+
+@media (max-width: 576px) {
+    .columns {
+        flex-direction: column;
+    }
+    .swapIcon {
+        align-self: center;
+        transform: rotate(90deg);
+        margin: 4px 0;
+    }
+}

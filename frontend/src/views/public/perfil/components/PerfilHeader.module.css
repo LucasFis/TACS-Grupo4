@@ -32,3 +32,15 @@
 .btn-editar {
   padding: 10px 18px;
 }
+
+@media (max-width: 576px) {
+  .inner {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .btn-editar {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+}

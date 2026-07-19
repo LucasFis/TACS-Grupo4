@@ -8,6 +8,7 @@ const OfertaCard = ({
   position,
   puedeAdjudicar = false,
   onAdjudicar,
+  onRechazar,
 }) => {
   const seleccionada = propuesta.seleccionada
 
@@ -56,11 +57,18 @@ const OfertaCard = ({
         )}
 
         {puedeAdjudicar && !propuesta.seleccionada && (
-          <Button
-            label="Seleccionar"
-            variante="secundarioBorde"
-            onClick={() => onAdjudicar(propuesta.id)}
-          />
+          <div className={styles.acciones}>
+            <Button
+              label="Seleccionar"
+              variante="secundarioBorde"
+              onClick={() => onAdjudicar(propuesta.id)}
+            />
+            <Button
+              label="Rechazar"
+              variante="peligroBorde"
+              onClick={() => onRechazar(propuesta.id)}
+            />
+          </div>
         )}
       </div>
     </div>

@@ -469,3 +469,19 @@
   gap: 0.75rem;
   height: 100%;
 }
+
+@media (max-width: 576px) {
+  .heroFilaFiltros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .heroPeriodoFiltro {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .heroPeriodoCampo {
+    min-width: 0;
+  }
+}

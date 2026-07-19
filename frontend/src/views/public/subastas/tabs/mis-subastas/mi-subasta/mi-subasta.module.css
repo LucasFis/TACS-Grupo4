@@ -5,3 +5,9 @@
 .textoGanador {
   font-size: 0.82rem;
 }
+
+@media (max-width: 576px) {
+  .footerActions {
+    flex-direction: column;
+  }
+}

@@ -205,7 +205,7 @@ const MiSubasta = ({ subasta, finalizada, onRefresh, finalizadaHace }) => {
           </div>
         )}
 
-        <div className="px-3 py-2 d-flex gap-2 border-top">
+        <div className={`px-3 py-2 d-flex gap-2 border-top ${styles.footerActions}`}>
           {finalizada ? (
             <>
               <Button

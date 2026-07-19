@@ -72,7 +72,7 @@ const Administrador = () => {
 
             <div className="row g-3 mb-3">
               {TARJETAS_GLOBALES(stats).map((t) => (
-                <div className="col-4" key={t.label}>
+                <div className="col-12 col-md-4" key={t.label}>
                   <StatCard {...t} destacado />
                 </div>
               ))}

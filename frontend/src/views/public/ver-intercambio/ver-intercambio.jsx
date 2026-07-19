@@ -8,6 +8,7 @@ import Button from '../../../components/ui/button/button.jsx'
 import OfertaCard from './oferta-card.jsx'
 import ConfirmModal from '@/components/ui/confirm-modal/confirm-modal.jsx'
 import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-informativo.jsx'
+import styles from './ver-intercambio.module.css'
 import { Spinner } from '@/components/ui/spinner/spinner.jsx'
 
 import {
@@ -137,7 +138,7 @@ const VerIntercambio = () => {
           <SectionCard>
             <SectionCard.Section>
               <p className="label-seccion">Estado del intercambio</p>
-              <div className="d-flex justify-content-between align-items-center mt-2">
+              <div className={`d-flex justify-content-between align-items-center mt-2 ${styles.statusRow}`}>
                 <span
                   className="badge fs-6 fw-semibold px-3 py-2 rounded-3"
                   style={ESTADO_STYLE[propuesta.estado] ?? ESTADO_STYLE.PENDIENTE}
@@ -146,7 +147,7 @@ const VerIntercambio = () => {
                 </span>
 
                 {estaPendiente && (
-                  <div className="d-flex gap-2">
+                  <div className={`d-flex gap-2 ${styles.statusButtons}`}>
                     <Button label="Rechazar" onClick={ejecutarRechazar} variante="peligroBorde" />
                     <Button label="Aceptar" onClick={handleClickAceptar} variante="exitoBorde" />
                   </div>
