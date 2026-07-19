@@ -166,25 +166,6 @@ const VerSubasta = () => {
           ]}
         />
 
-        {esAutor && subastaAbierta && (
-          <div className="d-flex gap-2 mb-3">
-            <Button
-              label="Cancelar subasta"
-              variante="peligroBorde"
-              className="flex-fill"
-              onClick={() => setModal('cancelar')}
-            />
-            {haySeleccionada && (
-              <Button
-                label="Cerrar subasta"
-                variante="exito"
-                className="flex-fill"
-                onClick={() => setModal('cerrar')}
-              />
-            )}
-          </div>
-        )}
-
         {cargando ? (
           <Spinner />
         ) : error ? (
@@ -377,6 +358,25 @@ const VerSubasta = () => {
                 </SectionCard.Section>
               )}
             </SectionCard>
+
+            {esAutor && subastaAbierta && (
+              <div className="d-flex gap-2">
+                <Button
+                  label="Cancelar subasta"
+                  variante="peligroBorde"
+                  className="flex-fill"
+                  onClick={() => setModal('cancelar')}
+                />
+                {haySeleccionada && (
+                  <Button
+                    label="Cerrar subasta"
+                    variante="exito"
+                    className="flex-fill"
+                    onClick={() => setModal('cerrar')}
+                  />
+                )}
+              </div>
+            )}
           </>
         )}
 
