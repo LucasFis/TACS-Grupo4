@@ -5,7 +5,7 @@ import styles from './oferta.module.css'
 
 const Oferta = ({ oferta, onAdjudicar, onRechazar }) => (
   <div
-    className={`d-flex align-items-center gap-2 rounded-3 px-2 py-2 ${oferta.seleccionada ? styles.ofertaSeleccionada : styles.ofertaDefault}`}
+    className={`d-flex align-items-center gap-2 rounded-3 px-2 py-2 ${styles.ofertaRow} ${oferta.seleccionada ? styles.ofertaSeleccionada : styles.ofertaDefault}`}
   >
     <div className={`${styles.avatar} d-flex align-items-center justify-content-center rounded-circle flex-shrink-0`}>
       {oferta.autor?.iniciales}
@@ -24,18 +24,17 @@ const Oferta = ({ oferta, onAdjudicar, onRechazar }) => (
       </div>
     </div>
 
-    {oferta.seleccionada && <Etiqueta label="Seleccionada" variante="exito" />}
-    {!oferta.seleccionada && (
-      <button className={`${styles.btnAdjudicar} btn btn-outline-secondary btn-sm`} onClick={onAdjudicar}>
-        Seleccionar
+    <div className={styles.ofertaActions}>
+      {oferta.seleccionada && <Etiqueta label="Seleccionada" variante="exito" />}
+      {!oferta.seleccionada && (
+        <button className={`${styles.btnAdjudicar} btn btn-outline-secondary btn-sm`} onClick={onAdjudicar}>
+          Seleccionar
+        </button>
+      )}
+      <button className="btn btn-outline-secondary btn-sm px-2" onClick={onRechazar}>
+        ✕
       </button>
-    )}
-
-    {
-    <button className="btn btn-outline-secondary btn-sm px-2" onClick={onRechazar}>
-      ✕
-    </button>
-     }
+    </div>
 
   </div>
 )
