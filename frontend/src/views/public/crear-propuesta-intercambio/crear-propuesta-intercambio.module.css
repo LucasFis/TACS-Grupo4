@@ -41,3 +41,15 @@
   border-radius: 20px;
   letter-spacing: 0.04em;
 }
+
+@media (max-width: 576px) {
+  .hero {
+    flex-direction: column;
+    align-items: center !important;
+    text-align: center;
+  }
+  .heroImagen {
+    width: min(70vw, 200px);
+    height: min(70vw, 200px);
+  }
+}
