@@ -18,6 +18,7 @@ import ModalInformativo from '@/components/ui/modales/modal-informativo/modal-in
 import { useError } from '@/contexts/errorContext.jsx'
 import { useToast } from '@/contexts/toastContext.jsx'
 import { construirAdvertenciaConflictos } from '@/utils/conflictos.js'
+import styles from './intercambio-card.module.css'
 
 
 const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => {
@@ -182,7 +183,7 @@ const IntercambioCard = ({ intercambio, tipo = 'RECIBIDAS', onActualizado }) => 
         </SectionCard.Section>
 
         <SectionCard.Section>
-          <div className="d-flex gap-2 mt-3">
+          <div className={`d-flex gap-2 mt-3 ${styles.actionsRow}`}>
             <Button
               className="flex-fill"
               label="Ver detalle"
