@@ -54,6 +54,17 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-custom">
       <div className="container navbar-container">
+        <button
+          className="navbar-toggler navbar-toggler-custom"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+          aria-controls="navbarContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon" />
+        </button>
         <Link className="navbar-brand navbar-logo" to="/">
           <img
             src="/figunet_favicon.svg"
