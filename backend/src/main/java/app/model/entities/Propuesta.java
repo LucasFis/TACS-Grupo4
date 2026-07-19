@@ -128,22 +128,22 @@ public class Propuesta {
             .collect(Collectors.toMap(Figurita::getId, f -> this.autor.getColeccion().getMetodosDe(f)));
 
         // Destinatario entrega figuritaBuscada y recibe figuritasOfrecidas
-        this.getFiguritasOfrecidas()
-            .forEach(f -> this.destinatario.getColeccion().eliminarFaltante(f));
         this.destinatario.getColeccion()
             .descontarRepetida(this.getFiguritaBuscada());
-        this.getFiguritasOfrecidas()
-            .forEach(f -> this.destinatario.getColeccion().agregarRepetida(
-                new FiguritaIntercambiable(f, 1, metodosOfrecidas.get(f.getId()), this.destinatario.getId())
-            ));
+        this.getFiguritasOfrecidas().forEach(f -> {
+            boolean eraFaltante = this.destinatario.getColeccion().tieneFaltante(f);
+            this.destinatario.getColeccion().eliminarFaltante(f);
+            if (!eraFaltante) {
+                this.destinatario.getColeccion().agregarRepetida(
+                    new FiguritaIntercambiable(f, 1, metodosOfrecidas.get(f.getId()), this.destinatario.getId())
+                );
+            }
+        });
 
         // Autor entrega figuritasOfrecidas y recibe figuritaBuscada
         this.getFiguritasOfrecidas()
             .forEach(f -> this.autor.getColeccion().descontarRepetida(f));
         this.autor.getColeccion().eliminarFaltante(this.getFiguritaBuscada());
-        this.autor.getColeccion().agregarRepetida(
-            new FiguritaIntercambiable(this.getFiguritaBuscada(), 1, metodosBuscada, this.autor.getId())
-        );
     }
 
     private void ejecutarRechazo() {
